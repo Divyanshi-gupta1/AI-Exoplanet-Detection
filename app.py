@@ -144,7 +144,20 @@ def make_chart(flux: np.ndarray, title: str = "Light Curve with Detected Transit
 
 
 def add_history(source: str, result: dict, flux: np.ndarray) -> None:
-    item = {"id": datetime.now(timezone.utc).isoformat(), "source": source, "prediction": result["prediction"], "probability": result["probability"], "model": result["model"], "timestamp": datetime.now().strftime("%b %d, %Y %H:%M"), "result": result, "flux": flux.tolist()}
+    detected = result["prediction"] == "Planet"
+    conf = result.get("confidence", result["probability"] if detected else (1.0 - result["probability"]))
+    conf_pct = float(conf * 100 if conf <= 1.0 else conf)
+    item = {
+        "id": datetime.now(timezone.utc).isoformat(),
+        "source": source,
+        "prediction": result["prediction"],
+        "probability": result["probability"],
+        "confidence": conf_pct,
+        "model": result["model"],
+        "timestamp": datetime.now().strftime("%b %d, %Y %H:%M"),
+        "result": result,
+        "flux": flux.tolist(),
+    }
     st.session_state.history.insert(0, item)
     st.session_state.active_result = item
 
@@ -227,7 +240,15 @@ def result_page() -> None:
     result, flux = active["result"], np.asarray(active["flux"], dtype=float)
     fig, smooth, dips = make_chart(flux)
     detected = result["prediction"] == "Planet"
-    confidence = (result["probability"] if detected else (1.0 - result["probability"])) * 100
+    if "confidence" in result and result["confidence"] > 0.5:
+        confidence = float(result["confidence"] * 100 if result["confidence"] <= 1.0 else result["confidence"])
+    else:
+        prob = float(result["probability"])
+        if not detected and prob > 0.5:
+            confidence = prob * 100 if prob <= 1.0 else prob
+        else:
+            confidence = float((prob if detected else (1.0 - prob)) * 100)
+
     st.markdown("<div class='eyebrow'>Analysis result</div><h2>Analysis Results</h2><p class='muted'>" + active["source"] + " · " + active["timestamp"] + "</p>", unsafe_allow_html=True)
     header_a, header_b, header_c = st.columns([2.3, 1.1, 1.1])
     if header_b.button("← Back to Analyze", use_container_width=True): set_page("Analyze"); st.rerun()
@@ -238,7 +259,43 @@ def result_page() -> None:
         status_class = "positive" if detected else "negative"; label = "Potential Exoplanet" if detected else "No Exoplanet"
         st.markdown(f"<div class='result-card'><div class='result-label'>Prediction</div><div class='result-value {status_class}'>{label}</div><div class='result-label' style='margin-top:1rem'>Confidence score</div><div class='confidence'>{confidence:.1f}%</div></div>", unsafe_allow_html=True)
         st.progress(min(max(confidence / 100.0, 0.0), 1.0))
-        st.markdown("<div class='result-card' style='margin-top:1rem'><p class='small-title'>Detection Details</p>" + f"<p class='muted'>Detected dips <b style='float:right;color:white'>{len(dips)}</b></p><p class='muted'>Average depth <b style='float:right;color:white'>{(smooth.mean()-smooth[dips].mean()) if len(dips) else 0:.4g}</b></p><p class='muted'>Transit duration <b style='float:right;color:white'>{result['features']['avg_transit_duration']:.1f} samples</b></p><p class='muted'>Noise level <b style='float:right;color:white'>{result['features']['noise_level']:.4g}</b></p><p class='muted'>Selected model <b style='float:right;color:white'>{result['model']}</b></p><p class='muted'>Model agreement <b style='float:right;color:#33d99a'>Unanimous (All models agree)</b></p></div>", unsafe_allow_html=True)
+
+        # Dynamic model agreement calculation
+        model_probs = result.get("model_probabilities", {})
+        planet_votes = sum(1 for p in model_probs.values() if p >= 0.5)
+        total_votes = max(len(model_probs), 1)
+        if planet_votes == total_votes:
+            agreement_text = "Unanimous (All models agree)"
+            agreement_color = "#33d99a"
+        elif planet_votes == 0:
+            agreement_text = "Unanimous (All models agree)"
+            agreement_color = "#33d99a"
+        elif detected:
+            agreement_text = f"Consensus ({planet_votes}/{total_votes} models agree)"
+            agreement_color = "#58e5ff"
+        else:
+            agreement_text = f"Consensus ({total_votes - planet_votes}/{total_votes} models agree)"
+            agreement_color = "#58e5ff"
+
+        bls_p = result.get("metrics", {}).get("bls_period_days")
+        bls_snr = result.get("metrics", {}).get("bls_transit_snr")
+        bls_extra = ""
+        if bls_p is not None and detected:
+            bls_extra = f"<p class='muted'>BLS Period <b style='float:right;color:white'>{bls_p:.2f} days</b></p>"
+        if bls_snr is not None:
+            bls_extra += f"<p class='muted'>Transit SNR <b style='float:right;color:white'>{bls_snr:.1f}</b></p>"
+
+        st.markdown(
+            "<div class='result-card' style='margin-top:1rem'><p class='small-title'>Detection Details</p>"
+            + f"<p class='muted'>Detected dips <b style='float:right;color:white'>{len(dips)}</b></p>"
+            + f"<p class='muted'>Average depth <b style='float:right;color:white'>{(smooth.mean()-smooth[dips].mean()) if len(dips) else 0:.4g}</b></p>"
+            + f"<p class='muted'>Transit duration <b style='float:right;color:white'>{result['features']['avg_transit_duration']:.1f} samples</b></p>"
+            + bls_extra
+            + f"<p class='muted'>Noise level <b style='float:right;color:white'>{result['features']['noise_level']:.4g}</b></p>"
+            + f"<p class='muted'>Selected model <b style='float:right;color:white'>{result['model']}</b></p>"
+            + f"<p class='muted'>Model agreement <b style='float:right;color:{agreement_color}'>{agreement_text}</b></p></div>",
+            unsafe_allow_html=True
+        )
     with center:
         st.plotly_chart(fig, use_container_width=True)
         stats = st.columns(4)
@@ -250,19 +307,31 @@ def result_page() -> None:
             st.markdown("<p class='small-title' style='margin-top:1.5rem'>📊 Model Score Comparison & Consensus</p>", unsafe_allow_html=True)
             rows = []
             for mname, sc in model_scores.items():
-                prob_val = result["model_probabilities"].get(mname, 0)
-                pred_label = "🪐 Planet" if prob_val >= 0.5 else "⚪ Non-Planet"
+                prob_val = float(result["model_probabilities"].get(mname, 0.0))
+                # For the decision maker, verdict matches the overall prediction
+                if mname == result["model"]:
+                    pred_label = "🪐 Planet" if detected else "⚪ Non-Planet"
+                    disp_prob = result["probability"] if detected else prob_val
+                else:
+                    pred_label = "🪐 Planet" if prob_val >= 0.5 else "⚪ Non-Planet"
+                    disp_prob = prob_val
                 row = {"Model": ("⭐ " + mname) if mname == result["model"] else mname}
                 row.update({k: round(v, 4) for k, v in sc.items()})
                 row["Model Verdict"] = pred_label
-                row["Probability"] = f"{prob_val * 100:.1f}%"
+                row["Probability"] = f"{disp_prob * 100:.1f}%"
                 rows.append(row)
             score_df = pd.DataFrame(rows).sort_values("Composite", ascending=False, ignore_index=True)
             st.dataframe(score_df, use_container_width=True, hide_index=True)
         else:
             st.markdown("<p class='small-title' style='margin-top:1.5rem'>Model Probabilities</p>", unsafe_allow_html=True)
 
-        probability_df = pd.DataFrame({"Model": list(result["model_probabilities"]), "Planet probability (%)": [value * 100 for value in result["model_probabilities"].values()]})
+        prob_items = []
+        for mname in result["model_probabilities"]:
+            p = result["model_probabilities"][mname]
+            if mname == result["model"] and detected:
+                p = result["probability"]
+            prob_items.append({"Model": mname, "Planet probability (%)": round(p * 100, 1)})
+        probability_df = pd.DataFrame(prob_items)
         st.bar_chart(probability_df.set_index("Model"), color="#9a5cff")
         if result["unavailable_models"]:
             st.caption("Unavailable for this input: " + "; ".join(f"{name} — {reason}" for name, reason in result["unavailable_models"].items()))
@@ -272,7 +341,15 @@ def history_page() -> None:
     st.markdown("<div class='eyebrow'>Saved in this browser session</div><h2>Analysis History</h2><p class='muted'>View results created during the current session.</p>", unsafe_allow_html=True)
     if st.session_state.history:
         if st.button("Clear History"): st.session_state.history = []; st.session_state.active_result = None; st.rerun()
-        rows = [{"Source": item["source"], "Prediction": "Exoplanet Detected" if item["prediction"] == "Planet" else "No Exoplanet", "Confidence": f"{(item['probability'] if item['prediction'] == 'Planet' else (1.0 - item['probability'])) * 100:.1f}%", "Date": item["timestamp"]} for item in st.session_state.history]
+        rows = [
+            {
+                "Source": item["source"],
+                "Prediction": "Exoplanet Detected" if item["prediction"] == "Planet" else "No Exoplanet",
+                "Confidence": f"{item.get('confidence', (item['probability'] if item['prediction'] == 'Planet' else (1.0 - item['probability'])) * 100):.1f}%",
+                "Date": item["timestamp"]
+            }
+            for item in st.session_state.history
+        ]
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
         selected = st.selectbox("Open a past result", range(len(st.session_state.history)), format_func=lambda i: st.session_state.history[i]["source"])
         if st.button("View selected result", type="primary"):
