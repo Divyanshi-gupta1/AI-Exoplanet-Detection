@@ -114,7 +114,7 @@ Probability that the observed transit signal corresponds to a genuine exoplanet 
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/AI-Exoplanet-Detection.git
+git clone https://github.com/Divyanshi-gupta1/AI-Exoplanet-Detection.git
 
 cd AI-Exoplanet-Detection
 ```
