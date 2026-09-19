@@ -1,4 +1,6 @@
-streamlit
+fastapi
+uvicorn
+python-multipart
 numpy
 pandas
 scipy
@@ -9,3 +11,4 @@ plotly
 astropy
 matplotlib
 seaborn
+streamlit

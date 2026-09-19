@@ -40,7 +40,7 @@ def set_page(page: str) -> None:
 def inject_styles() -> None:
     st.markdown(
         """<style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
         :root {
             --bg-space: #020308;
@@ -137,7 +137,7 @@ def inject_styles() -> None:
         .block-container { max-width: 1440px; padding-top: 0.9rem; padding-bottom: 2.8rem; }
 
         /* Typography (+1, +2 size bump) */
-        h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; letter-spacing: -0.025em; color: #fff; }
+        h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.025em; color: #fff; }
         h1 { font-size: 3.15rem !important; line-height: 1.08; font-weight: 800; }
         h2 { font-size: 1.85rem !important; font-weight: 700; margin-bottom: 0.4rem; }
         h3 { font-size: 1.32rem !important; font-weight: 600; }
@@ -196,7 +196,7 @@ def inject_styles() -> None:
             filter: drop-shadow(0 0 10px rgba(129, 140, 248, 0.7));
         }
         .brand-name {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-weight: 800;
             font-size: 1.45rem;
             color: #ffffff;
@@ -327,7 +327,7 @@ def inject_styles() -> None:
             gap: 8px;
             padding: 0.45rem 1rem;
             border-radius: 20px;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-weight: 700;
             font-size: 1.12rem;
             background: rgba(52, 211, 153, 0.15);
@@ -341,7 +341,7 @@ def inject_styles() -> None:
             gap: 8px;
             padding: 0.45rem 1rem;
             border-radius: 20px;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-weight: 700;
             font-size: 1.12rem;
             background: rgba(148, 163, 184, 0.12);
@@ -370,7 +370,7 @@ def inject_styles() -> None:
             margin-bottom: 3px;
         }
         .metric-cell-value {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-weight: 700;
             font-size: 1.25rem;
             color: #fff;
@@ -1028,53 +1028,39 @@ def home_page() -> None:
 
     if (planet.type === 'earth') {
       // -------------------------------------------------------------
-      // 1. AUTHENTIC 3D EARTH
+      // 1. CRYSTAL-CLEAR AZURE / OCEAN WORLD (WITH SUBTLE SHINE LIKE PLANET 3)
       // -------------------------------------------------------------
       ctx.save();
       ctx.beginPath();
       ctx.arc(0, 0, r, 0, Math.PI * 2);
       ctx.clip(); // Mask to sphere
 
-      // Ocean base with soft directional sunlight (matte, not shiny)
-      const oceanGrad = ctx.createRadialGradient(lightDx, lightDy, r * 0.35, 0, 0, r);
-      oceanGrad.addColorStop(0, '#2563eb');    // Muted sunlit blue (not bright/white)
-      oceanGrad.addColorStop(0.40, '#1d4ed8'); // Deep blue sea
-      oceanGrad.addColorStop(0.75, '#1e3a8a'); // Twilight ocean
-      oceanGrad.addColorStop(1.0, '#020617');  // Night side shadow
-      ctx.fillStyle = oceanGrad;
+      // Base atmospheric gradient with gentle sunlit sheen
+      const azureGrad = ctx.createRadialGradient(lightDx, lightDy, r * 0.20, 0, 0, r);
+      azureGrad.addColorStop(0, '#93c5fd');    // Soft bright sky-blue highlight (subtle shine)
+      azureGrad.addColorStop(0.30, '#38bdf8'); // Clear radiant azure
+      azureGrad.addColorStop(0.65, '#1d4ed8'); // Deep sapphire body
+      azureGrad.addColorStop(1.0, '#020617');  // Night side shadow
+      ctx.fillStyle = azureGrad;
       ctx.fill();
 
-      // Continents (Green landmasses)
-      const rot = planet.rotation;
-      ctx.fillStyle = 'rgba(34, 197, 94, 0.85)';
+      // Clear horizontal atmospheric / ocean current belts (clean banded structure like planet 3)
+      ctx.fillStyle = 'rgba(14, 116, 144, 0.36)'; // Deep cyan-teal zone
+      ctx.fillRect(-r, -r * 0.38, r * 2, r * 0.16);
+      ctx.fillRect(-r, r * 0.08, r * 2, r * 0.20);
+      ctx.fillRect(-r, r * 0.48, r * 2, r * 0.12);
+
+      ctx.fillStyle = 'rgba(224, 242, 254, 0.26)'; // Bright white/cyan cloud sheen belt
+      ctx.fillRect(-r, -r * 0.18, r * 2, r * 0.14);
+      ctx.fillRect(-r, r * 0.30, r * 2, r * 0.12);
+
+      // Great Azure Spot / cyclone oval
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.65)';
       ctx.beginPath();
-      ctx.ellipse(lightDx * 0.5 + Math.cos(rot) * 2 - 1, lightDy * 0.5 - 2.5, r * 0.48, r * 0.35, 0.35, 0, Math.PI * 2);
+      ctx.ellipse(lightDx * 0.35 + 2.0, lightDy * 0.35 + r * 0.14, r * 0.22, r * 0.12, 0.05, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = 'rgba(21, 128, 61, 0.80)';
-      ctx.beginPath();
-      ctx.ellipse(lightDx * 0.6 + Math.cos(rot + 1.2) * 1.5 + 1.5, lightDy * 0.6 + 3.0, r * 0.38, r * 0.46, -0.3, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.75)';
-      ctx.beginPath();
-      ctx.arc(lightDx * 0.7 + 3.5, lightDy * 0.7 - 0.5, r * 0.18, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Swirling White Cloud Belts
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
-      ctx.lineWidth = Math.max(1.0, r * 0.14);
-      ctx.beginPath();
-      ctx.arc(lightDx * 0.35, lightDy * 0.35 - 3.0, r * 0.6, 0.2, Math.PI * 0.85);
-      ctx.stroke();
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.50)';
-      ctx.lineWidth = Math.max(0.9, r * 0.12);
-      ctx.beginPath();
-      ctx.arc(lightDx * 0.45, lightDy * 0.45 + 2.5, r * 0.68, 0.4, Math.PI * 0.95);
-      ctx.stroke();
-
-      // Night-side shadow mask (terminator)
+      // Night-side volumetric shadow mask (clean 3D globe effect)
       const shadowGrad = ctx.createRadialGradient(-lightDx * 0.75, -lightDy * 0.75, r * 0.15, 0, 0, r);
       shadowGrad.addColorStop(0, 'rgba(2, 6, 23, 0.98)');
       shadowGrad.addColorStop(0.55, 'rgba(2, 6, 23, 0.75)');
@@ -1084,11 +1070,11 @@ def home_page() -> None:
 
       ctx.restore();
 
-      // Atmospheric Rayleigh scattering cyan halo
+      // Delicate illuminated outer limb edge (clean and clear like planet 3)
       ctx.beginPath();
-      ctx.arc(0, 0, r + 0.6, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.55)';
-      ctx.lineWidth = 1.1;
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(147, 197, 253, 0.38)';
+      ctx.lineWidth = 0.9;
       ctx.stroke();
 
     } else if (planet.type === 'rocky') {
