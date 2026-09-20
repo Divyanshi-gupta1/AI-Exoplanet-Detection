@@ -12,10 +12,8 @@ dependencies = [
     "scikit-learn",
     "xgboost",
     "joblib",
-    "plotly",
+    "h5py",
     "astropy",
-    "matplotlib",
-    "seaborn",
 ]
 
 [tool.vercel]
