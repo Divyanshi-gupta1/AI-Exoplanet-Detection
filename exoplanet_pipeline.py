@@ -4,13 +4,11 @@ from pathlib import Path
 
 import joblib
 import numpy as np
-import csv
-from scipy_compat import (  # pure-NumPy; no scipy install needed
-    fft,
-    uniform_filter1d, median_filter,
-    find_peaks, peak_prominences, peak_widths,
-    entropy, kurtosis, skew,
-)
+import pandas as pd
+from scipy.fft import fft
+from scipy.ndimage import uniform_filter1d, median_filter
+from scipy.signal import find_peaks, peak_prominences, peak_widths
+from scipy.stats import entropy, kurtosis, skew
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
@@ -131,31 +129,19 @@ def _train_missing_models():
     if not missing:
         return
 
+    # Build training features from exoTrain.csv
     train_csv = DATA_DIR / "exoTrain.csv"
     if not train_csv.exists():
         return  # cannot train without data
-
-    labels_list, raw_list = [], []
-    with open(train_csv, mode="r", encoding="utf-8-sig") as f:
-        reader = csv.reader(f)
-        next(reader, None)
-        for row in reader:
-            if row:
-                labels_list.append(1 if row[0].strip() == "2" else 0)
-                raw_list.append([float(x) for x in row[1:]])
-    labels = np.array(labels_list, dtype=int)
-    raw = np.array(raw_list, dtype=float)
+    train = pd.read_csv(train_csv)
+    labels = train["LABEL"].replace({1: 0, 2: 1}).to_numpy()
+    raw = train.iloc[:, 1:].to_numpy(float)
+    feat_df = pd.DataFrame([extract_features(row) for row in raw])
 
     ref_rf = joblib.load(DATA_DIR / "best_rf.pkl")
-    feat_names = list(getattr(ref_rf, "feature_names_in_", []))
-    all_feats = [extract_features(row) for row in raw]
-    if feat_names:
-        feat_matrix = np.array([[f_dict.get(c, 0.0) for c in feat_names] for f_dict in all_feats], dtype=float)
-    else:
-        feat_matrix = np.array([list(f_dict.values()) for f_dict in all_feats], dtype=float)
-
+    feat_df = feat_df.reindex(columns=ref_rf.feature_names_in_, fill_value=0)
     scaler = joblib.load(DATA_DIR / "scaler.pkl")
-    scaled = scaler.transform(feat_matrix)
+    scaled = scaler.transform(feat_df)
 
     from sklearn.linear_model import LogisticRegression
     from sklearn.ensemble import RandomForestClassifier
@@ -201,45 +187,17 @@ SCORE_COLS = ["Accuracy", "Precision", "Recall", "F1 Score", "ROC-AUC"]
 
 @lru_cache(maxsize=1)
 def load_model_scores():
-    """Load per-model evaluation scores from model_comparison.csv or model_selection.json."""
-    import json
-    json_path = DATA_DIR / "model_selection.json"
-    scores = {}
-    if json_path.exists():
-        try:
-            with open(json_path, mode="r", encoding="utf-8") as f:
-                data = json.load(f)
-                for item in data.get("ranking", []):
-                    name = item.get("Model")
-                    if name:
-                        individual = {col: float(item[col]) for col in SCORE_COLS if col in item}
-                        individual["Composite"] = sum(individual.values()) / max(len(individual), 1)
-                        scores[name] = individual
-        except Exception:
-            pass
-
+    """Load per-model evaluation scores from model_comparison.csv."""
     csv_path = DATA_DIR / "model_comparison.csv"
-    if not scores and csv_path.exists():
-        try:
-            with open(csv_path, mode="r", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    name = row.get("Model")
-                    if name:
-                        individual = {}
-                        for col in SCORE_COLS:
-                            val = row.get(col)
-                            if val is not None and val != "":
-                                try:
-                                    individual[col] = float(val)
-                                except ValueError:
-                                    pass
-                        if individual:
-                            individual["Composite"] = sum(individual.values()) / max(len(individual), 1)
-                            scores[name] = individual
-        except Exception:
-            pass
-
+    if not csv_path.exists():
+        return {}
+    df = pd.read_csv(csv_path, usecols=lambda c: c in ["Model"] + SCORE_COLS)
+    scores = {}
+    for _, row in df.iterrows():
+        name = row["Model"]
+        individual = {col: float(row[col]) for col in SCORE_COLS if col in row.index and pd.notna(row[col])}
+        individual["Composite"] = sum(individual.values()) / max(len(individual), 1)
+        scores[name] = individual
     if "1D CNN" not in scores:
         scores["1D CNN"] = {
             "Accuracy": 0.9931,
@@ -424,29 +382,15 @@ def _load_test_exoplanets():
     known = []
     test_csv = DATA_DIR / "exoTest.csv"
     if test_csv.exists():
-        try:
-            with open(test_csv, mode="r", encoding="utf-8-sig") as f:
-                reader = csv.reader(f)
-                next(reader, None)
-                for idx, row in enumerate(reader):
-                    if idx >= 5:
-                        break
-                    known.append(np.array([float(x) for x in row[1:]], dtype=float))
-        except Exception:
-            pass
+        df_test = pd.read_csv(test_csv, nrows=5)
+        for i in range(len(df_test)):
+            known.append(df_test.iloc[i, 1:].to_numpy(float))
     train_csv = DATA_DIR / "exoTrain.csv"
     if train_csv.exists():
-        try:
-            with open(train_csv, mode="r", encoding="utf-8-sig") as f:
-                reader = csv.reader(f)
-                next(reader, None)
-                for idx, row in enumerate(reader):
-                    if idx >= 40:
-                        break
-                    if len(row) > 1 and row[0].strip() == "2":
-                        known.append(np.array([float(x) for x in row[1:]], dtype=float))
-        except Exception:
-            pass
+        df_train = pd.read_csv(train_csv, nrows=40)
+        planets = df_train[df_train["LABEL"] == 2]
+        for _, row in planets.iterrows():
+            known.append(row.iloc[1:].to_numpy(float))
     return known
 
 

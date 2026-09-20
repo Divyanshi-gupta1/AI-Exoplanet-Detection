@@ -11,15 +11,13 @@ from functools import lru_cache
 from pathlib import Path
 import joblib
 import numpy as np
-import csv
-from scipy_compat import (  # pure-NumPy; no scipy install needed
-    fft, interp1d,
-    uniform_filter1d, median_filter,
-    find_peaks, peak_prominences, peak_widths,
-    entropy, kurtosis, skew,
-)
-# astropy.timeseries.BoxLeastSquares replaced with pure-NumPy implementation
-# to avoid the ~100 MB astropy install on Vercel.
+import pandas as pd
+from scipy.fft import fft
+from scipy.interpolate import interp1d
+from scipy.ndimage import uniform_filter1d, median_filter
+from scipy.signal import find_peaks, peak_prominences, peak_widths
+from scipy.stats import entropy, kurtosis, skew
+from astropy.timeseries import BoxLeastSquares
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
@@ -304,29 +302,15 @@ def load_confirmed_catalog() -> list[np.ndarray]:
     catalog = []
     test_file = DATA_DIR / "exoTest.csv"
     if test_file.exists():
-        try:
-            with open(test_file, mode="r", encoding="utf-8-sig") as f:
-                reader = csv.reader(f)
-                next(reader, None)
-                for idx, row in enumerate(reader):
-                    if idx >= 5:
-                        break
-                    catalog.append(np.array([float(x) for x in row[1:]], dtype=float))
-        except Exception:
-            pass
+        df_test = pd.read_csv(test_file, nrows=5)
+        for i in range(len(df_test)):
+            catalog.append(df_test.iloc[i, 1:].to_numpy(dtype=float))
     train_file = DATA_DIR / "exoTrain.csv"
     if train_file.exists():
-        try:
-            with open(train_file, mode="r", encoding="utf-8-sig") as f:
-                reader = csv.reader(f)
-                next(reader, None)
-                for idx, row in enumerate(reader):
-                    if idx >= 40:
-                        break
-                    if len(row) > 1 and row[0].strip() == "2":
-                        catalog.append(np.array([float(x) for x in row[1:]], dtype=float))
-        except Exception:
-            pass
+        df_train = pd.read_csv(train_file, nrows=40)
+        planets = df_train[df_train["LABEL"] == 2]
+        for _, row in planets.iterrows():
+            catalog.append(row.iloc[1:].to_numpy(dtype=float))
     return catalog
 
 
@@ -370,45 +354,16 @@ def load_all_models_dict():
 
 @lru_cache(maxsize=1)
 def load_evaluation_metrics():
-    """Load model benchmark metrics from model_selection.json or model_comparison.csv."""
-    import json
-    json_path = DATA_DIR / "model_selection.json"
-    scores = {}
-    if json_path.exists():
-        try:
-            with open(json_path, mode="r", encoding="utf-8") as f:
-                data = json.load(f)
-                for item in data.get("ranking", []):
-                    name = item.get("Model")
-                    if name:
-                        sub = {col: float(item[col]) for col in SCORE_COLS if col in item}
-                        sub["Composite"] = sum(sub.values()) / max(len(sub), 1)
-                        scores[name] = sub
-        except Exception:
-            pass
-
+    """Load model benchmark metrics from model_comparison.csv + 1D CNN metrics."""
     csv_path = DATA_DIR / "model_comparison.csv"
-    if not scores and csv_path.exists():
-        try:
-            with open(csv_path, mode="r", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    name = row.get("Model")
-                    if name:
-                        item = {}
-                        for col in SCORE_COLS:
-                            val = row.get(col)
-                            if val is not None and val != "":
-                                try:
-                                    item[col] = float(val)
-                                except ValueError:
-                                    pass
-                        if item:
-                            item["Composite"] = sum(item.values()) / max(len(item), 1)
-                            scores[name] = item
-        except Exception:
-            pass
-
+    scores = {}
+    if csv_path.exists():
+        df = pd.read_csv(csv_path, usecols=lambda c: c in ["Model"] + SCORE_COLS)
+        for _, row in df.iterrows():
+            name = row["Model"]
+            item = {col: float(row[col]) for col in SCORE_COLS if col in row.index and pd.notna(row[col])}
+            item["Composite"] = sum(item.values()) / max(len(item), 1)
+            scores[name] = item
     if "1D CNN" not in scores:
         scores["1D CNN"] = {
             "Accuracy": 0.9931, "Precision": 0.5185, "Recall": 0.7568,
@@ -493,50 +448,6 @@ def cnn_infer(flux_3197: np.ndarray) -> tuple[float, str | None]:
 # 5. Box Least Squares (BLS) Periodogram Engine
 # =====================================================================
 
-def _numpy_bls(t: np.ndarray, y: np.ndarray,
-               periods: np.ndarray, durations: np.ndarray) -> tuple:
-    """Vectorised Box Least Squares periodogram (pure NumPy).
-
-    Returns (best_period, best_duration, best_t0, best_depth, best_power).
-    Replaces astropy.timeseries.BoxLeastSquares to eliminate the ~100 MB
-    astropy dependency from the Vercel serverless bundle.
-    """
-    best_power = -np.inf
-    best_P = periods[0]
-    best_dur = durations[0]
-    best_t0 = float(t[0])
-    best_depth = 0.0
-
-    y_centered = y - float(np.mean(y))
-
-    for P in periods:
-        for dur in durations:
-            phase = t % P
-            n_t0 = max(10, int(P / dur * 2))
-            for k in range(n_t0):
-                t0 = (k / n_t0) * P
-                in_box = (phase >= t0) & (phase < t0 + dur)
-                if t0 + dur > P:
-                    in_box |= phase < (t0 + dur - P)
-                n_in = int(np.sum(in_box))
-                n_out = len(y) - n_in
-                if n_in < 2 or n_out < 2:
-                    continue
-                s_in = float(np.sum(y_centered[in_box]))
-                s_out = float(np.sum(y_centered[~in_box]))
-                power = (s_in ** 2 / n_in) + (s_out ** 2 / n_out)
-                if power > best_power:
-                    best_power = power
-                    best_P = float(P)
-                    best_dur = float(dur)
-                    best_t0 = float(t0)
-                    d_in = float(np.mean(y[in_box]))
-                    d_out = float(np.mean(y[~in_box]))
-                    best_depth = max(0.0, d_out - d_in)
-
-    return best_P, best_dur, best_t0, best_depth, float(best_power)
-
-
 def compute_bls_metrics(flux: np.ndarray) -> dict:
     """Detect and quantify periodic transit signals using Box Least Squares (BLS).
 
@@ -560,9 +471,16 @@ def compute_bls_metrics(flux: np.ndarray) -> dict:
     diff = np.diff(det)
     noise_sigma = float(1.4826 * np.median(np.abs(diff - np.median(diff))) / np.sqrt(2)) + 1e-10
 
+    bls = BoxLeastSquares(t, det)
     periods = np.linspace(0.8, 15.0, 500)
     durations = np.linspace(0.04, 0.25, 8)
-    P, dur, t0, depth, bls_power = _numpy_bls(t, det, periods, durations)
+    power = bls.power(periods, durations)
+
+    b = int(np.argmax(power.power))
+    P = float(power.period[b])
+    dur = float(power.duration[b])
+    t0 = float(power.transit_time[b])
+    depth = float(power.depth[b])
 
     phase = ((t - t0 + 0.5 * P) % P) - 0.5 * P
     in_tr = np.abs(phase) < 0.5 * dur
@@ -589,7 +507,7 @@ def compute_bls_metrics(flux: np.ndarray) -> dict:
         "transit_snr": round(snr, 1),
         "num_observed_transits": int(observed_transits),
         "duty_cycle": round(duty_cycle, 4),
-        "bls_power": round(bls_power, 5),
+        "bls_power": round(float(power.power[b]), 5),
     }
 
 
@@ -643,17 +561,13 @@ def detect_exoplanet(raw_flux: np.ndarray) -> dict:
     # ── 5. Feature extraction & classical model inference ──
     features = extract_features(flux_for_ml)
     best_rf, _, scaler = load_classical_models()
-    feat_names = list(getattr(best_rf, "feature_names_in_", []))
-    if feat_names:
-        feature_vector = np.array([[features.get(col, 0.0) for col in feat_names]], dtype=float)
-    else:
-        feature_vector = np.array([list(features.values())], dtype=float)
-    scaled_vector = scaler.transform(feature_vector)
+    frame = pd.DataFrame([features]).reindex(columns=best_rf.feature_names_in_, fill_value=0)
+    scaled_frame = scaler.transform(frame)
 
     raw_probs: dict[str, float] = {}
     unavailable: dict[str, str] = {}
     for model_name, details in load_all_models_dict().items():
-        inp = scaled_vector if details["input_type"] == "scaled" else feature_vector
+        inp = scaled_frame if details["input_type"] == "scaled" else frame
         raw_probs[model_name] = float(details["model"].predict_proba(inp)[0, 1])
 
     # ── 6. 1D CNN inference ──

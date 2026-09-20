@@ -12,7 +12,6 @@ synthetic_data/
 # Legacy files (kept locally, not in repo)
 app.py
 error_analysis.py
-requirements.txt
 *.ipynb
 .devcontainer/
 

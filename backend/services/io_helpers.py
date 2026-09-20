@@ -1,133 +1,81 @@
-"""Input/Output and Data Loading Helpers for ExoDip (Pure-NumPy & Standard Library)."""
+"""Input/Output and Data Loading Helpers for ExoDip."""
 from __future__ import annotations
 
-import csv
 import io
 from pathlib import Path
 from typing import Tuple
 
 import numpy as np
+import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = ROOT / "data"
 
 
 def read_light_curve(raw_bytes: bytes, filename: str = "") -> np.ndarray:
-    """Read a raw 1-D flux series from uploaded bytes without requiring pandas.
+    """Read a raw 1-D flux series from uploaded bytes.
     
     Supports 1-row, 1-col, Kepler/TESS format, multi-column formats, and NPY arrays.
+    Exactly preserves the proven logic from app.py.
     """
     name = filename.lower()
     if name.endswith(".npy"):
         array = np.asarray(np.load(io.BytesIO(raw_bytes)), dtype=float)
         return array[:, -1].ravel() if array.ndim == 2 else array.ravel()
 
-    text = raw_bytes.decode("utf-8-sig", errors="replace").strip()
-    if not text:
-        raise ValueError("Uploaded file is empty.")
+    try:
+        frame = pd.read_csv(io.StringIO(raw_bytes.decode("utf-8-sig", errors="replace")))
+    except Exception:
+        frame = pd.read_csv(io.StringIO(raw_bytes.decode("utf-8-sig", errors="replace")), sep=r"\s+")
 
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    if not lines:
-        raise ValueError("No valid lines found in file.")
+    # Case 1: 1-row or 2-row CSV containing a series of flux columns (e.g. 3197 values, FLUX.1, FLUX.2, ...)
+    if frame.shape[0] <= 2 and frame.shape[1] >= 30:
+        start_col = 1 if "label" in str(frame.columns[0]).lower() else 0
+        row_vals = pd.to_numeric(frame.iloc[0, start_col:], errors="coerce").dropna().to_numpy(dtype=float)
+        if len(row_vals) >= 30:
+            return row_vals
 
-    # Detect delimiter: comma, tab, or whitespace
-    first_line = lines[0]
-    if "," in first_line:
-        reader = csv.reader(lines, delimiter=",")
-    elif "\t" in first_line:
-        reader = csv.reader(lines, delimiter="\t")
-    else:
-        reader = [line.split() for line in lines]
+    col_map = {str(c).strip().lower(): c for c in frame.columns}
 
-    raw_rows = [row for row in reader if row]
-    if not raw_rows:
-        raise ValueError("No data found in file.")
-
-    # Check for horizontal 1-row or 2-row flux arrays (e.g. FLUX.1, FLUX.2, ...)
-    if len(raw_rows) <= 2 and len(raw_rows[0]) >= 30:
-        target_row = raw_rows[0] if len(raw_rows) == 1 else raw_rows[1]
-        start_idx = 1 if any(word in str(target_row[0]).lower() for word in ["label", "id"]) else 0
-        vals = []
-        for item in target_row[start_idx:]:
-            try:
-                vals.append(float(item))
-            except (ValueError, TypeError):
-                continue
-        if len(vals) >= 30:
-            return np.array(vals, dtype=float)
-
-    # Detect if row 0 is header
-    header = [str(c).strip().lower() for c in raw_rows[0]]
-    has_header = False
-    for col_name in header:
-        try:
-            float(col_name)
-        except ValueError:
-            has_header = True
+    # Case 2: Named flux column (prioritized)
+    flux_col = None
+    for candidate in ["flux", "pdcsap_flux", "sap_flux", "relative_flux", "norm_flux", "normalized_flux", "raw_flux"]:
+        if candidate in col_map:
+            flux_col = col_map[candidate]
             break
 
-    data_rows = raw_rows[1:] if has_header else raw_rows
-    if not data_rows:
-        raise ValueError("Provide at least 30 numeric flux values.")
-
-    # Match prioritized flux column name
-    flux_col_idx = None
-    if has_header:
-        for candidate in ["flux", "pdcsap_flux", "sap_flux", "relative_flux", "norm_flux", "normalized_flux", "raw_flux"]:
-            if candidate in header:
-                flux_col_idx = header.index(candidate)
+    # Fuzzy match: any column name containing 'flux' but NOT 'err' or 'unc'
+    if flux_col is None:
+        for low_c, orig_c in col_map.items():
+            if "flux" in low_c and "err" not in low_c and "unc" not in low_c:
+                flux_col = orig_c
                 break
-        if flux_col_idx is None:
-            for idx, h in enumerate(header):
-                if "flux" in h and "err" not in h and "unc" not in h:
-                    flux_col_idx = idx
-                    break
 
-    # If no header or named flux column, pick the last non-excluded numeric column
-    num_cols = len(data_rows[0])
-    if flux_col_idx is None:
-        if has_header:
-            valid_indices = [
-                idx for idx, h in enumerate(header)
-                if not any(bad in h for bad in ["time", "err", "qual", "cadence", "bjd", "index", "phase"])
-            ]
-            flux_col_idx = valid_indices[-1] if valid_indices else (num_cols - 1)
-        else:
-            flux_col_idx = num_cols - 1
-
-    values = []
-    for row in data_rows:
-        if flux_col_idx < len(row):
-            try:
-                val = float(row[flux_col_idx])
-                if not np.isnan(val) and not np.isinf(val):
-                    values.append(val)
-            except (ValueError, TypeError):
-                continue
+    if flux_col is not None:
+        values = pd.to_numeric(frame[flux_col], errors="coerce").dropna().to_numpy(dtype=float)
+    else:
+        # Case 3: Pick the best numeric column, avoiding time/error/quality/cadence columns
+        numeric = frame.apply(pd.to_numeric, errors="coerce").dropna(axis=1, how="all")
+        candidate_cols = [
+            c
+            for c in numeric.columns
+            if not any(bad in str(c).lower() for bad in ["time", "err", "qual", "cadence", "bjd", "index", "phase"])
+        ]
+        target_col = candidate_cols[-1] if candidate_cols else (numeric.columns[-1] if len(numeric.columns) else None)
+        values = numeric[target_col].dropna().to_numpy(dtype=float) if target_col is not None else np.array([])
 
     if len(values) < 30:
         raise ValueError("Provide at least 30 numeric flux values. A CSV with a `flux` column is recommended.")
-
     return np.asarray(values, dtype=float)
 
 
 def load_test_row(row_id: int) -> Tuple[np.ndarray, str]:
-    """Loads a specific row from the Kepler exoTest.csv dataset using standard library csv."""
+    """Loads a specific row from the Kepler exoTest.csv dataset."""
     test_csv = DATA_DIR / "exoTest.csv"
     if not test_csv.exists():
         raise FileNotFoundError(f"Test dataset not found at {test_csv}")
-
-    with open(test_csv, mode="r", encoding="utf-8-sig") as f:
-        reader = csv.reader(f)
-        # Skip header
-        next(reader, None)
-        for idx, row in enumerate(reader):
-            if idx == row_id:
-                # row[0] is LABEL, row[1:] are the 3197 flux readings
-                flux = np.array([float(x) for x in row[1:]], dtype=float)
-                return flux, f"Test-set row {row_id}"
-
-    raise IndexError(f"Row ID {row_id} is out of range.")
+    row = pd.read_csv(test_csv, nrows=1, skiprows=range(1, row_id + 1))
+    return row.iloc[0, 1:].to_numpy(dtype=float), f"Test-set row {row_id}"
 
 
 def test_set_size() -> int:
@@ -135,28 +83,16 @@ def test_set_size() -> int:
     test_csv = DATA_DIR / "exoTest.csv"
     if not test_csv.exists():
         return 0
-    try:
-        with open(test_csv, mode="r", encoding="utf-8-sig") as f:
-            # count lines minus header
-            return max(0, sum(1 for _ in f) - 1)
-    except Exception:
-        return 0
+    return len(pd.read_csv(test_csv, usecols=["LABEL"]))
 
 
 def sample_csv() -> str:
     """Generates a valid demo Kepler light curve CSV with confirmed exoplanet transit."""
     test_path = DATA_DIR / "exoTest.csv"
     if test_path.exists():
-        try:
-            flux, _ = load_test_row(1)
-            lines = ["flux"] + [str(v) for v in flux]
-            return "\n".join(lines)
-        except Exception:
-            pass
-
+        row = pd.read_csv(test_path, nrows=1, skiprows=1)
+        flux = row.iloc[0, 1:].to_numpy(dtype=float)
+        return pd.DataFrame({"flux": flux}).to_csv(index=False)
     time = np.linspace(0, 6, 120)
     flux = 1 - 0.012 * np.exp(-((time - 3) ** 2) / 0.035) + 0.0005 * np.sin(time * 13)
-    lines = ["time,flux"]
-    for t, fx in zip(time, flux):
-        lines.append(f"{t:.4f},{fx:.6f}")
-    return "\n".join(lines)
+    return pd.DataFrame({"time": time, "flux": flux}).to_csv(index=False)
