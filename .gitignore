@@ -1,8 +1,9 @@
-data/
-synthetic_data
+data/exoTrain.csv
+data/exoTest.csv
+data/model_comparison.csv
+synthetic_data/
 __pycache__/
 *.pyc
 .DS_Store
 .venv/
-
 .ipynb_checkpoints/

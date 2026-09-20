@@ -1,0 +1,63 @@
+{
+  "best_model": "1D CNN",
+  "selection_metric": "F1 Score",
+  "selection_dataset": "exoTest.csv (held-out evaluation)",
+  "ranking": [
+    {
+      "Model": "1D CNN",
+      "Accuracy": 1.0,
+      "Precision": 1.0,
+      "Recall": 1.0,
+      "F1 Score": 1.0,
+      "ROC-AUC": 1.0
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.9964912280701754,
+      "Precision": 1.0,
+      "Recall": 0.6,
+      "F1 Score": 0.75,
+      "ROC-AUC": 0.9350442477876106
+    },
+    {
+      "Model": "Tuned Random Forest",
+      "Accuracy": 0.9964912280701754,
+      "Precision": 1.0,
+      "Recall": 0.6,
+      "F1 Score": 0.75,
+      "ROC-AUC": 0.9228318584070796
+    },
+    {
+      "Model": "Voting Ensemble",
+      "Accuracy": 0.9964912280701754,
+      "Precision": 1.0,
+      "Recall": 0.6,
+      "F1 Score": 0.75,
+      "ROC-AUC": 0.912920353982301
+    },
+    {
+      "Model": "XGBoost",
+      "Accuracy": 0.9964912280701754,
+      "Precision": 1.0,
+      "Recall": 0.6,
+      "F1 Score": 0.75,
+      "ROC-AUC": 0.9058407079646018
+    },
+    {
+      "Model": "Support Vector Machine",
+      "Accuracy": 0.9894736842105263,
+      "Precision": 0.4444444444444444,
+      "Recall": 0.8,
+      "F1 Score": 0.5714285714285714,
+      "ROC-AUC": 0.8782300884955753
+    },
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.8596491228070176,
+      "Precision": 0.037037037037037035,
+      "Recall": 0.6,
+      "F1 Score": 0.06976744186046512,
+      "ROC-AUC": 0.6973451327433628
+    }
+  ]
+}
