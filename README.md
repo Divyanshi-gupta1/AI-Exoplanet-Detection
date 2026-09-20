@@ -3,8 +3,7 @@ title: ExoDip AI Exoplanet Detection
 emoji: 🪐
 colorFrom: indigo
 colorTo: blue
-sdk: docker
-app_port: 7860
+sdk: static
 pinned: false
 ---
 

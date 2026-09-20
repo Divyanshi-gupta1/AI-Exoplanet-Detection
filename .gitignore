@@ -10,7 +10,6 @@ __pycache__/
 synthetic_data/
 
 # Legacy files (kept locally, not in repo)
-app.py
 error_analysis.py
 *.ipynb
 .devcontainer/
