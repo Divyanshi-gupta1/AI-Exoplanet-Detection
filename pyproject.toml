@@ -13,7 +13,6 @@ dependencies = [
     "xgboost",
     "joblib",
     "h5py",
-    "astropy",
 ]
 
 [tool.vercel]

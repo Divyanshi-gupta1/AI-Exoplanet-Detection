@@ -17,7 +17,8 @@ from scipy.interpolate import interp1d
 from scipy.ndimage import uniform_filter1d, median_filter
 from scipy.signal import find_peaks, peak_prominences, peak_widths
 from scipy.stats import entropy, kurtosis, skew
-from astropy.timeseries import BoxLeastSquares
+# astropy.timeseries.BoxLeastSquares replaced with pure-NumPy implementation
+# to avoid the ~100 MB astropy install on Vercel.
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
@@ -448,6 +449,50 @@ def cnn_infer(flux_3197: np.ndarray) -> tuple[float, str | None]:
 # 5. Box Least Squares (BLS) Periodogram Engine
 # =====================================================================
 
+def _numpy_bls(t: np.ndarray, y: np.ndarray,
+               periods: np.ndarray, durations: np.ndarray) -> tuple:
+    """Vectorised Box Least Squares periodogram (pure NumPy).
+
+    Returns (best_period, best_duration, best_t0, best_depth, best_power).
+    Replaces astropy.timeseries.BoxLeastSquares to eliminate the ~100 MB
+    astropy dependency from the Vercel serverless bundle.
+    """
+    best_power = -np.inf
+    best_P = periods[0]
+    best_dur = durations[0]
+    best_t0 = float(t[0])
+    best_depth = 0.0
+
+    y_centered = y - float(np.mean(y))
+
+    for P in periods:
+        for dur in durations:
+            phase = t % P
+            n_t0 = max(10, int(P / dur * 2))
+            for k in range(n_t0):
+                t0 = (k / n_t0) * P
+                in_box = (phase >= t0) & (phase < t0 + dur)
+                if t0 + dur > P:
+                    in_box |= phase < (t0 + dur - P)
+                n_in = int(np.sum(in_box))
+                n_out = len(y) - n_in
+                if n_in < 2 or n_out < 2:
+                    continue
+                s_in = float(np.sum(y_centered[in_box]))
+                s_out = float(np.sum(y_centered[~in_box]))
+                power = (s_in ** 2 / n_in) + (s_out ** 2 / n_out)
+                if power > best_power:
+                    best_power = power
+                    best_P = float(P)
+                    best_dur = float(dur)
+                    best_t0 = float(t0)
+                    d_in = float(np.mean(y[in_box]))
+                    d_out = float(np.mean(y[~in_box]))
+                    best_depth = max(0.0, d_out - d_in)
+
+    return best_P, best_dur, best_t0, best_depth, float(best_power)
+
+
 def compute_bls_metrics(flux: np.ndarray) -> dict:
     """Detect and quantify periodic transit signals using Box Least Squares (BLS).
 
@@ -471,16 +516,9 @@ def compute_bls_metrics(flux: np.ndarray) -> dict:
     diff = np.diff(det)
     noise_sigma = float(1.4826 * np.median(np.abs(diff - np.median(diff))) / np.sqrt(2)) + 1e-10
 
-    bls = BoxLeastSquares(t, det)
     periods = np.linspace(0.8, 15.0, 500)
     durations = np.linspace(0.04, 0.25, 8)
-    power = bls.power(periods, durations)
-
-    b = int(np.argmax(power.power))
-    P = float(power.period[b])
-    dur = float(power.duration[b])
-    t0 = float(power.transit_time[b])
-    depth = float(power.depth[b])
+    P, dur, t0, depth, bls_power = _numpy_bls(t, det, periods, durations)
 
     phase = ((t - t0 + 0.5 * P) % P) - 0.5 * P
     in_tr = np.abs(phase) < 0.5 * dur
@@ -507,7 +545,7 @@ def compute_bls_metrics(flux: np.ndarray) -> dict:
         "transit_snr": round(snr, 1),
         "num_observed_transits": int(observed_transits),
         "duty_cycle": round(duty_cycle, 4),
-        "bls_power": round(float(power.power[b]), 5),
+        "bls_power": round(bls_power, 5),
     }
 
 
