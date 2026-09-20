@@ -7,7 +7,6 @@ dependencies = [
     "uvicorn[standard]",
     "python-multipart",
     "numpy",
-    "pandas",
     "scikit-learn",
     "xgboost",
     "joblib",

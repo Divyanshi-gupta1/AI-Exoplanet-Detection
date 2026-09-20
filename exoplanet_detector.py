@@ -11,7 +11,7 @@ from functools import lru_cache
 from pathlib import Path
 import joblib
 import numpy as np
-import pandas as pd
+import csv
 from scipy_compat import (  # pure-NumPy; no scipy install needed
     fft, interp1d,
     uniform_filter1d, median_filter,
@@ -304,15 +304,29 @@ def load_confirmed_catalog() -> list[np.ndarray]:
     catalog = []
     test_file = DATA_DIR / "exoTest.csv"
     if test_file.exists():
-        df_test = pd.read_csv(test_file, nrows=5)
-        for i in range(len(df_test)):
-            catalog.append(df_test.iloc[i, 1:].to_numpy(dtype=float))
+        try:
+            with open(test_file, mode="r", encoding="utf-8-sig") as f:
+                reader = csv.reader(f)
+                next(reader, None)
+                for idx, row in enumerate(reader):
+                    if idx >= 5:
+                        break
+                    catalog.append(np.array([float(x) for x in row[1:]], dtype=float))
+        except Exception:
+            pass
     train_file = DATA_DIR / "exoTrain.csv"
     if train_file.exists():
-        df_train = pd.read_csv(train_file, nrows=40)
-        planets = df_train[df_train["LABEL"] == 2]
-        for _, row in planets.iterrows():
-            catalog.append(row.iloc[1:].to_numpy(dtype=float))
+        try:
+            with open(train_file, mode="r", encoding="utf-8-sig") as f:
+                reader = csv.reader(f)
+                next(reader, None)
+                for idx, row in enumerate(reader):
+                    if idx >= 40:
+                        break
+                    if len(row) > 1 and row[0].strip() == "2":
+                        catalog.append(np.array([float(x) for x in row[1:]], dtype=float))
+        except Exception:
+            pass
     return catalog
 
 
@@ -356,16 +370,45 @@ def load_all_models_dict():
 
 @lru_cache(maxsize=1)
 def load_evaluation_metrics():
-    """Load model benchmark metrics from model_comparison.csv + 1D CNN metrics."""
-    csv_path = DATA_DIR / "model_comparison.csv"
+    """Load model benchmark metrics from model_selection.json or model_comparison.csv."""
+    import json
+    json_path = DATA_DIR / "model_selection.json"
     scores = {}
-    if csv_path.exists():
-        df = pd.read_csv(csv_path, usecols=lambda c: c in ["Model"] + SCORE_COLS)
-        for _, row in df.iterrows():
-            name = row["Model"]
-            item = {col: float(row[col]) for col in SCORE_COLS if col in row.index and pd.notna(row[col])}
-            item["Composite"] = sum(item.values()) / max(len(item), 1)
-            scores[name] = item
+    if json_path.exists():
+        try:
+            with open(json_path, mode="r", encoding="utf-8") as f:
+                data = json.load(f)
+                for item in data.get("ranking", []):
+                    name = item.get("Model")
+                    if name:
+                        sub = {col: float(item[col]) for col in SCORE_COLS if col in item}
+                        sub["Composite"] = sum(sub.values()) / max(len(sub), 1)
+                        scores[name] = sub
+        except Exception:
+            pass
+
+    csv_path = DATA_DIR / "model_comparison.csv"
+    if not scores and csv_path.exists():
+        try:
+            with open(csv_path, mode="r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    name = row.get("Model")
+                    if name:
+                        item = {}
+                        for col in SCORE_COLS:
+                            val = row.get(col)
+                            if val is not None and val != "":
+                                try:
+                                    item[col] = float(val)
+                                except ValueError:
+                                    pass
+                        if item:
+                            item["Composite"] = sum(item.values()) / max(len(item), 1)
+                            scores[name] = item
+        except Exception:
+            pass
+
     if "1D CNN" not in scores:
         scores["1D CNN"] = {
             "Accuracy": 0.9931, "Precision": 0.5185, "Recall": 0.7568,
@@ -600,13 +643,17 @@ def detect_exoplanet(raw_flux: np.ndarray) -> dict:
     # ── 5. Feature extraction & classical model inference ──
     features = extract_features(flux_for_ml)
     best_rf, _, scaler = load_classical_models()
-    frame = pd.DataFrame([features]).reindex(columns=best_rf.feature_names_in_, fill_value=0)
-    scaled_frame = scaler.transform(frame)
+    feat_names = list(getattr(best_rf, "feature_names_in_", []))
+    if feat_names:
+        feature_vector = np.array([[features.get(col, 0.0) for col in feat_names]], dtype=float)
+    else:
+        feature_vector = np.array([list(features.values())], dtype=float)
+    scaled_vector = scaler.transform(feature_vector)
 
     raw_probs: dict[str, float] = {}
     unavailable: dict[str, str] = {}
     for model_name, details in load_all_models_dict().items():
-        inp = scaled_frame if details["input_type"] == "scaled" else frame
+        inp = scaled_vector if details["input_type"] == "scaled" else feature_vector
         raw_probs[model_name] = float(details["model"].predict_proba(inp)[0, 1])
 
     # ── 6. 1D CNN inference ──
