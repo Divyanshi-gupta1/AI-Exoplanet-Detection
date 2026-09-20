@@ -8,7 +8,6 @@ dependencies = [
     "python-multipart",
     "numpy",
     "pandas",
-    "scipy",
     "scikit-learn",
     "xgboost",
     "joblib",

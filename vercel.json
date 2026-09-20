@@ -1,7 +1,7 @@
 {
   "functions": {
     "backend/main.py": {
-      "excludeFiles": "{data/exoTrain.csv,data/exoTest.csv,data/model_comparison.csv,.venv/**,**/__pycache__/**,*.ipynb,*.pyc,synthetic_data/**}"
+      "excludeFiles": "{data/exoTrain.csv,data/exoTest.csv,**/__pycache__/**,**/*.pyc,**/*.pyi,**/tests/**,**/test/**,**/*.dist-info/**,**/*.egg-info/**,**/docs/**,**/examples/**,**/benchmarks/**,**/tutorials/**,synthetic_data/**,*.ipynb,.venv/**}"
     }
   }
 }

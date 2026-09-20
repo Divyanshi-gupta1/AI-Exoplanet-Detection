@@ -12,11 +12,12 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
-from scipy.fft import fft
-from scipy.interpolate import interp1d
-from scipy.ndimage import uniform_filter1d, median_filter
-from scipy.signal import find_peaks, peak_prominences, peak_widths
-from scipy.stats import entropy, kurtosis, skew
+from scipy_compat import (  # pure-NumPy; no scipy install needed
+    fft, interp1d,
+    uniform_filter1d, median_filter,
+    find_peaks, peak_prominences, peak_widths,
+    entropy, kurtosis, skew,
+)
 # astropy.timeseries.BoxLeastSquares replaced with pure-NumPy implementation
 # to avoid the ~100 MB astropy install on Vercel.
 
