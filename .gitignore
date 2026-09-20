@@ -1,9 +1,20 @@
-data/exoTrain.csv
-data/exoTest.csv
-data/model_comparison.csv
-synthetic_data/
+# Large training/test datasets — tracked via Git LFS
+# (already handled by .gitattributes after git lfs install)
+
+# Dev artifacts
 __pycache__/
 *.pyc
 .DS_Store
 .venv/
 .ipynb_checkpoints/
+synthetic_data/
+
+# Legacy files (kept locally, not in repo)
+app.py
+error_analysis.py
+requirements.txt
+*.ipynb
+.devcontainer/
+
+# Local data files not tracked
+data/model_comparison.csv
