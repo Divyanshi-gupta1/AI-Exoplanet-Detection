@@ -387,23 +387,24 @@ h4 { font-size: 1.1rem; font-weight: 600; }
     text-decoration: none;
 }
 
-/* Active page link: Clean illuminated cyan text, NO box/pill outline */
+/* Active page link: bright cyan text + subtle underline, no box */
 .nav-item.active {
     background: transparent;
-    border: 1px solid transparent;
+    border: none;
+    border-bottom: 2px solid #38bdf8;
+    border-radius: 0;
     color: #38bdf8;
     font-weight: 700;
     box-shadow: none;
-    text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    text-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
 }
 
-/* ONLY ON HOVER: Show a sleek modern box outline */
-.nav-item:hover {
+/* Hover: just brighten text, no box */
+.nav-item:hover:not(.active) {
     color: #ffffff;
-    background: rgba(30, 41, 59, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 8px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 /* Glassmorphism Cards & Panels */
@@ -894,6 +895,26 @@ input[type="number"]:focus, select:focus {
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
     }
+
+    /* Analyze page: stack the 2-column layout */
+    .grid-analyze {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Results page: stack left panel and charts */
+    .grid-results {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Analyze tab labels — allow wrapping on mid-width */
+    .tab-btn {
+        white-space: normal;
+        word-break: break-word;
+        text-align: left;
+        line-height: 1.3;
+    }
 }
 
 /* Phones (under 768px) */
@@ -903,8 +924,8 @@ input[type="number"]:focus, select:focus {
     }
 
     h1 {
-        font-size: 2.25rem;
-        line-height: 1.15;
+        font-size: 2.75rem;
+        line-height: 1.1;
     }
     h2 {
         font-size: 1.5rem;
@@ -966,7 +987,8 @@ input[type="number"]:focus, select:focus {
     }
 
     h1 {
-        font-size: 1.85rem;
+        font-size: 2.15rem;
+        line-height: 1.1;
     }
     h2 {
         font-size: 1.35rem;
@@ -1016,12 +1038,35 @@ input[type="number"]:focus, select:focus {
     }
 
     /* Stack Hero CTA buttons */
-    .grid-hero > div:first-child > div:last-of-type {
+    .hero-actions {
         flex-direction: column;
+        align-items: stretch;
         width: 100%;
-        gap: 10px !important;
+        gap: 10px;
     }
-    .grid-hero .btn {
+    .hero-actions .btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        min-height: 2.75rem;
+    }
+
+    /* Analyze page full-width buttons */
+    #view-analyze .btn-primary,
+    #view-analyze .btn-full {
+        width: 100%;
+        min-height: 2.75rem;
+    }
+
+    /* Upload zone bigger tap target on small screens */
+    .upload-zone {
+        padding: 2rem 1rem;
+        min-height: 140px;
+    }
+
+    /* Advanced config summary full width */
+    details {
         width: 100%;
     }
 
