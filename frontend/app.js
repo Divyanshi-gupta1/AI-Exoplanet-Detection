@@ -354,10 +354,10 @@ function renderResultsView() {
     const verdictDesc = document.getElementById('res-verdict-desc');
 
     if (isPlanet) {
-        badgeContainer.innerHTML = "<div class='candidate-badge-candidate'>🪐 EXOPLANET CANDIDATE</div>";
+        badgeContainer.innerHTML = "<div class='candidate-badge-candidate'>EXOPLANET CANDIDATE</div>";
         verdictDesc.textContent = "Candidate status indicates periodic transit-like signal characteristics warranting further astronomical follow-up.";
     } else {
-        badgeContainer.innerHTML = "<div class='candidate-badge-non'>⚪ NON-CANDIDATE</div>";
+        badgeContainer.innerHTML = "<div class='candidate-badge-non'>NON-CANDIDATE</div>";
         verdictDesc.textContent = "Signal does not exhibit sufficient periodic transit depth, SNR, or classifier confidence to qualify as a candidate.";
     }
 
@@ -367,7 +367,7 @@ function renderResultsView() {
     document.getElementById('res-conf-bar').style.width = `${Math.min(Math.max(confVal, 0), 100)}%`;
 
     // Detection Telemetry
-    document.getElementById('res-tele-model').textContent = `⭐ ${r.model}`;
+    document.getElementById('res-tele-model').textContent = r.model;
     document.getElementById('res-tele-dips').textContent = r.chart_data ? r.chart_data.dips.length : 0;
     document.getElementById('res-tele-noise').textContent = r.features ? r.features.noise_level.toPrecision(4) : '0';
     document.getElementById('res-tele-neg').textContent = r.features ? r.features.negative_ratio.toPrecision(4) : '0';
@@ -443,11 +443,11 @@ function renderModelsTable(r) {
     for (const [mname, sc] of Object.entries(scores)) {
         const prob = probs[mname] || 0.0;
         const isSelected = mname === r.model;
-        const verdict = (isSelected ? r.prediction === 'Planet' : prob >= 0.5) ? '🪐 Candidate' : '⚪ Non-Candidate';
+        const verdict = (isSelected ? r.prediction === 'Planet' : prob >= 0.5) ? 'Candidate' : 'Non-Candidate';
         const dispProb = (isSelected && r.prediction === 'Planet') ? (r.probability * 100) : (prob * 100);
 
         rows.push({
-            modelName: (isSelected ? '⭐ ' : '') + mname,
+            modelName: (isSelected ? '<span style="color:#38bdf8;margin-right:4px;">●</span> ' : '') + mname,
             acc: sc.Accuracy != null ? sc.Accuracy.toFixed(4) : '-',
             prec: sc.Precision != null ? sc.Precision.toFixed(4) : '-',
             rec: sc.Recall != null ? sc.Recall.toFixed(4) : '-',
@@ -653,7 +653,7 @@ function renderHistoryView() {
 
     state.history.forEach((item, idx) => {
         const tr = document.createElement('tr');
-        const verdictText = item.prediction === 'Planet' ? '🪐 Candidate' : '⚪ Non-Candidate';
+        const verdictText = item.prediction === 'Planet' ? 'Candidate' : 'Non-Candidate';
         const confText = item.confidence != null ? `${item.confidence.toFixed(1)}%` : '-';
 
         tr.innerHTML = `
@@ -734,7 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isOk = res.ok;
             const color = isOk ? '#34d399' : '#f43f5e';
             const shadow = isOk ? '0 0 8px rgba(52, 211, 153, 0.6)' : '0 0 8px rgba(244, 63, 94, 0.6)';
-            const text = isOk ? 'AI Core: Online' : 'AI Core: Offline';
+            const text = isOk ? 'Engine: Online' : 'Engine: Offline';
 
             document.querySelectorAll('.status-dot').forEach(d => {
                 d.style.background = color;
@@ -751,9 +751,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 d.style.boxShadow = '0 0 8px rgba(244, 63, 94, 0.6)';
             });
             const statusText = document.getElementById('api-status-text');
-            if (statusText) statusText.textContent = 'AI Core: Offline';
+            if (statusText) statusText.textContent = 'Engine: Offline';
             const mobileStatusText = document.querySelector('.mobile-status-text');
-            if (mobileStatusText) mobileStatusText.textContent = 'AI Core: Offline';
+            if (mobileStatusText) mobileStatusText.textContent = 'Engine: Offline';
         });
 
     // Fetch test-set metadata for the row-ID hint

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExoDip - AI Exoplanet Transit Screening</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪐</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2238%22 fill=%22%2338bdf8%22/></svg>">
     <!-- Google Fonts: Inter, Plus Jakarta Sans, DM Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,9 +18,9 @@
         <!-- ================= NAVBAR ================= -->
         <header class="navbar">
             <div class="nav-brand-box" onclick="navigateTo('Home')">
-                <span class="logo-icon">🪐</span>
+                <svg class="logo-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#38bdf8;"><circle cx="12" cy="12" r="7"/><ellipse cx="12" cy="12" rx="10" ry="3.5" stroke="rgba(129,140,248,0.75)" stroke-dasharray="2 2"/><circle cx="19" cy="11" r="2" fill="#38bdf8"/></svg>
                 <span class="brand-name">ExoDip</span>
-                <span class="brand-pill">AI Screening</span>
+                <span class="brand-pill">Transit Screening</span>
             </div>
 
             <!-- Desktop Nav Links -->
@@ -36,7 +36,7 @@
             <div class="nav-actions">
                 <div id="api-status" class="api-status-badge">
                     <span id="api-status-dot" class="status-dot"></span>
-                    <span id="api-status-text">AI Core: Initializing…</span>
+                    <span id="api-status-text">Engine: Initializing…</span>
                 </div>
 
                 <!-- Hamburger Button for Phones -->
@@ -48,32 +48,20 @@
             </div>
         </header>
 
-        <!-- Mobile Drawer Navigation -->
+        <!-- Mobile Drawer Navigation (2 tags per row) -->
         <div class="mobile-nav-drawer" id="mobile-drawer">
             <div class="mobile-nav-items">
-                <button class="mobile-nav-item active" data-page="Home" onclick="navigateTo('Home')">
-                    <span class="mobile-nav-icon">🏠</span> Home
-                </button>
-                <button class="mobile-nav-item" data-page="Analyze" onclick="navigateTo('Analyze')">
-                    <span class="mobile-nav-icon">🔭</span> Analyze
-                </button>
-                <button class="mobile-nav-item" data-page="Results" onclick="navigateTo('Results')">
-                    <span class="mobile-nav-icon">📊</span> Results
-                </button>
-                <button class="mobile-nav-item" data-page="History" onclick="navigateTo('History')">
-                    <span class="mobile-nav-icon">📜</span> History
-                </button>
-                <button class="mobile-nav-item" data-page="About" onclick="navigateTo('About')">
-                    <span class="mobile-nav-icon">🪐</span> About
-                </button>
-                <button class="mobile-nav-item" data-page="Docs" onclick="navigateTo('Docs')">
-                    <span class="mobile-nav-icon">📖</span> Docs
-                </button>
+                <button class="mobile-nav-item active" data-page="Home" onclick="navigateTo('Home')">Home</button>
+                <button class="mobile-nav-item" data-page="Analyze" onclick="navigateTo('Analyze')">Analyze</button>
+                <button class="mobile-nav-item" data-page="Results" onclick="navigateTo('Results')">Results</button>
+                <button class="mobile-nav-item" data-page="History" onclick="navigateTo('History')">History</button>
+                <button class="mobile-nav-item" data-page="About" onclick="navigateTo('About')">About</button>
+                <button class="mobile-nav-item" data-page="Docs" onclick="navigateTo('Docs')">Docs</button>
             </div>
             <div class="mobile-nav-footer">
                 <div class="mobile-status">
                     <span class="status-dot mobile-status-dot"></span>
-                    <span class="mobile-status-text">AI Core: Initializing…</span>
+                    <span class="mobile-status-text">Engine: Initializing…</span>
                 </div>
             </div>
         </div>
@@ -83,11 +71,11 @@
         <main id="view-home" class="view-page">
             <div class="grid-hero">
                 <div>
-                    <div class="eyebrow">AI-POWERED EXOPLANET CANDIDATE SCREENING</div>
+                    <div class="eyebrow">PHOTOMETRIC TRANSIT SCREENING</div>
                     <h1>Discover Worlds<br><span class="purple-gradient">Beyond Our Own</span></h1>
-                    <p style="font-size:1.24rem;font-weight:600;color:#38bdf8;margin:0.5rem 0 0.8rem;">Find the dip. Discover the world.</p>
-                    <p class="lead">Analyze stellar light curves for periodic transit signals and use machine learning to screen potential exoplanet candidates.</p>
-                    <div style="display:flex; gap:16px; margin-top:1.4rem;">
+                    <p style="font-size:1.15rem;font-weight:600;color:#38bdf8;margin:0.5rem 0 0.75rem;">Find the dip. Discover the world.</p>
+                    <p class="lead">Analyze stellar light curves for periodic transit signals and screen potential exoplanet candidates.</p>
+                    <div class="hero-actions">
                         <button class="btn btn-primary" onclick="navigateTo('Analyze')">Analyze Data</button>
                         <button class="btn" onclick="navigateTo('Docs')">Learn More</button>
                     </div>
@@ -97,26 +85,26 @@
                 </div>
             </div>
 
-            <div style="height: 3rem;"></div>
+            <div style="height: 2.5rem;"></div>
             <h3 style="margin-bottom: 1rem;">Core Capabilities</h3>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🔭</div>
+                    <div class="feature-num">01</div>
                     <h4>Transit Signal Detection</h4>
                     <p>Identify periodic brightness dips that may indicate planetary transits.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🧠</div>
-                    <h4>Machine Learning Screening</h4>
-                    <p>Use trained ML models to distinguish candidate signals from non-planetary patterns.</p>
+                    <div class="feature-num">02</div>
+                    <h4>Ensemble Screening</h4>
+                    <p>Use trained models to distinguish candidate signals from non-planetary patterns.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📈</div>
+                    <div class="feature-num">03</div>
                     <h4>Light-Curve Analysis</h4>
                     <p>Visualize and inspect stellar brightness variations and detected transit characteristics.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🪐</div>
+                    <div class="feature-num">04</div>
                     <h4>Candidate Insights</h4>
                     <p>Review metrics such as period, transit depth, duration, BLS power/SNR, and model outputs.</p>
                 </div>
@@ -154,7 +142,7 @@
                         <div id="analyze-tab-upload" class="tab-content active">
                             <input type="file" id="file-input" accept=".csv,.txt,.npy" style="display:none;" onchange="handleFileSelected(this.files[0])">
                             <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-                                <div style="font-size:2.4rem; margin-bottom:0.4rem;">🔭</div>
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><br>
                                 <b style="color:#e2e8f0; font-size:1.05rem;">Drag and drop your light-curve file here</b><br>
                                 <span class="muted">Supports CSV with flux column, Kepler 1-row CSVs, whitespace-separated TXT, or NPY arrays</span>
                             </div>
@@ -178,7 +166,7 @@
                             </div>
 
                             <div style="margin-top: 1rem;">
-                                <a href="/api/sample-csv" class="btn" style="font-size:0.92rem; width:100%;">⇩ Download Sample Kepler Transit CSV</a>
+                                <a href="/api/sample-csv" class="btn" style="font-size:0.92rem; width:100%;">Download Sample Kepler Transit CSV</a>
                             </div>
                         </div>
 
@@ -208,7 +196,7 @@
 
                         <!-- Advanced Configuration Expander -->
                         <details style="margin-top: 1.5rem;">
-                            <summary>⚙ Advanced Screening Configuration</summary>
+                            <summary>Advanced Screening Configuration</summary>
                             <ul style="color:#cbd5e1; font-size:0.92rem; line-height:1.75; padding-left:1.2rem; margin-top:0.5rem;">
                                 <li><b>Transit Search Method:</b> Box Least Squares (Astropy BLS periodogram)</li>
                                 <li><b>Period Search Grid:</b> 0.5 to 20.0 days (duration grid: 1 to 12 hours)</li>
@@ -254,8 +242,8 @@
                         <p id="res-source-line" class="muted">sample.csv · Analyzed on Sep 20, 2026</p>
                     </div>
                     <div style="display:flex; gap:12px;">
-                        <button class="btn" onclick="navigateTo('Analyze')">← Back to Analyze</button>
-                        <button class="btn btn-primary" onclick="downloadReport()">⇩ Download Report</button>
+                        <button class="btn" onclick="navigateTo('Analyze')">&larr; Back to Analyze</button>
+                        <button class="btn btn-primary" onclick="downloadReport()">Download Report</button>
                     </div>
                 </div>
 
@@ -275,7 +263,7 @@
 
                         <div class="result-card" style="margin-top:1.2rem;">
                             <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 0.75rem; color:#fff;">Detection Telemetry</p>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Primary Model</span><b id="res-tele-model" style="color:#fff;">⭐ XGBoost</b></div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Primary Model</span><b id="res-tele-model" style="color:#fff;">XGBoost</b></div>
                             <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Model Agreement</span><b id="res-tele-agree" style="color:#34d399;">Unanimous</b></div>
                             <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Detected Dips</span><b id="res-tele-dips" style="color:#fff;">0</b></div>
                             <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Noise Std Dev</span><b id="res-tele-noise" style="color:#fff;">0.0004</b></div>
@@ -297,10 +285,10 @@
 
                         <!-- Result Tabs -->
                         <div class="tab-nav" style="margin-top:1.2rem;">
-                            <button class="tab-btn active" onclick="switchResultTab('full')">📈 Full Light Curve</button>
-                            <button class="tab-btn" onclick="switchResultTab('zoom')">🔍 Transit Dip View</button>
-                            <button class="tab-btn" onclick="switchResultTab('models')">📊 Model Comparison & Consensus</button>
-                            <button class="tab-btn" onclick="switchResultTab('features')">🔬 Extracted Features</button>
+                            <button class="tab-btn active" onclick="switchResultTab('full')">Full Light Curve</button>
+                            <button class="tab-btn" onclick="switchResultTab('zoom')">Transit Dip View</button>
+                            <button class="tab-btn" onclick="switchResultTab('models')">Model Comparison & Consensus</button>
+                            <button class="tab-btn" onclick="switchResultTab('features')">Extracted Features</button>
                         </div>
 
                         <!-- Tab 1: Full Light Curve Plotly Chart -->
@@ -393,7 +381,7 @@
             </div>
 
             <div style="margin: 1.25rem 0 0.75rem;">
-                <span class="model-chip">⭐ Active Decision Model: <b>XGBoost</b></span>
+                <span class="model-chip">Active Decision Model: <b>XGBoost</b></span>
             </div>
 
             <div id="history-table-container">
@@ -424,7 +412,7 @@
             <h2>About ExoDip</h2>
             <div class="panel" style="margin-top:1rem;">
                 <p class="lead" style="color:#f1f5f9;">
-                    <b>ExoDip</b> is an AI-assisted screening tool designed to help researchers, students, and astronomy enthusiasts analyze stellar light curves for signatures of transiting exoplanets. Using a combination of Box Least Squares (BLS) period searching, astrophysical feature extraction, and an ensemble of machine learning classifiers (including tuned XGBoost and Random Forest models), ExoDip evaluates raw photometry to identify candidate transit events.
+                    <b>ExoDip</b> is a candidate screening tool designed to help researchers, students, and astronomy enthusiasts analyze stellar light curves for signatures of transiting exoplanets. Using a combination of Box Least Squares (BLS) period searching, astrophysical feature extraction, and an ensemble of machine learning classifiers (including tuned XGBoost and Random Forest models), ExoDip evaluates raw photometry to identify candidate transit events.
                 </p>
                 <div style="background:rgba(239, 68, 68, 0.12); border-left:4px solid #f43f5e; padding:0.95rem 1.15rem; border-radius:6px; margin:1.35rem 0;">
                     <b style="color:#fca5a5; font-size:1.02rem;">Scientific Notice:</b>
@@ -464,12 +452,12 @@
             <h2>Documentation</h2>
 
             <div class="tab-nav" style="margin-top:1.2rem;">
-                <button class="tab-btn active" onclick="switchDocsTab('start')">🚀 Getting Started</button>
-                <button class="tab-btn" onclick="switchDocsTab('formats')">📄 Input Formats</button>
-                <button class="tab-btn" onclick="switchDocsTab('pipeline')">⚙ How It Works</button>
-                <button class="tab-btn" onclick="switchDocsTab('results')">📊 Understanding Results</button>
-                <button class="tab-btn" onclick="switchDocsTab('limitations')">⚠️ Limitations</button>
-                <button class="tab-btn" onclick="switchDocsTab('faq')">❓ FAQ</button>
+                <button class="tab-btn active" onclick="switchDocsTab('start')">Getting Started</button>
+                <button class="tab-btn" onclick="switchDocsTab('formats')">Input Formats</button>
+                <button class="tab-btn" onclick="switchDocsTab('pipeline')">How It Works</button>
+                <button class="tab-btn" onclick="switchDocsTab('results')">Understanding Results</button>
+                <button class="tab-btn" onclick="switchDocsTab('limitations')">Limitations</button>
+                <button class="tab-btn" onclick="switchDocsTab('faq')">FAQ</button>
             </div>
 
             <div class="panel">
@@ -544,7 +532,7 @@
 
         <!-- ================= FOOTER ================= -->
         <footer class="app-footer">
-            <b>ExoDip</b> • AI-assisted screening of exoplanet transit candidates • Developed for astrophysics research and candidate vetting.
+            <b>ExoDip</b> &bull; Candidate screening and photometric transit analysis &bull; Developed for astrophysics research and candidate vetting.
         </footer>
     </div>
 
