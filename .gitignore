@@ -14,5 +14,4 @@ error_analysis.py
 *.ipynb
 .devcontainer/
 
-# Local data files not tracked
-data/model_comparison.csv
+
