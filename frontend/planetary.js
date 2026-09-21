@@ -11,7 +11,7 @@
     function resize() {
         const rect = canvas.getBoundingClientRect();
         canvas.width = rect.width > 0 ? rect.width : (canvas.parentElement ? canvas.parentElement.clientWidth : 640);
-        canvas.height = 420;
+        canvas.height = rect.height > 0 ? rect.height : (canvas.width < 520 ? 250 : (canvas.width < 768 ? 310 : 420));
     }
     resize();
     window.addEventListener('resize', resize);
@@ -95,9 +95,10 @@
         // FOCAL CENTER: Positioned in the center so the entire system fits completely inside the box
         const cx = W * 0.50;
         const cy = H * 0.50;
+        const scale = Math.min(1.0, Math.max(0.48, W / 580));
 
         // 1. Ultra-Dark Space Background with warm ambient stellar radiance
-        const bg = ctx.createRadialGradient(cx, cy, 25, cx, cy, Math.max(W, H) * 0.85);
+        const bg = ctx.createRadialGradient(cx, cy, 25 * scale, cx, cy, Math.max(W, H) * 0.85);
         bg.addColorStop(0, 'rgba(32, 22, 12, 0.48)');     // Subtle warm golden solar ambiance
         bg.addColorStop(0.30, 'rgba(6, 10, 20, 0.85)');   // Deep dark midnight
         bg.addColorStop(0.70, 'rgba(2, 4, 10, 0.98)');
@@ -121,7 +122,7 @@
         stars.forEach(s => {
             const alpha = s.baseAlpha + Math.sin(now * s.speed + s.phase) * 0.15;
             ctx.beginPath();
-            ctx.arc(s.x * (W / 850), s.y, s.r, 0, Math.PI * 2);
+            ctx.arc(s.x * (W / 850), s.y * (H / 420), Math.max(0.3, s.r * scale), 0, Math.PI * 2);
             ctx.fillStyle = s.color;
             ctx.globalAlpha = Math.max(0.10, Math.min(1.0, alpha));
             ctx.fill();
@@ -134,8 +135,8 @@
             const steps = 110;
             for (let i = 0; i <= steps; i++) {
                 const theta = (i / steps) * Math.PI * 2;
-                const ox = orb.a * Math.cos(theta);
-                const oy = orb.b * Math.sin(theta);
+                const ox = (orb.a * scale) * Math.cos(theta);
+                const oy = (orb.b * scale) * Math.sin(theta);
                 const rx = ox * cosT - oy * sinT;
                 const ry = ox * sinT + oy * cosT;
                 const px = cx + rx;
@@ -147,22 +148,22 @@
             ctx.closePath();
 
             ctx.strokeStyle = orb.stroke;
-            ctx.lineWidth = orb.width;
+            ctx.lineWidth = Math.max(0.75, orb.width * scale);
             ctx.stroke();
         });
 
         // 4. Asteroid Belt Particles
         asteroids.forEach(a => {
             a.angle = (a.angle + a.speed * dt) % (Math.PI * 2);
-            const ax = a.dist * Math.cos(a.angle);
-            const ay = a.bDist * Math.sin(a.angle);
+            const ax = (a.dist * scale) * Math.cos(a.angle);
+            const ay = (a.bDist * scale) * Math.sin(a.angle);
             const rx = ax * cosT - ay * sinT;
             const ry = ax * sinT + ay * cosT;
             const px = cx + rx;
             const py = cy + ry;
 
             ctx.beginPath();
-            ctx.arc(px, py, a.size, 0, Math.PI * 2);
+            ctx.arc(px, py, Math.max(0.3, a.size * scale), 0, Math.PI * 2);
             ctx.fillStyle = a.color + a.alpha + ')';
             ctx.fill();
         });
@@ -184,8 +185,8 @@
             pl.angle = (pl.angle + orb.speed * dt) % (Math.PI * 2);
             if (pl.type === 'earth') pl.rotation += 0.35 * dt;
 
-            const ox = orb.a * Math.cos(pl.angle);
-            const oy = orb.b * Math.sin(pl.angle);
+            const ox = (orb.a * scale) * Math.cos(pl.angle);
+            const oy = (orb.b * scale) * Math.sin(pl.angle);
             const rx = ox * cosT - oy * sinT;
             const ry = ox * sinT + oy * cosT;
             const px = cx + rx;
@@ -200,7 +201,7 @@
                 depth: depth,
                 x: px,
                 y: py,
-                r: pl.r
+                r: Math.max(3.5, pl.r * Math.max(0.65, scale))
             });
         });
 
@@ -210,7 +211,7 @@
         // 6. Draw in Depth Order
         renderQueue.forEach(item => {
             if (item.type === 'star') {
-                drawStar(item.x, item.y);
+                drawStar(item.x, item.y, scale);
             } else {
                 drawPlanet(item, cx, cy);
             }
@@ -220,8 +221,8 @@
     }
 
     // === COMPLETE, UNCLIPPED CENTRAL STAR ===
-    function drawStar(sx, sy) {
-        const starR = 30;
+    function drawStar(sx, sy, scale = 1.0) {
+        const starR = Math.max(16, 30 * scale);
 
         // Soft, warm coronal halo radiating into space
         const corona = ctx.createRadialGradient(sx, sy, starR * 0.7, sx, sy, starR * 2.4);

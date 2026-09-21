@@ -720,4 +720,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(err => console.warn('Could not fetch test set info:', err));
+
+    // Handle mobile orientation changes & window resize for Plotly charts
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (window.Plotly) {
+                ['chart-full', 'chart-zoom', 'chart-probs'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.data) {
+                        Plotly.Plots.resize(el);
+                    }
+                });
+            }
+        }, 150);
+    });
 });
+

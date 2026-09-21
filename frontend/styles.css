@@ -584,8 +584,9 @@ input[type="number"], select {
     border-radius: 8px;
     color: #fff;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 1rem;
     outline: none;
+    -webkit-appearance: none;
 }
 input[type="number"]:focus, select:focus {
     border-color: var(--accent-cyan);
@@ -613,19 +614,231 @@ input[type="number"]:focus, select:focus {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
 }
+/* Responsive Breakpoints & Mobile Optimization */
 @media (max-width: 980px) {
-    .grid-hero, .grid-analyze, .grid-results, .grid-history-stats {
+    .grid-hero, .grid-analyze, .grid-results {
         grid-template-columns: 1fr;
         gap: 24px;
     }
 }
 
+/* Tablet & Mobile (under 860px) */
+@media (max-width: 860px) {
+    .navbar {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 1.4rem;
+    }
+
+    .nav-brand-box {
+        flex: 1;
+    }
+
+    #api-status {
+        order: 2;
+    }
+
+    .nav-links {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px 2px 6px;
+        gap: 6px;
+    }
+    .nav-links::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-item {
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: 0.92rem;
+        padding: 0 0.85rem;
+        min-height: 2.2rem;
+        height: 2.2rem;
+    }
+
+    .workflow-banner {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        white-space: nowrap;
+        gap: 12px;
+        padding: 0.75rem 1rem;
+        justify-content: flex-start;
+    }
+    .workflow-banner::-webkit-scrollbar {
+        display: none;
+    }
+    .wf-step {
+        flex-shrink: 0;
+        font-size: 0.84rem;
+    }
+    .wf-arrow {
+        flex-shrink: 0;
+    }
+
+    .tab-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        white-space: nowrap;
+        gap: 16px;
+        padding-bottom: 2px;
+    }
+    .tab-nav::-webkit-scrollbar {
+        display: none;
+    }
+    .tab-btn {
+        flex-shrink: 0;
+        font-size: 0.92rem;
+        padding: 0.55rem 0.25rem;
+    }
+
+    .grid-history-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+}
+
+/* Phones (under 768px) */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 0.75rem 1rem 2rem;
+    }
+
+    h1 {
+        font-size: 2.25rem;
+        line-height: 1.15;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+    h3 {
+        font-size: 1.2rem;
+    }
+    .lead {
+        font-size: 1.02rem;
+        line-height: 1.6;
+    }
+
+    #c {
+        height: 310px;
+    }
+
+    .metric-strip {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    .metric-cell {
+        padding: 0.65rem 0.75rem;
+    }
+    .metric-cell-value {
+        font-size: 1.12rem;
+    }
+
+    .panel, .stat-card, .result-card, .feature-card, .workflow-card {
+        padding: 1.15rem;
+        border-radius: 12px;
+    }
+
+    .data-table th, .data-table td {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.84rem;
+        white-space: nowrap;
+    }
+}
+
+/* Small Phones (under 520px) */
+@media (max-width: 520px) {
+    .app-container {
+        padding: 0.5rem 0.75rem 1.8rem;
+    }
+
+    .brand-name {
+        font-size: 1.25rem;
+    }
+    .brand-pill {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+
+    h1 {
+        font-size: 1.85rem;
+    }
+    h2 {
+        font-size: 1.35rem;
+    }
+
+    #c {
+        height: 250px;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .grid-history-stats {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .metric-strip {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .metric-cell-value {
+        font-size: 1.05rem;
+    }
+
+    .upload-zone {
+        padding: 1.5rem 1rem;
+    }
+
+    /* Stack Results View action buttons */
+    #results-content > div:first-child {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 12px;
+    }
+    #results-content > div:first-child > div:last-child {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+    #results-content > div:first-child > div:last-child .btn {
+        flex: 1;
+        font-size: 0.85rem;
+        padding: 0 0.6rem;
+    }
+
+    /* Stack Hero CTA buttons */
+    .grid-hero > div:first-child > div:last-of-type {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px !important;
+    }
+    .grid-hero .btn {
+        width: 100%;
+    }
+
+    /* Plotly charts on small screens */
+    #chart-full { height: 310px !important; }
+    #chart-zoom { height: 290px !important; }
+    #chart-probs { height: 230px !important; }
+}
+
 /* Footer */
 .app-footer {
-    margin-top: 3.8rem;
+    margin-top: 3.2rem;
     padding-top: 1.35rem;
     border-top: 1px solid var(--border-subtle);
     text-align: center;
     color: var(--text-muted);
-    font-size: 0.88rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
 }
+
