@@ -18,7 +18,28 @@
         <!-- ================= NAVBAR ================= -->
         <header class="navbar">
             <div class="nav-brand-box" onclick="navigateTo('Home')">
-                <svg class="logo-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#38bdf8;"><circle cx="12" cy="12" r="7"/><ellipse cx="12" cy="12" rx="10" ry="3.5" stroke="rgba(129,140,248,0.75)" stroke-dasharray="2 2"/><circle cx="19" cy="11" r="2" fill="#38bdf8"/></svg>
+                <svg class="logo-icon" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="planetSphere" cx="35%" cy="35%" r="65%">
+                            <stop offset="0%" stop-color="#38bdf8"/>
+                            <stop offset="60%" stop-color="#2563eb"/>
+                            <stop offset="100%" stop-color="#0b1329"/>
+                        </radialGradient>
+                        <linearGradient id="orbitGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#38bdf8"/>
+                            <stop offset="50%" stop-color="#818cf8"/>
+                            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.3"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Background arc of tilted orbital ring -->
+                    <path d="M 4 20 C 4.5 13 13 9 20 10.5 C 24.5 11.5 28 14 29 17.5" stroke="url(#orbitGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+                    <!-- Central Planet Sphere -->
+                    <circle cx="16" cy="16" r="8" fill="url(#planetSphere)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <!-- Atmospheric rim crescent -->
+                    <path d="M 10 11.5 C 11.5 9 14.5 8.2 18 9.2" stroke="#bae6fd" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+                    <!-- Foreground arc of orbital ring (crosses in front) -->
+                    <path d="M 3 15 C 4 21 12 24.5 19 23 C 24 22 27.5 19 29 15.5" stroke="url(#orbitGrad)" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
                 <span class="brand-name">ExoDip</span>
                 <span class="brand-pill">Transit Screening</span>
             </div>
@@ -113,18 +134,6 @@
 
         <!-- ================= VIEW: ANALYZE ================= -->
         <main id="view-analyze" class="view-page" style="display:none;">
-            <div class="workflow-banner">
-                <span class="wf-step active"><b>1</b> Upload Light Curve</span>
-                <span class="wf-arrow">→</span>
-                <span class="wf-step"><b>2</b> Preprocess & Filter</span>
-                <span class="wf-arrow">→</span>
-                <span class="wf-step"><b>3</b> BLS Transit Search</span>
-                <span class="wf-arrow">→</span>
-                <span class="wf-step"><b>4</b> ML Classification</span>
-                <span class="wf-arrow">→</span>
-                <span class="wf-step"><b>5</b> Review Candidate</span>
-            </div>
-
             <div class="eyebrow">Screening Workspace</div>
             <h2>Analyze Light Curve</h2>
             <p class="muted" style="margin-bottom: 1.5rem;">Submit raw photometric flux measurements for exoplanet transit candidate screening.</p>
@@ -208,9 +217,51 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Data Format Guide -->
+                <!-- Right Column: Vertical Flowchart + Data Format Guide -->
                 <div>
                     <div class="panel">
+                        <div class="eyebrow" style="margin-bottom:0.35rem;">Screening Stages</div>
+                        <h3 style="color:#fff; margin-bottom:1.15rem;">Detection Pipeline</h3>
+                        <div class="v-flowchart">
+                            <div class="v-flow-step v-step-1">
+                                <div class="v-flow-node">01</div>
+                                <div class="v-flow-content">
+                                    <div class="v-flow-title">Photometry Ingestion</div>
+                                    <p class="v-flow-desc">Upload time-series stellar flux measurements from Kepler, TESS, or ground-based surveys.</p>
+                                </div>
+                            </div>
+                            <div class="v-flow-step v-step-2">
+                                <div class="v-flow-node">02</div>
+                                <div class="v-flow-content">
+                                    <div class="v-flow-title">Noise Detrending</div>
+                                    <p class="v-flow-desc">Filter instrumental noise, sensor drift, and low-frequency stellar stellar pulsations.</p>
+                                </div>
+                            </div>
+                            <div class="v-flow-step v-step-3">
+                                <div class="v-flow-node">03</div>
+                                <div class="v-flow-content">
+                                    <div class="v-flow-title">BLS Transit Search</div>
+                                    <p class="v-flow-desc">Scan trial periods (0.5 to 20 days) with Box Least Squares to detect recurring transit dips.</p>
+                                </div>
+                            </div>
+                            <div class="v-flow-step v-step-4">
+                                <div class="v-flow-node">04</div>
+                                <div class="v-flow-content">
+                                    <div class="v-flow-title">Feature Extraction</div>
+                                    <p class="v-flow-desc">Calculate transit depth, duration, ingress/egress ratios, and signal-to-noise metrics.</p>
+                                </div>
+                            </div>
+                            <div class="v-flow-step v-step-5">
+                                <div class="v-flow-node">05</div>
+                                <div class="v-flow-content">
+                                    <div class="v-flow-title">Ensemble Screening</div>
+                                    <p class="v-flow-desc">Evaluate signal through tuned XGBoost, Random Forest, and CNN models for candidate verdict.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-top: 1.35rem;">
                         <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 0.6rem; color:#fff;">Data Format Guide</p>
                         <p class="muted">For CSV files, include a numeric <code>flux</code> column. A <code>time</code> column is optional.</p>
                         <pre class="mono" style="background:rgba(15,23,42,0.85); padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.06); margin:0.8rem 0; color:#38bdf8;">time,flux
@@ -422,19 +473,53 @@
                 </div>
             </div>
 
-            <h3 style="margin: 2rem 0 1rem;">Detection & Screening Pipeline</h3>
-            <div class="workflow-banner" style="padding:1.15rem;">
-                <div style="text-align:center;"><b>1. Light Curve</b><br><span class="muted">Time-series flux</span></div>
-                <span class="wf-arrow">→</span>
-                <div style="text-align:center;"><b>2. Preprocessing</b><br><span class="muted">Noise & detrending</span></div>
-                <span class="wf-arrow">→</span>
-                <div style="text-align:center;"><b>3. Transit Detection</b><br><span class="muted">BLS periodogram</span></div>
-                <span class="wf-arrow">→</span>
-                <div style="text-align:center;"><b>4. Feature Extraction</b><br><span class="muted">Morphology & entropy</span></div>
-                <span class="wf-arrow">→</span>
-                <div style="text-align:center;"><b>5. Machine Learning</b><br><span class="muted">XGBoost Ensemble</span></div>
-                <span class="wf-arrow">→</span>
-                <div style="text-align:center;"><b style="color:#34d399;">6. Candidate Screening</b><br><span class="muted">Vetted candidate</span></div>
+            <div class="panel" style="margin-top:2rem;">
+                <div class="eyebrow" style="margin-bottom:0.35rem;">Scientific Architecture</div>
+                <h3 style="color:#fff; margin-bottom:1.25rem;">Detection & Screening Pipeline</h3>
+                <div class="v-flowchart">
+                    <div class="v-flow-step v-step-1">
+                        <div class="v-flow-node">01</div>
+                        <div class="v-flow-content">
+                            <div class="v-flow-title">Photometric Ingestion</div>
+                            <p class="v-flow-desc">High-precision stellar flux measurements collected across long baselines by space-borne (Kepler, TESS) or ground observatories.</p>
+                        </div>
+                    </div>
+                    <div class="v-flow-step v-step-2">
+                        <div class="v-flow-node">02</div>
+                        <div class="v-flow-content">
+                            <div class="v-flow-title">Detrending & Calibration</div>
+                            <p class="v-flow-desc">Systematic noise mitigation, baseline normalization, and removal of instrumental artifacts and stellar flare activity.</p>
+                        </div>
+                    </div>
+                    <div class="v-flow-step v-step-3">
+                        <div class="v-flow-node">03</div>
+                        <div class="v-flow-content">
+                            <div class="v-flow-title">BLS Periodic Dip Search</div>
+                            <p class="v-flow-desc">Astropy Box Least Squares periodogram algorithm scans trial orbital periods (0.5 to 20 days) to detect periodic box-shaped dips.</p>
+                        </div>
+                    </div>
+                    <div class="v-flow-step v-step-4">
+                        <div class="v-flow-node">04</div>
+                        <div class="v-flow-content">
+                            <div class="v-flow-title">Morphological Profiling</div>
+                            <p class="v-flow-desc">Calculation of 15 key astrophysical features: transit depth, transit duration, SNR, signal energy, Shannon entropy, and skewness.</p>
+                        </div>
+                    </div>
+                    <div class="v-flow-step v-step-5">
+                        <div class="v-flow-node">05</div>
+                        <div class="v-flow-content">
+                            <div class="v-flow-title">Machine Learning Ensemble</div>
+                            <p class="v-flow-desc">Supervised consensus voting combining tuned XGBoost, Random Forest, Support Vector Machines, and Deep Convolutional Networks.</p>
+                        </div>
+                    </div>
+                    <div class="v-flow-step v-step-6">
+                        <div class="v-flow-node">06</div>
+                        <div class="v-flow-content">
+                            <div class="v-flow-title">Candidate Screening Verdict</div>
+                            <p class="v-flow-desc">Generation of calibrated confidence scores, detection telemetry, diagnostic transit charts, and downloadable JSON reports.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <h3 style="margin: 2rem 0 1rem;">Core Technologies</h3>
