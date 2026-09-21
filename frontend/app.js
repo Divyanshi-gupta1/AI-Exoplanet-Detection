@@ -205,7 +205,7 @@ async function startFileAnalysis() {
     const progressPromise = animateProgressSteps();
 
     try {
-        const res = await fetch('/api/analyze/file', {
+        const res = await fetch(BACKEND_URL + '/api/analyze/file', {
             method: 'POST',
             body: formData
         });
@@ -238,7 +238,7 @@ async function startTestRowAnalysis() {
     const progressPromise = animateProgressSteps();
 
     try {
-        const res = await fetch('/api/analyze/test-row', {
+        const res = await fetch(BACKEND_URL + '/api/analyze/test-row', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ row_id: rowId })
@@ -682,8 +682,34 @@ function downloadReport() {
 // 9. App Initialization
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Fetch test-set metadata
-    fetch('/api/test-set-info')
+    // Fix the sample CSV download link to point to the right backend
+    const sampleLink = document.querySelector('a[href="/api/sample-csv"]');
+    if (sampleLink) {
+        sampleLink.href = BACKEND_URL + '/api/sample-csv';
+    }
+
+    // Silent wake-up ping — fires immediately so Render starts booting
+    // while the user is still reading the page. No UI blocking.
+    const dot = document.getElementById('api-status-dot');
+    const txt = document.getElementById('api-status-text');
+
+    fetch(BACKEND_URL + '/api/health')
+        .then(res => {
+            if (res.ok) {
+                if (dot) { dot.style.background = '#34d399'; }
+                if (txt) { txt.textContent = 'AI Core: Online'; }
+            } else {
+                if (dot) { dot.style.background = '#f43f5e'; }
+                if (txt) { txt.textContent = 'AI Core: Offline'; }
+            }
+        })
+        .catch(() => {
+            if (dot) { dot.style.background = '#f43f5e'; }
+            if (txt) { txt.textContent = 'AI Core: Offline'; }
+        });
+
+    // Fetch test-set metadata for the row-ID hint
+    fetch(BACKEND_URL + '/api/test-set-info')
         .then(res => res.json())
         .then(info => {
             if (info && info.max_row_id != null) {

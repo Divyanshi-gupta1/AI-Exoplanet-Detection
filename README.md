@@ -1,11 +1,3 @@
----
-title: ExoDip AI Exoplanet Detection
-emoji: 🪐
-colorFrom: indigo
-colorTo: blue
-sdk: static
-pinned: false
----
 
 # 🔭 ExoDip — AI Exoplanet Transit Screening
 

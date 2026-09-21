@@ -26,6 +26,10 @@
                 <button class="nav-item" data-page="About" onclick="navigateTo('About')">About</button>
                 <button class="nav-item" data-page="Docs" onclick="navigateTo('Docs')">Docs</button>
             </nav>
+            <div id="api-status" style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#94a3b8;white-space:nowrap;padding:0 0.5rem;">
+                <span id="api-status-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;"></span>
+                <span id="api-status-text">AI Core: Initializing…</span>
+            </div>
         </header>
 
         <!-- ================= VIEW: HOME ================= -->
@@ -498,6 +502,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="config.js"></script>
     <script src="planetary.js"></script>
     <script src="app.js"></script>
 </body>
