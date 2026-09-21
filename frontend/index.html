@@ -22,6 +22,8 @@
                 <span class="brand-name">ExoDip</span>
                 <span class="brand-pill">AI Screening</span>
             </div>
+
+            <!-- Desktop Nav Links -->
             <nav class="nav-links">
                 <button class="nav-item active" data-page="Home" onclick="navigateTo('Home')">Home</button>
                 <button class="nav-item" data-page="Analyze" onclick="navigateTo('Analyze')">Analyze</button>
@@ -30,11 +32,52 @@
                 <button class="nav-item" data-page="About" onclick="navigateTo('About')">About</button>
                 <button class="nav-item" data-page="Docs" onclick="navigateTo('Docs')">Docs</button>
             </nav>
-            <div id="api-status" style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#94a3b8;white-space:nowrap;padding:0 0.5rem;">
-                <span id="api-status-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;"></span>
-                <span id="api-status-text">AI Core: Initializing…</span>
+
+            <div class="nav-actions">
+                <div id="api-status" class="api-status-badge">
+                    <span id="api-status-dot" class="status-dot"></span>
+                    <span id="api-status-text">AI Core: Initializing…</span>
+                </div>
+
+                <!-- Hamburger Button for Phones -->
+                <button class="hamburger-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
+                    <span class="ham-bar"></span>
+                    <span class="ham-bar"></span>
+                    <span class="ham-bar"></span>
+                </button>
             </div>
         </header>
+
+        <!-- Mobile Drawer Navigation -->
+        <div class="mobile-nav-drawer" id="mobile-drawer">
+            <div class="mobile-nav-items">
+                <button class="mobile-nav-item active" data-page="Home" onclick="navigateTo('Home')">
+                    <span class="mobile-nav-icon">🏠</span> Home
+                </button>
+                <button class="mobile-nav-item" data-page="Analyze" onclick="navigateTo('Analyze')">
+                    <span class="mobile-nav-icon">🔭</span> Analyze
+                </button>
+                <button class="mobile-nav-item" data-page="Results" onclick="navigateTo('Results')">
+                    <span class="mobile-nav-icon">📊</span> Results
+                </button>
+                <button class="mobile-nav-item" data-page="History" onclick="navigateTo('History')">
+                    <span class="mobile-nav-icon">📜</span> History
+                </button>
+                <button class="mobile-nav-item" data-page="About" onclick="navigateTo('About')">
+                    <span class="mobile-nav-icon">🪐</span> About
+                </button>
+                <button class="mobile-nav-item" data-page="Docs" onclick="navigateTo('Docs')">
+                    <span class="mobile-nav-icon">📖</span> Docs
+                </button>
+            </div>
+            <div class="mobile-nav-footer">
+                <div class="mobile-status">
+                    <span class="status-dot mobile-status-dot"></span>
+                    <span class="mobile-status-text">AI Core: Initializing…</span>
+                </div>
+            </div>
+        </div>
+        <div class="mobile-backdrop" id="mobile-backdrop" onclick="closeMobileMenu()"></div>
 
         <!-- ================= VIEW: HOME ================= -->
         <main id="view-home" class="view-page">

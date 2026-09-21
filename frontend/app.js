@@ -26,12 +26,39 @@ try {
 }
 
 // ==========================================
-// 2. Navigation Controller
+// 2. Navigation Controller & Mobile Menu
 // ==========================================
+function toggleMobileMenu() {
+    const drawer = document.getElementById('mobile-drawer');
+    const btn = document.getElementById('mobile-menu-btn');
+    const backdrop = document.getElementById('mobile-backdrop');
+    if (!drawer) return;
+
+    const isOpen = drawer.classList.contains('open');
+    if (isOpen) {
+        closeMobileMenu();
+    } else {
+        drawer.classList.add('open');
+        if (btn) btn.classList.add('active');
+        if (backdrop) backdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeMobileMenu() {
+    const drawer = document.getElementById('mobile-drawer');
+    const btn = document.getElementById('mobile-menu-btn');
+    const backdrop = document.getElementById('mobile-backdrop');
+    if (drawer) drawer.classList.remove('open');
+    if (btn) btn.classList.remove('active');
+    if (backdrop) backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
 function navigateTo(pageName) {
     state.page = pageName;
 
-    // Update navbar active state
+    // Update navbar active state (desktop)
     document.querySelectorAll('.nav-item').forEach(el => {
         if (el.getAttribute('data-page') === pageName) {
             el.classList.add('active');
@@ -39,6 +66,18 @@ function navigateTo(pageName) {
             el.classList.remove('active');
         }
     });
+
+    // Update mobile drawer active state
+    document.querySelectorAll('.mobile-nav-item').forEach(el => {
+        if (el.getAttribute('data-page') === pageName) {
+            el.classList.add('active');
+        } else {
+            el.classList.remove('active');
+        }
+    });
+
+    // Close mobile menu if open
+    closeMobileMenu();
 
     // Toggle view visibility
     document.querySelectorAll('.view-page').forEach(el => el.style.display = 'none');
@@ -690,22 +729,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Silent wake-up ping — fires immediately so Render starts booting
     // while the user is still reading the page. No UI blocking.
-    const dot = document.getElementById('api-status-dot');
-    const txt = document.getElementById('api-status-text');
-
     fetch(BACKEND_URL + '/api/health')
         .then(res => {
-            if (res.ok) {
-                if (dot) { dot.style.background = '#34d399'; }
-                if (txt) { txt.textContent = 'AI Core: Online'; }
-            } else {
-                if (dot) { dot.style.background = '#f43f5e'; }
-                if (txt) { txt.textContent = 'AI Core: Offline'; }
-            }
+            const isOk = res.ok;
+            const color = isOk ? '#34d399' : '#f43f5e';
+            const shadow = isOk ? '0 0 8px rgba(52, 211, 153, 0.6)' : '0 0 8px rgba(244, 63, 94, 0.6)';
+            const text = isOk ? 'AI Core: Online' : 'AI Core: Offline';
+
+            document.querySelectorAll('.status-dot').forEach(d => {
+                d.style.background = color;
+                d.style.boxShadow = shadow;
+            });
+            const statusText = document.getElementById('api-status-text');
+            if (statusText) statusText.textContent = text;
+            const mobileStatusText = document.querySelector('.mobile-status-text');
+            if (mobileStatusText) mobileStatusText.textContent = text;
         })
         .catch(() => {
-            if (dot) { dot.style.background = '#f43f5e'; }
-            if (txt) { txt.textContent = 'AI Core: Offline'; }
+            document.querySelectorAll('.status-dot').forEach(d => {
+                d.style.background = '#f43f5e';
+                d.style.boxShadow = '0 0 8px rgba(244, 63, 94, 0.6)';
+            });
+            const statusText = document.getElementById('api-status-text');
+            if (statusText) statusText.textContent = 'AI Core: Offline';
+            const mobileStatusText = document.querySelector('.mobile-status-text');
+            if (mobileStatusText) mobileStatusText.textContent = 'AI Core: Offline';
         });
 
     // Fetch test-set metadata for the row-ID hint
