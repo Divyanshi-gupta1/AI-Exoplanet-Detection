@@ -139,6 +139,7 @@
             <p class="muted" style="margin-bottom: 1.5rem;">Submit raw photometric flux measurements for exoplanet transit candidate screening.</p>
 
             <div class="grid-analyze">
+                <!-- Left Column: Input Workspace + Data Format Guide -->
                 <div>
                     <div class="panel">
                         <!-- Analyze Tabs -->
@@ -202,23 +203,25 @@
                             <div class="loading-step" id="step-4"><span>○</span> Extracting transit depth, duration, and shape features</div>
                             <div class="loading-step" id="step-5"><span>○</span> Executing ML model ensemble (XGBoost, RF, CNN, SVM)</div>
                         </div>
+                    </div>
 
-                        <!-- Advanced Configuration Expander -->
-                        <details style="margin-top: 1.5rem;">
-                            <summary>Advanced Screening Configuration</summary>
-                            <ul style="color:#cbd5e1; font-size:0.92rem; line-height:1.75; padding-left:1.2rem; margin-top:0.5rem;">
-                                <li><b>Transit Search Method:</b> Box Least Squares (Astropy BLS periodogram)</li>
-                                <li><b>Period Search Grid:</b> 0.5 to 20.0 days (duration grid: 1 to 12 hours)</li>
-                                <li><b>Primary Decision Model:</b> Tuned XGBoost Classifier (selected via composite cross-validation score)</li>
-                                <li><b>Feature Pipeline:</b> 15 astrophysical and statistical indicators (energy, entropy, kurtosis, transit depth/duration)</li>
-                                <li><b>Candidate Vetting Criteria:</b> Periodic transit signal + BLS SNR ≥ 3.0 + ML classification confidence</li>
-                            </ul>
-                        </details>
+                    <!-- Data Format Guide Panel -->
+                    <div class="panel" style="margin-top: 1.5rem;">
+                        <div class="eyebrow" style="margin-bottom:0.35rem;">Input Specification</div>
+                        <h3 style="color:#fff; margin-bottom:0.6rem;">Data Format Guide</h3>
+                        <p class="muted">For CSV files, include a numeric <code>flux</code> column. A <code>time</code> column is optional.</p>
+                        <pre class="mono" style="background:rgba(15,23,42,0.85); padding:0.85rem; border-radius:8px; border:1px solid rgba(255,255,255,0.06); margin:0.85rem 0; color:#38bdf8; font-size:0.9rem; line-height:1.6;">time,flux
+0.0,1.0002
+0.02,0.9998
+0.04,0.9912
+0.06,0.9915</pre>
+                        <p class="muted" style="margin-top:0.75rem;">Minimum 30 data points are required. Kepler 3197-cadence observations are fully supported.</p>
                     </div>
                 </div>
 
-                <!-- Right Column: Vertical Flowchart + Data Format Guide -->
+                <!-- Right Column: Vertical Flowchart + Engine Parameters -->
                 <div>
+                    <!-- Pipeline Flowchart Panel -->
                     <div class="panel">
                         <div class="eyebrow" style="margin-bottom:0.35rem;">Screening Stages</div>
                         <h3 style="color:#fff; margin-bottom:1.15rem;">Detection Pipeline</h3>
@@ -234,7 +237,7 @@
                                 <div class="v-flow-node">02</div>
                                 <div class="v-flow-content">
                                     <div class="v-flow-title">Noise Detrending</div>
-                                    <p class="v-flow-desc">Filter instrumental noise, sensor drift, and low-frequency stellar stellar pulsations.</p>
+                                    <p class="v-flow-desc">Filter instrumental noise, sensor drift, and low-frequency stellar pulsations.</p>
                                 </div>
                             </div>
                             <div class="v-flow-step v-step-3">
@@ -261,15 +264,17 @@
                         </div>
                     </div>
 
-                    <div class="panel" style="margin-top: 1.35rem;">
-                        <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 0.6rem; color:#fff;">Data Format Guide</p>
-                        <p class="muted">For CSV files, include a numeric <code>flux</code> column. A <code>time</code> column is optional.</p>
-                        <pre class="mono" style="background:rgba(15,23,42,0.85); padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.06); margin:0.8rem 0; color:#38bdf8;">time,flux
-0.0,1.0002
-0.02,0.9998
-0.04,0.9912
-0.06,0.9915</pre>
-                        <p class="muted" style="margin-top:0.75rem;">Minimum 30 data points are required. Kepler 3197-cadence observations are fully supported.</p>
+                    <!-- Engine & Model Configuration Panel -->
+                    <div class="panel" style="margin-top: 1.5rem;">
+                        <div class="eyebrow" style="margin-bottom:0.35rem;">Engine Settings</div>
+                        <h3 style="color:#fff; margin-bottom:0.85rem;">Astrophysical Parameters</h3>
+                        <ul style="color:#cbd5e1; font-size:0.9rem; line-height:1.75; padding-left:1.2rem; margin:0;">
+                            <li><b>Transit Search Method:</b> Box Least Squares (Astropy BLS periodogram)</li>
+                            <li><b>Period Search Grid:</b> 0.5 to 20.0 days (duration grid: 1 to 12 hours)</li>
+                            <li><b>Primary Decision Model:</b> Tuned XGBoost Classifier (composite cross-validation score)</li>
+                            <li><b>Feature Pipeline:</b> 15 astrophysical and statistical indicators (energy, entropy, depth, duration)</li>
+                            <li><b>Candidate Vetting Criteria:</b> Periodic dip + BLS SNR ≥ 3.0 + ML classification confidence</li>
+                        </ul>
                     </div>
                 </div>
             </div>
