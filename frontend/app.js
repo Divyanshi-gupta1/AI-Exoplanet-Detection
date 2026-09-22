@@ -8,7 +8,7 @@
 // 1. Application State
 // ==========================================
 const state = {
-    page: 'Analyze',
+    page: 'Home',
     selectedFile: null,
     activeResult: null,
     history: []
@@ -91,13 +91,8 @@ function navigateTo(pageName) {
     // Page-specific lifecycle hooks
     if (pageName === 'Results') {
         renderResultsView();
-    }
-}
-
-function scrollToWorkspace() {
-    const ws = document.getElementById('workspace-panel');
-    if (ws) {
-        ws.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (pageName === 'History') {
+        renderHistoryView();
     }
 }
 
@@ -118,42 +113,46 @@ function switchAnalyzeTab(tabId) {
     }
 }
 
-function showResultPlot(type) {
-    const fullEl = document.getElementById('chart-full');
-    const zoomEl = document.getElementById('chart-zoom');
-    const toggleFull = document.getElementById('plot-toggle-full');
-    const toggleZoom = document.getElementById('plot-toggle-zoom');
+function switchResultTab(tabKey) {
+    const parent = document.querySelector('#view-results');
+    parent.querySelectorAll('.tab-nav .tab-btn').forEach(b => b.classList.remove('active'));
+    parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-    if (type === 'full') {
-        if (fullEl) fullEl.style.display = 'block';
-        if (zoomEl) zoomEl.style.display = 'none';
-        if (toggleFull) { toggleFull.classList.add('active'); }
-        if (toggleZoom) { toggleZoom.classList.remove('active'); }
-        if (fullEl && fullEl.data && window.Plotly) Plotly.Plots.resize(fullEl);
-    } else {
-        if (fullEl) fullEl.style.display = 'none';
-        if (zoomEl) zoomEl.style.display = 'block';
-        if (toggleFull) { toggleFull.classList.remove('active'); }
-        if (toggleZoom) { toggleZoom.classList.add('active'); }
-        if (zoomEl && zoomEl.data && window.Plotly) Plotly.Plots.resize(zoomEl);
+    const tabMap = {
+        'full': { index: 0, id: 'res-tab-full' },
+        'zoom': { index: 1, id: 'res-tab-zoom' },
+        'models': { index: 2, id: 'res-tab-models' },
+        'features': { index: 3, id: 'res-tab-features' }
+    };
+
+    const target = tabMap[tabKey];
+    if (target) {
+        parent.querySelectorAll('.tab-nav .tab-btn')[target.index].classList.add('active');
+        document.getElementById(target.id).classList.add('active');
+
+        // Trigger Plotly relayout to ensure proper dimensions on tab reveal
+        if (tabKey === 'full' && document.getElementById('chart-full')) {
+            Plotly.Plots.resize('chart-full');
+        } else if (tabKey === 'zoom' && document.getElementById('chart-zoom')) {
+            Plotly.Plots.resize('chart-zoom');
+        } else if (tabKey === 'models' && document.getElementById('chart-probs')) {
+            Plotly.Plots.resize('chart-probs');
+        }
     }
 }
 
 function switchDocsTab(tabKey) {
-    const parent = document.querySelector('#view-documentation');
+    const parent = document.querySelector('#view-docs');
     parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
     const tabMap = {
-        'start':       { index: 0, id: 'docs-tab-start' },
-        'formats':     { index: 1, id: 'docs-tab-formats' },
-        'pipeline':    { index: 2, id: 'docs-tab-pipeline' },
-        'bls':         { index: 3, id: 'docs-tab-bls' },
-        'features':    { index: 4, id: 'docs-tab-features' },
-        'models':      { index: 5, id: 'docs-tab-models' },
-        'results':     { index: 6, id: 'docs-tab-results' },
-        'limitations': { index: 7, id: 'docs-tab-limitations' },
-        'faq':         { index: 8, id: 'docs-tab-faq' }
+        'start': { index: 0, id: 'docs-tab-start' },
+        'formats': { index: 1, id: 'docs-tab-formats' },
+        'pipeline': { index: 2, id: 'docs-tab-pipeline' },
+        'results': { index: 3, id: 'docs-tab-results' },
+        'limitations': { index: 4, id: 'docs-tab-limitations' },
+        'faq': { index: 5, id: 'docs-tab-faq' }
     };
 
     const target = tabMap[tabKey];
@@ -214,23 +213,20 @@ function handleFileSelected(file) {
 // 5. Analysis Execution & API Calls
 // ==========================================
 async function animateProgressSteps() {
-    const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
+    const steps = ['step-1', 'step-2', 'step-3', 'step-4', 'step-5'];
     steps.forEach(id => {
         const el = document.getElementById(id);
-        if (el) {
-            el.className = 'loading-step';
-            el.querySelector('span').textContent = '○';
-        }
+        el.className = 'loading-step';
+        el.querySelector('span').textContent = '○';
     });
 
     document.getElementById('analysis-loading-banner').style.display = 'block';
 
     for (let i = 0; i < steps.length; i++) {
         const el = document.getElementById(steps[i]);
-        if (!el) continue;
         el.className = 'loading-step active';
         el.querySelector('span').textContent = '▶';
-        await new Promise(r => setTimeout(r, 260));
+        await new Promise(r => setTimeout(r, 220));
         el.className = 'loading-step done';
         el.querySelector('span').textContent = '✓';
     }
@@ -238,7 +234,7 @@ async function animateProgressSteps() {
 
 async function startFileAnalysis() {
     if (!state.selectedFile) {
-        alert('Please select a photometry file to screen.');
+        alert('Please select a file to screen.');
         return;
     }
 
@@ -261,13 +257,11 @@ async function startFileAnalysis() {
         }
 
         const data = await res.json();
-        // Label uploaded file as source for display
-        if (!data.source) data.source = state.selectedFile.name;
         saveAndDisplayResult(data);
 
     } catch (err) {
         document.getElementById('analysis-loading-banner').style.display = 'none';
-        alert('Screening error: ' + err.message);
+        alert('Error: ' + err.message);
     }
 }
 
@@ -276,7 +270,7 @@ async function startTestRowAnalysis() {
     const rowId = parseInt(rowInput.value, 10);
 
     if (isNaN(rowId) || rowId < 0) {
-        alert('Please provide a valid non-negative row index.');
+        alert('Please provide a valid non-negative row ID.');
         return;
     }
 
@@ -297,32 +291,12 @@ async function startTestRowAnalysis() {
         }
 
         const data = await res.json();
-        // Label clearly as demonstration dataset
-        data.source = `Demonstration Dataset — Kepler exoTest.csv Row #${rowId}`;
         saveAndDisplayResult(data);
 
     } catch (err) {
         document.getElementById('analysis-loading-banner').style.display = 'none';
-        alert('Screening error: ' + err.message);
+        alert('Error: ' + err.message);
     }
-}
-
-/**
- * Run example analysis via pre-loaded Kepler test dataset row.
- * Called by "Try Example" hero button and the example link in the upload zone.
- * @param {number} rowId - Row index (defaults to 0)
- */
-async function runExampleAnalysis(rowId = 0) {
-    // Switch to the Analyze page and select example tab
-    navigateTo('Analyze');
-    switchAnalyzeTab('test-row');
-
-    const rowInput = document.getElementById('test-row-id');
-    if (rowInput) rowInput.value = rowId;
-
-    // Short pause for UI to settle, then fire screening
-    await new Promise(r => setTimeout(r, 80));
-    await startTestRowAnalysis();
 }
 
 function saveAndDisplayResult(data) {
@@ -343,9 +317,9 @@ function saveAndDisplayResult(data) {
         data: data
     });
 
-    // Persist to localStorage (cap at 50 entries to avoid quota issues)
+    // Persist to localStorage
     try {
-        localStorage.setItem('exodip_history', JSON.stringify(state.history.slice(0, 50)));
+        localStorage.setItem('exodip_history', JSON.stringify(state.history));
     } catch (e) {
         console.warn('Could not save to localStorage:', e);
     }
@@ -373,40 +347,46 @@ function renderResultsView() {
     const isPlanet = r.prediction === 'Planet';
 
     // Source line
-    const cadences = r.chart_data && r.chart_data.flux ? r.chart_data.flux.length.toLocaleString() : '—';
-    document.getElementById('res-source-line').textContent = `${r.source} · ${cadences} Cadences · Analyzed on ${r.timestamp}`;
+    document.getElementById('res-source-line').textContent = `${r.source} · Analyzed on ${r.timestamp}`;
 
-    // Verdict Badge + Confidence
+    // Verdict Badge
     const badgeContainer = document.getElementById('res-badge-container');
     const verdictDesc = document.getElementById('res-verdict-desc');
-    const confValue = document.getElementById('res-conf-value');
-
-    const confVal = r.confidence != null ? r.confidence : 0;
-    if (confValue) confValue.textContent = `${confVal.toFixed(1)}%`;
 
     if (isPlanet) {
         badgeContainer.innerHTML = "<div class='candidate-badge-candidate'>EXOPLANET CANDIDATE</div>";
-        verdictDesc.textContent = "Periodic transit-like signals detected with sufficient BLS significance and classifier confidence to warrant further observational follow-up.";
+        verdictDesc.textContent = "Candidate status indicates periodic transit-like signal characteristics warranting further astronomical follow-up.";
     } else {
         badgeContainer.innerHTML = "<div class='candidate-badge-non'>NON-CANDIDATE</div>";
-        verdictDesc.textContent = "Signal does not exhibit sufficient periodic transit depth, BLS SNR, or classifier confidence. Consistent with stellar noise or non-planetary variability.";
+        verdictDesc.textContent = "Signal does not exhibit sufficient periodic transit depth, SNR, or classifier confidence to qualify as a candidate.";
     }
 
-    // Detection Telemetry — Model Agreement
+    // Confidence
+    const confVal = r.confidence != null ? r.confidence : 0;
+    document.getElementById('res-conf-value').textContent = `${confVal.toFixed(1)}%`;
+    document.getElementById('res-conf-bar').style.width = `${Math.min(Math.max(confVal, 0), 100)}%`;
+
+    // Detection Telemetry
+    document.getElementById('res-tele-model').textContent = r.model;
+    document.getElementById('res-tele-dips').textContent = r.chart_data ? r.chart_data.dips.length : 0;
+    document.getElementById('res-tele-noise').textContent = r.features ? r.features.noise_level.toPrecision(4) : '0';
+    document.getElementById('res-tele-neg').textContent = r.features ? r.features.negative_ratio.toPrecision(4) : '0';
+
+    // Model Agreement calculation
     const modelProbs = r.model_probabilities || {};
     const totalVotes = Object.keys(modelProbs).length || 1;
     const planetVotes = Object.values(modelProbs).filter(p => p >= 0.5).length;
     const agreeEl = document.getElementById('res-tele-agree');
 
     if (planetVotes === totalVotes || planetVotes === 0) {
-        agreeEl.textContent = 'Unanimous';
-        agreeEl.style.color = 'var(--accent-teal)';
+        agreeEl.textContent = 'Unanimous (All models agree)';
+        agreeEl.style.color = '#34d399';
     } else if (isPlanet) {
-        agreeEl.textContent = `Consensus (${planetVotes}/${totalVotes})`;
-        agreeEl.style.color = 'var(--accent-blue)';
+        agreeEl.textContent = `Consensus (${planetVotes}/${totalVotes} models agree)`;
+        agreeEl.style.color = '#38bdf8';
     } else {
-        agreeEl.textContent = `Split (${totalVotes - planetVotes}/${totalVotes} reject)`;
-        agreeEl.style.color = 'var(--text-muted)';
+        agreeEl.textContent = `Consensus (${totalVotes - planetVotes}/${totalVotes} models agree)`;
+        agreeEl.style.color = '#38bdf8';
     }
 
     // Signal Metrics Strip
@@ -420,9 +400,8 @@ function renderResultsView() {
     document.getElementById('res-m-depth').textContent = (blsDepth != null && blsDepth > 0) ? `${(blsDepth < 1.0 ? blsDepth * 100 : blsDepth).toFixed(3)}%` : '0.000%';
     document.getElementById('res-m-duration').textContent = (blsDur != null && blsDur > 0) ? `${blsDur.toFixed(1)} h` : (r.features ? `${r.features.avg_transit_duration.toFixed(1)} pts` : 'N/A');
     document.getElementById('res-m-snr').textContent = (blsSnr != null && blsSnr > 0) ? blsSnr.toFixed(1) : '0.0';
+    document.getElementById('res-m-groups').textContent = r.chart_data ? r.chart_data.dips.length : 0;
     document.getElementById('res-m-model').textContent = r.model;
-    document.getElementById('res-tele-dips').textContent = r.chart_data ? r.chart_data.dips.length : 0;
-    document.getElementById('res-tele-noise').textContent = r.features ? r.features.noise_level.toPrecision(4) : '0';
 
     // Fill Features tab
     const f = r.features || {};
@@ -431,19 +410,26 @@ function renderResultsView() {
     document.getElementById('feat-var').textContent = f.variance != null ? f.variance.toPrecision(4) : '0.0';
     document.getElementById('feat-skew').textContent = f.skewness != null ? f.skewness.toPrecision(4) : '0.0';
     document.getElementById('feat-kurt').textContent = f.kurtosis != null ? f.kurtosis.toPrecision(4) : '0.0';
-    document.getElementById('feat-neg').textContent = f.negative_ratio != null ? f.negative_ratio.toPrecision(4) : '0.0';
+
     document.getElementById('feat-energy').textContent = f.signal_energy != null ? f.signal_energy.toPrecision(4) : '0.0';
     document.getElementById('feat-entropy').textContent = f.spectral_entropy != null ? f.spectral_entropy.toPrecision(4) : '0.0';
+    document.getElementById('feat-neg').textContent = f.negative_ratio != null ? f.negative_ratio.toPrecision(4) : '0.0';
+    document.getElementById('feat-noise').textContent = f.noise_level != null ? f.noise_level.toPrecision(4) : '0.0';
+
     document.getElementById('feat-depth').textContent = f.avg_transit_depth != null ? f.avg_transit_depth.toPrecision(4) : '0.0';
     document.getElementById('feat-dur').textContent = f.avg_transit_duration != null ? `${f.avg_transit_duration.toFixed(1)} pts` : '0.0';
     document.getElementById('feat-dips').textContent = f.num_dips != null ? f.num_dips : '0';
+    document.getElementById('feat-min').textContent = f.min_flux != null ? f.min_flux.toPrecision(4) : '0.0';
+
+    document.getElementById('feat-bls-p').textContent = (blsP != null && blsP > 0) ? `${blsP.toFixed(2)} d` : 'N/A';
+    document.getElementById('feat-bls-dur').textContent = (blsDur != null && blsDur > 0) ? `${blsDur.toFixed(1)} h` : 'N/A';
+    document.getElementById('feat-bls-snr').textContent = (blsSnr != null && blsSnr > 0) ? blsSnr.toFixed(1) : '0.0';
     document.getElementById('feat-bls-pow').textContent = m.bls_power != null ? m.bls_power.toPrecision(4) : '0.0';
 
     // Render Models Table
     renderModelsTable(r);
 
-    // Render Plotly Charts — reset to Full view
-    showResultPlot('full');
+    // Render Plotly Charts
     renderCharts(r);
 }
 
@@ -461,7 +447,7 @@ function renderModelsTable(r) {
         const dispProb = (isSelected && r.prediction === 'Planet') ? (r.probability * 100) : (prob * 100);
 
         rows.push({
-            modelName: (isSelected ? '<span style="color:#D3A65A;margin-right:4px;" title="Primary decision model">★</span>' : '') + mname,
+            modelName: (isSelected ? '<span style="color:#38bdf8;margin-right:4px;">●</span> ' : '') + mname,
             acc: sc.Accuracy != null ? sc.Accuracy.toFixed(4) : '-',
             prec: sc.Precision != null ? sc.Precision.toFixed(4) : '-',
             rec: sc.Recall != null ? sc.Recall.toFixed(4) : '-',
@@ -470,7 +456,6 @@ function renderModelsTable(r) {
             comp: sc.Composite != null ? sc.Composite.toFixed(4) : '0',
             compNum: sc.Composite || 0,
             verdict: verdict,
-            verdictColor: verdict === 'Candidate' ? 'var(--accent-gold)' : 'var(--text-muted)',
             prob: `${dispProb.toFixed(1)}%`
         });
     }
@@ -487,8 +472,8 @@ function renderModelsTable(r) {
             <td>${row.f1}</td>
             <td>${row.auc}</td>
             <td><b>${row.comp}</b></td>
-            <td style="color:${row.verdictColor}; font-weight:600;">${row.verdict}</td>
-            <td style="color:var(--accent-blue); font-weight:600;">${row.prob}</td>
+            <td>${row.verdict}</td>
+            <td style="color:#38bdf8; font-weight:600;">${row.prob}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -502,15 +487,6 @@ function renderCharts(r) {
     const smooth = cd.smooth || [];
     const dips = cd.dips || [];
 
-    // --- Observatory Palette ---
-    const OBS_BG = '#0B1020';
-    const OBS_SURFACE = '#141A27';
-    const OBS_GRID = '#293344';
-    const OBS_BLUE = '#5B7C99';
-    const OBS_TEAL = '#6F9694';
-    const OBS_GOLD = '#D3A65A';
-    const OBS_TEXT = '#8C96A6';
-
     // --- Chart 1: Full Light Curve ---
     const fullTraces = [
         {
@@ -518,15 +494,15 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'lines',
             name: 'Observed Flux',
-            line: { color: OBS_BLUE, width: 1 },
-            opacity: 0.75
+            line: { color: '#818cf8', width: 1 },
+            opacity: 0.65
         },
         {
             y: smooth,
             type: 'scatter',
             mode: 'lines',
             name: 'Smoothed Trend',
-            line: { color: OBS_TEAL, width: 2 }
+            line: { color: '#38bdf8', width: 2 }
         }
     ];
 
@@ -536,39 +512,27 @@ function renderCharts(r) {
             y: dips.map(i => smooth[i]),
             type: 'scatter',
             mode: 'markers',
-            name: 'Detected Transit Dips',
-            marker: { color: OBS_GOLD, size: 6, symbol: 'circle', line: { color: '#A07A30', width: 1 } }
+            name: 'Detected Dips',
+            marker: { color: '#f43f5e', size: 5, symbol: 'circle' }
         });
     }
 
     const fullLayout = {
-        title: { text: 'Full Photometric Light Curve with Transit Event Markers', font: { size: 13, color: OBS_TEXT }, x: 0 },
+        title: 'Light Curve with Detected Transit Dips',
         template: 'plotly_dark',
-        paper_bgcolor: OBS_SURFACE,
-        plot_bgcolor: OBS_BG,
-        height: 460,
-        margin: { l: 55, r: 20, t: 44, b: 48 },
-        legend: { orientation: 'h', y: -0.14, font: { size: 11, color: OBS_TEXT }, bgcolor: 'transparent' },
-        xaxis: {
-            title: { text: 'Sample Index (Cadence)', font: { size: 11, color: OBS_TEXT } },
-            gridcolor: OBS_GRID,
-            zeroline: false,
-            color: OBS_TEXT,
-            tickfont: { size: 10, color: OBS_TEXT }
-        },
-        yaxis: {
-            title: { text: 'Normalized Relative Flux', font: { size: 11, color: OBS_TEXT } },
-            gridcolor: OBS_GRID,
-            zeroline: false,
-            color: OBS_TEXT,
-            tickfont: { size: 10, color: OBS_TEXT }
-        },
-        font: { family: "'IBM Plex Mono', monospace", color: OBS_TEXT }
+        paper_bgcolor: '#03050a',
+        plot_bgcolor: '#03050a',
+        height: 400,
+        margin: { l: 45, r: 15, t: 42, b: 40 },
+        legend: { orientation: 'h', y: 1.05 },
+        xaxis: { title: 'Time / Sample Index', gridcolor: '#1b2a42', zeroline: false },
+        yaxis: { title: 'Normalized Relative Flux', gridcolor: '#1b2a42', zeroline: false },
+        font: { family: 'Inter, sans-serif' }
     };
 
     Plotly.newPlot('chart-full', fullTraces, fullLayout, { responsive: true, displayModeBar: false });
 
-    // --- Chart 2: Zoomed Transit Dip View ---
+    // --- Chart 2: Zoomed Transit View ---
     const z = cd.zoom || {};
     const start = z.start || 0;
     const end = z.end || Math.min(flux.length, 150);
@@ -581,9 +545,9 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'markers+lines',
             name: 'Observed Data Points',
-            line: { color: OBS_BLUE, width: 1 },
-            marker: { size: 4, color: OBS_BLUE },
-            opacity: 0.75
+            line: { color: '#818cf8', width: 1 },
+            marker: { size: 4, color: '#818cf8' },
+            opacity: 0.6
         },
         {
             x: xRange,
@@ -591,7 +555,7 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'lines',
             name: 'Smoothed Profile',
-            line: { color: OBS_TEAL, width: 2.5 }
+            line: { color: '#38bdf8', width: 2.5 }
         }
     ];
 
@@ -602,37 +566,25 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'markers',
             name: 'Transit Ingress/Egress',
-            marker: { color: OBS_GOLD, size: 8, symbol: 'triangle-down', line: { color: '#A07A30', width: 1 } }
+            marker: { color: '#f43f5e', size: 7, symbol: 'triangle-down' }
         });
     }
 
     const zoomTitle = z.has_deepest_dip
-        ? `Deepest Transit Event — Centered on Sample #${z.deepest_idx}`
-        : 'Zoomed Transit Window (No Significant Dips Detected)';
+        ? `Deepest Transit Dip (Centered at Sample #${z.deepest_idx})`
+        : 'Transit View (No Significant Dips Detected)';
 
     const zoomLayout = {
-        title: { text: zoomTitle, font: { size: 13, color: OBS_TEXT }, x: 0 },
+        title: zoomTitle,
         template: 'plotly_dark',
-        paper_bgcolor: OBS_SURFACE,
-        plot_bgcolor: OBS_BG,
-        height: 460,
-        margin: { l: 55, r: 20, t: 44, b: 48 },
-        legend: { orientation: 'h', y: -0.14, font: { size: 11, color: OBS_TEXT }, bgcolor: 'transparent' },
-        xaxis: {
-            title: { text: 'Sample Index (Cadence)', font: { size: 11, color: OBS_TEXT } },
-            gridcolor: OBS_GRID,
-            zeroline: false,
-            color: OBS_TEXT,
-            tickfont: { size: 10, color: OBS_TEXT }
-        },
-        yaxis: {
-            title: { text: 'Normalized Relative Flux', font: { size: 11, color: OBS_TEXT } },
-            gridcolor: OBS_GRID,
-            zeroline: false,
-            color: OBS_TEXT,
-            tickfont: { size: 10, color: OBS_TEXT }
-        },
-        font: { family: "'IBM Plex Mono', monospace", color: OBS_TEXT }
+        paper_bgcolor: '#03050a',
+        plot_bgcolor: '#03050a',
+        height: 380,
+        margin: { l: 45, r: 20, t: 40, b: 40 },
+        legend: { orientation: 'h', y: 1.05 },
+        xaxis: { title: 'Sample Index', gridcolor: '#1b2a42', zeroline: false },
+        yaxis: { title: 'Normalized Relative Flux', gridcolor: '#1b2a42', zeroline: false },
+        font: { family: 'Inter, sans-serif' }
     };
 
     Plotly.newPlot('chart-zoom', zoomTraces, zoomLayout, { responsive: true, displayModeBar: false });
@@ -648,54 +600,93 @@ function renderCharts(r) {
         return Math.round(p * 1000) / 10;
     });
 
-    const barColors = probValues.map(v => v >= 50 ? OBS_GOLD : OBS_BLUE);
-
     const probTraces = [
         {
             x: modelNames,
             y: probValues,
             type: 'bar',
-            marker: { color: barColors, opacity: 0.88, line: { color: OBS_GRID, width: 1 } },
+            marker: { color: '#818cf8', opacity: 0.9 },
             text: probValues.map(v => `${v}%`),
-            textposition: 'outside',
-            textfont: { family: "'IBM Plex Mono', monospace", size: 11, color: OBS_TEXT }
+            textposition: 'auto'
         }
     ];
 
     const probLayout = {
         template: 'plotly_dark',
-        paper_bgcolor: 'transparent',
-        plot_bgcolor: 'transparent',
-        height: 220,
-        margin: { l: 45, r: 20, t: 12, b: 52 },
-        xaxis: {
-            gridcolor: OBS_GRID,
-            color: OBS_TEXT,
-            tickfont: { size: 11, family: "'IBM Plex Mono', monospace", color: OBS_TEXT }
-        },
-        yaxis: {
-            title: { text: 'Probability (%)', font: { size: 10, color: OBS_TEXT } },
-            range: [0, 110],
-            gridcolor: OBS_GRID,
-            color: OBS_TEXT,
-            tickfont: { size: 10, color: OBS_TEXT }
-        },
-        shapes: [
-            { type: 'line', x0: -0.5, x1: modelNames.length - 0.5, y0: 50, y1: 50,
-              line: { color: OBS_TEXT, width: 1, dash: 'dot' } }
-        ],
-        annotations: [
-            { x: modelNames.length - 0.5, y: 50, xanchor: 'right', yanchor: 'bottom',
-              text: '50% Decision Threshold', font: { size: 10, color: OBS_TEXT }, showarrow: false }
-        ],
-        font: { family: "'IBM Plex Mono', monospace", color: OBS_TEXT }
+        paper_bgcolor: '#03050a',
+        plot_bgcolor: '#03050a',
+        height: 250,
+        margin: { l: 40, r: 20, t: 20, b: 45 },
+        xaxis: { gridcolor: '#1b2a42' },
+        yaxis: { title: 'Probability (%)', range: [0, 100], gridcolor: '#1b2a42' },
+        font: { family: 'Inter, sans-serif' }
     };
 
     Plotly.newPlot('chart-probs', probTraces, probLayout, { responsive: true, displayModeBar: false });
 }
 
 // ==========================================
-// 7. Download Report Handler
+// 7. Session History Controller
+// ==========================================
+function renderHistoryView() {
+    const total = state.history.length;
+    const planets = state.history.filter(h => h.prediction === 'Planet').length;
+    const rate = total > 0 ? (planets / total * 100.0).toFixed(1) : '0.0';
+
+    document.getElementById('hist-total').textContent = total;
+    document.getElementById('hist-planets').textContent = planets;
+    document.getElementById('hist-rate').textContent = `${rate}%`;
+
+    const tableContainer = document.getElementById('history-table-container');
+    const emptyEl = document.getElementById('history-empty');
+    const tbody = document.getElementById('history-tbody');
+
+    if (total === 0) {
+        tableContainer.style.display = 'none';
+        emptyEl.style.display = 'block';
+        return;
+    }
+
+    tableContainer.style.display = 'block';
+    emptyEl.style.display = 'none';
+    tbody.innerHTML = '';
+
+    state.history.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        const verdictText = item.prediction === 'Planet' ? 'Candidate' : 'Non-Candidate';
+        const confText = item.confidence != null ? `${item.confidence.toFixed(1)}%` : '-';
+
+        tr.innerHTML = `
+            <td><b>${item.source}</b></td>
+            <td>${verdictText}</td>
+            <td style="color:#38bdf8; font-weight:600;">${confText}</td>
+            <td>${item.model || 'XGBoost'}</td>
+            <td class="muted">${item.timestamp}</td>
+            <td><button class="btn btn-primary" style="min-height:2rem; padding:0 0.8rem; font-size:0.85rem;" onclick="openHistoryItem(${idx})">View</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function openHistoryItem(index) {
+    if (state.history[index]) {
+        state.activeResult = state.history[index].data;
+        navigateTo('Results');
+    }
+}
+
+function clearHistory() {
+    if (confirm('Are you sure you want to clear your active session history?')) {
+        state.history = [];
+        try {
+            localStorage.removeItem('exodip_history');
+        } catch (e) {}
+        renderHistoryView();
+    }
+}
+
+// ==========================================
+// 8. Download Report Handler
 // ==========================================
 function downloadReport() {
     if (!state.activeResult) return;
@@ -712,7 +703,6 @@ function downloadReport() {
         selection_metric: r.selection_metric,
         metrics: r.metrics || {},
         model_probabilities: r.model_probabilities || {},
-        model_scores: r.model_scores || {},
         features: r.features || {}
     };
 
@@ -720,8 +710,7 @@ function downloadReport() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const ts = new Date().toISOString().slice(0, 10);
-    a.download = `exodip_telemetry_${ts}.json`;
+    a.download = 'exodip_report.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -729,7 +718,7 @@ function downloadReport() {
 }
 
 // ==========================================
-// 8. App Initialization
+// 9. App Initialization
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     // Fix the sample CSV download link to point to the right backend
@@ -738,15 +727,13 @@ document.addEventListener('DOMContentLoaded', () => {
         sampleLink.href = BACKEND_URL + '/api/sample-csv';
     }
 
-    // Initialize on Analyze page
-    navigateTo('Analyze');
-
     // Silent wake-up ping — fires immediately so Render starts booting
+    // while the user is still reading the page. No UI blocking.
     fetch(BACKEND_URL + '/api/health')
         .then(res => {
             const isOk = res.ok;
-            const color = isOk ? '#6F9694' : '#B96B62';
-            const shadow = isOk ? '0 0 8px rgba(111, 150, 148, 0.6)' : '0 0 8px rgba(185, 107, 98, 0.5)';
+            const color = isOk ? '#34d399' : '#f43f5e';
+            const shadow = isOk ? '0 0 8px rgba(52, 211, 153, 0.6)' : '0 0 8px rgba(244, 63, 94, 0.6)';
             const text = isOk ? 'Engine: Online' : 'Engine: Offline';
 
             document.querySelectorAll('.status-dot').forEach(d => {
@@ -760,8 +747,8 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(() => {
             document.querySelectorAll('.status-dot').forEach(d => {
-                d.style.background = '#B96B62';
-                d.style.boxShadow = '0 0 8px rgba(185, 107, 98, 0.5)';
+                d.style.background = '#f43f5e';
+                d.style.boxShadow = '0 0 8px rgba(244, 63, 94, 0.6)';
             });
             const statusText = document.getElementById('api-status-text');
             if (statusText) statusText.textContent = 'Engine: Offline';
@@ -782,7 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.warn('Could not fetch test set info:', err));
 
-    // Handle window resize for Plotly charts
+    // Handle mobile orientation changes & window resize for Plotly charts
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
@@ -798,3 +785,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 150);
     });
 });
+
