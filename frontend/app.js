@@ -380,13 +380,13 @@ function renderResultsView() {
 
     if (planetVotes === totalVotes || planetVotes === 0) {
         agreeEl.textContent = 'Unanimous (All models agree)';
-        agreeEl.style.color = '#34d399';
+        agreeEl.style.color = '#7DD3C7';
     } else if (isPlanet) {
         agreeEl.textContent = `Consensus (${planetVotes}/${totalVotes} models agree)`;
-        agreeEl.style.color = '#38bdf8';
+        agreeEl.style.color = '#6FA8DC';
     } else {
         agreeEl.textContent = `Consensus (${totalVotes - planetVotes}/${totalVotes} models agree)`;
-        agreeEl.style.color = '#38bdf8';
+        agreeEl.style.color = '#94A3B8';
     }
 
     // Signal Metrics Strip
@@ -447,7 +447,7 @@ function renderModelsTable(r) {
         const dispProb = (isSelected && r.prediction === 'Planet') ? (r.probability * 100) : (prob * 100);
 
         rows.push({
-            modelName: (isSelected ? '<span style="color:#38bdf8;margin-right:4px;">●</span> ' : '') + mname,
+            modelName: (isSelected ? '<span style="color:#7DD3C7;margin-right:4px;">●</span> ' : '') + mname,
             acc: sc.Accuracy != null ? sc.Accuracy.toFixed(4) : '-',
             prec: sc.Precision != null ? sc.Precision.toFixed(4) : '-',
             rec: sc.Recall != null ? sc.Recall.toFixed(4) : '-',
@@ -473,7 +473,7 @@ function renderModelsTable(r) {
             <td>${row.auc}</td>
             <td><b>${row.comp}</b></td>
             <td>${row.verdict}</td>
-            <td style="color:#38bdf8; font-weight:600;">${row.prob}</td>
+            <td style="color:#6FA8DC; font-weight:600;">${row.prob}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -494,15 +494,15 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'lines',
             name: 'Observed Flux',
-            line: { color: '#818cf8', width: 1 },
-            opacity: 0.65
+            line: { color: '#6FA8DC', width: 1 },
+            opacity: 0.70
         },
         {
             y: smooth,
             type: 'scatter',
             mode: 'lines',
             name: 'Smoothed Trend',
-            line: { color: '#38bdf8', width: 2 }
+            line: { color: '#7DD3C7', width: 2 }
         }
     ];
 
@@ -513,21 +513,21 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'markers',
             name: 'Detected Dips',
-            marker: { color: '#f43f5e', size: 5, symbol: 'circle' }
+            marker: { color: '#F4C95D', size: 5, symbol: 'circle' }
         });
     }
 
     const fullLayout = {
-        title: 'Light Curve with Detected Transit Dips',
+        title: { text: 'Light Curve with Detected Transit Dips', font: { color: '#F1F5F9' } },
         template: 'plotly_dark',
-        paper_bgcolor: '#03050a',
-        plot_bgcolor: '#03050a',
+        paper_bgcolor: '#0E1524',
+        plot_bgcolor: '#070B14',
         height: 400,
         margin: { l: 45, r: 15, t: 42, b: 40 },
-        legend: { orientation: 'h', y: 1.05 },
-        xaxis: { title: 'Time / Sample Index', gridcolor: '#1b2a42', zeroline: false },
-        yaxis: { title: 'Normalized Relative Flux', gridcolor: '#1b2a42', zeroline: false },
-        font: { family: 'Inter, sans-serif' }
+        legend: { orientation: 'h', y: 1.05, font: { color: '#94A3B8' } },
+        xaxis: { title: { text: 'Time / Sample Index', font: { color: '#94A3B8' } }, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
+        yaxis: { title: { text: 'Normalized Relative Flux', font: { color: '#94A3B8' } }, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
+        font: { family: 'Inter, sans-serif', color: '#94A3B8' }
     };
 
     Plotly.newPlot('chart-full', fullTraces, fullLayout, { responsive: true, displayModeBar: false });
@@ -545,9 +545,9 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'markers+lines',
             name: 'Observed Data Points',
-            line: { color: '#818cf8', width: 1 },
-            marker: { size: 4, color: '#818cf8' },
-            opacity: 0.6
+            line: { color: '#6FA8DC', width: 1 },
+            marker: { size: 4, color: '#6FA8DC' },
+            opacity: 0.65
         },
         {
             x: xRange,
@@ -555,7 +555,7 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'lines',
             name: 'Smoothed Profile',
-            line: { color: '#38bdf8', width: 2.5 }
+            line: { color: '#7DD3C7', width: 2.5 }
         }
     ];
 
@@ -566,7 +566,7 @@ function renderCharts(r) {
             type: 'scatter',
             mode: 'markers',
             name: 'Transit Ingress/Egress',
-            marker: { color: '#f43f5e', size: 7, symbol: 'triangle-down' }
+            marker: { color: '#F4C95D', size: 7, symbol: 'triangle-down' }
         });
     }
 
@@ -575,16 +575,16 @@ function renderCharts(r) {
         : 'Transit View (No Significant Dips Detected)';
 
     const zoomLayout = {
-        title: zoomTitle,
+        title: { text: zoomTitle, font: { color: '#F1F5F9' } },
         template: 'plotly_dark',
-        paper_bgcolor: '#03050a',
-        plot_bgcolor: '#03050a',
+        paper_bgcolor: '#0E1524',
+        plot_bgcolor: '#070B14',
         height: 380,
         margin: { l: 45, r: 20, t: 40, b: 40 },
-        legend: { orientation: 'h', y: 1.05 },
-        xaxis: { title: 'Sample Index', gridcolor: '#1b2a42', zeroline: false },
-        yaxis: { title: 'Normalized Relative Flux', gridcolor: '#1b2a42', zeroline: false },
-        font: { family: 'Inter, sans-serif' }
+        legend: { orientation: 'h', y: 1.05, font: { color: '#94A3B8' } },
+        xaxis: { title: { text: 'Sample Index', font: { color: '#94A3B8' } }, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
+        yaxis: { title: { text: 'Normalized Relative Flux', font: { color: '#94A3B8' } }, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
+        font: { family: 'Inter, sans-serif', color: '#94A3B8' }
     };
 
     Plotly.newPlot('chart-zoom', zoomTraces, zoomLayout, { responsive: true, displayModeBar: false });
@@ -605,21 +605,22 @@ function renderCharts(r) {
             x: modelNames,
             y: probValues,
             type: 'bar',
-            marker: { color: '#818cf8', opacity: 0.9 },
+            marker: { color: '#6FA8DC', opacity: 0.9 },
             text: probValues.map(v => `${v}%`),
-            textposition: 'auto'
+            textposition: 'auto',
+            textfont: { color: '#F1F5F9' }
         }
     ];
 
     const probLayout = {
         template: 'plotly_dark',
-        paper_bgcolor: '#03050a',
-        plot_bgcolor: '#03050a',
+        paper_bgcolor: '#0E1524',
+        plot_bgcolor: '#070B14',
         height: 250,
         margin: { l: 40, r: 20, t: 20, b: 45 },
-        xaxis: { gridcolor: '#1b2a42' },
-        yaxis: { title: 'Probability (%)', range: [0, 100], gridcolor: '#1b2a42' },
-        font: { family: 'Inter, sans-serif' }
+        xaxis: { gridcolor: '#26344A', tickfont: { color: '#94A3B8' } },
+        yaxis: { title: { text: 'Probability (%)', font: { color: '#94A3B8' } }, range: [0, 100], gridcolor: '#26344A', tickfont: { color: '#94A3B8' } },
+        font: { family: 'Inter, sans-serif', color: '#94A3B8' }
     };
 
     Plotly.newPlot('chart-probs', probTraces, probLayout, { responsive: true, displayModeBar: false });
@@ -659,7 +660,7 @@ function renderHistoryView() {
         tr.innerHTML = `
             <td><b>${item.source}</b></td>
             <td>${verdictText}</td>
-            <td style="color:#38bdf8; font-weight:600;">${confText}</td>
+            <td style="color:#6FA8DC; font-weight:600;">${confText}</td>
             <td>${item.model || 'XGBoost'}</td>
             <td class="muted">${item.timestamp}</td>
             <td><button class="btn btn-primary" style="min-height:2rem; padding:0 0.8rem; font-size:0.85rem;" onclick="openHistoryItem(${idx})">View</button></td>
@@ -732,8 +733,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(BACKEND_URL + '/api/health')
         .then(res => {
             const isOk = res.ok;
-            const color = isOk ? '#34d399' : '#f43f5e';
-            const shadow = isOk ? '0 0 8px rgba(52, 211, 153, 0.6)' : '0 0 8px rgba(244, 63, 94, 0.6)';
+            const color = isOk ? '#7DD3C7' : '#F08080';
+            const shadow = isOk ? '0 0 8px rgba(125, 211, 199, 0.6)' : '0 0 8px rgba(240, 128, 128, 0.6)';
             const text = isOk ? 'Engine: Online' : 'Engine: Offline';
 
             document.querySelectorAll('.status-dot').forEach(d => {
@@ -747,8 +748,8 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(() => {
             document.querySelectorAll('.status-dot').forEach(d => {
-                d.style.background = '#f43f5e';
-                d.style.boxShadow = '0 0 8px rgba(244, 63, 94, 0.6)';
+                d.style.background = '#F08080';
+                d.style.boxShadow = '0 0 8px rgba(240, 128, 128, 0.6)';
             });
             const statusText = document.getElementById('api-status-text');
             if (statusText) statusText.textContent = 'Engine: Offline';

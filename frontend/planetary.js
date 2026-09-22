@@ -18,7 +18,7 @@
 
     // Background stars
     const stars = [];
-    const starPalette = ['#ffffff', '#fef08a', '#93c5fd', '#fed7aa', '#cbd5e1'];
+    const starPalette = ['#F1F5F9', '#F4C95D', '#7DD3C7', '#6FA8DC', '#94A3B8'];
     for (let i = 0; i < 190; i++) {
         stars.push({
             x: Math.random() * 850,
@@ -38,9 +38,9 @@
 
     // Scaled orbits: fully contained within canvas boundaries (width ~600, height 420)
     const orbits = [
-        { a: 88,  b: 33,  speed: 0.50, stroke: 'rgba(251, 191, 36, 0.45)', width: 1.2 }, // Orbit 1: Inner Rocky
-        { a: 155, b: 58,  speed: 0.28, stroke: 'rgba(56, 189, 248, 0.40)', width: 1.2 }, // Orbit 2: Earth
-        { a: 238, b: 89,  speed: 0.16, stroke: 'rgba(245, 158, 11, 0.38)', width: 1.3 }  // Orbit 3: Jupiter
+        { a: 88,  b: 33,  speed: 0.50, stroke: 'rgba(244, 201, 93, 0.45)', width: 1.2 }, // Orbit 1: Inner Rocky
+        { a: 155, b: 58,  speed: 0.28, stroke: 'rgba(125, 211, 199, 0.42)', width: 1.2 }, // Orbit 2: Earth
+        { a: 238, b: 89,  speed: 0.16, stroke: 'rgba(111, 168, 220, 0.40)', width: 1.3 }  // Orbit 3: Jupiter
     ];
 
     // Asteroid Belt: revolving ring between Earth and Jupiter (radius 182 to 206)
@@ -54,7 +54,7 @@
             angle: angle,
             speed: 0.20 + (Math.random() - 0.5) * 0.03,
             size: Math.random() * 1.0 + 0.35,
-            color: Math.random() > 0.45 ? 'rgba(214, 211, 209, ' : 'rgba(251, 191, 36, ',
+            color: Math.random() > 0.45 ? 'rgba(148, 163, 184, ' : 'rgba(244, 201, 93, ',
             alpha: Math.random() * 0.45 + 0.20
         });
     }
@@ -99,10 +99,10 @@
 
         // 1. Ultra-Dark Space Background with warm ambient stellar radiance
         const bg = ctx.createRadialGradient(cx, cy, 25 * scale, cx, cy, Math.max(W, H) * 0.85);
-        bg.addColorStop(0, 'rgba(32, 22, 12, 0.48)');     // Subtle warm golden solar ambiance
-        bg.addColorStop(0.30, 'rgba(6, 10, 20, 0.85)');   // Deep dark midnight
-        bg.addColorStop(0.70, 'rgba(2, 4, 10, 0.98)');
-        bg.addColorStop(1, '#010206');                     // Deep space black
+        bg.addColorStop(0, 'rgba(36, 28, 14, 0.48)');     // Subtle warm golden solar ambiance
+        bg.addColorStop(0.30, 'rgba(14, 21, 36, 0.85)');  // Main surface
+        bg.addColorStop(0.70, 'rgba(7, 11, 20, 0.98)');   // Deep background
+        bg.addColorStop(1, '#070B14');                     // Deep space canvas background
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, W, H);
 
@@ -111,8 +111,8 @@
         ctx.rotate(-0.25);
         const dustGrad = ctx.createLinearGradient(0, -H, W * 1.4, H * 1.4);
         dustGrad.addColorStop(0, 'transparent');
-        dustGrad.addColorStop(0.48, 'rgba(129, 140, 248, 0.022)');
-        dustGrad.addColorStop(0.52, 'rgba(251, 191, 36, 0.020)');
+        dustGrad.addColorStop(0.48, 'rgba(111, 168, 220, 0.025)');
+        dustGrad.addColorStop(0.52, 'rgba(244, 201, 93, 0.020)');
         dustGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = dustGrad;
         ctx.fillRect(-W * 0.5, -H * 0.5, W * 2, H * 2);
@@ -226,21 +226,21 @@
 
         // Soft, warm coronal halo radiating into space
         const corona = ctx.createRadialGradient(sx, sy, starR * 0.7, sx, sy, starR * 2.4);
-        corona.addColorStop(0, 'rgba(254, 215, 170, 0.85)');
-        corona.addColorStop(0.30, 'rgba(249, 115, 22, 0.40)');
-        corona.addColorStop(0.70, 'rgba(234, 88, 12, 0.12)');
+        corona.addColorStop(0, 'rgba(244, 201, 93, 0.85)');
+        corona.addColorStop(0.30, 'rgba(244, 201, 93, 0.38)');
+        corona.addColorStop(0.70, 'rgba(244, 201, 93, 0.10)');
         corona.addColorStop(1, 'transparent');
         ctx.beginPath();
         ctx.arc(sx, sy, starR * 2.4, 0, Math.PI * 2);
         ctx.fillStyle = corona;
         ctx.fill();
 
-        // Single cohesive yellow-orange star body (clean, warm, radiant)
+        // Single cohesive gold star body (clean, warm, radiant #F4C95D)
         const bodyGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, starR);
-        bodyGrad.addColorStop(0, '#fef08a');
-        bodyGrad.addColorStop(0.38, '#fbbf24');
-        bodyGrad.addColorStop(0.75, '#f59e0b');
-        bodyGrad.addColorStop(1.0, '#ea580c');
+        bodyGrad.addColorStop(0, '#FFFDF5');
+        bodyGrad.addColorStop(0.35, '#FCE8A6');
+        bodyGrad.addColorStop(0.72, '#F4C95D');
+        bodyGrad.addColorStop(1.0, '#D4A83E');
         ctx.beginPath();
         ctx.arc(sx, sy, starR, 0, Math.PI * 2);
         ctx.fillStyle = bodyGrad;
@@ -249,7 +249,7 @@
         // Delicate line outwards of its surface (clean, fine single outer ring)
         ctx.beginPath();
         ctx.arc(sx, sy, starR + 5, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.75)';
+        ctx.strokeStyle = 'rgba(244, 201, 93, 0.75)';
         ctx.lineWidth = 1.1;
         ctx.stroke();
     }
@@ -275,43 +275,43 @@
 
             // Base atmospheric gradient with gentle sunlit sheen
             const azureGrad = ctx.createRadialGradient(lightDx, lightDy, r * 0.20, 0, 0, r);
-            azureGrad.addColorStop(0, '#93c5fd');    // Soft bright sky-blue highlight (subtle shine)
-            azureGrad.addColorStop(0.30, '#38bdf8'); // Clear radiant azure
-            azureGrad.addColorStop(0.65, '#1d4ed8'); // Deep sapphire body
-            azureGrad.addColorStop(1.0, '#020617');  // Night side shadow
+            azureGrad.addColorStop(0, '#F1F5F9');    // Main text highlight sheen
+            azureGrad.addColorStop(0.30, '#7DD3C7'); // Accent cyan
+            azureGrad.addColorStop(0.65, '#6FA8DC'); // Primary blue body
+            azureGrad.addColorStop(1.0, '#070B14');  // Night side shadow
             ctx.fillStyle = azureGrad;
             ctx.fill();
 
-            // Clear horizontal atmospheric / ocean current belts (clean banded structure like planet 3)
-            ctx.fillStyle = 'rgba(14, 116, 144, 0.36)'; // Deep cyan-teal zone
+            // Clear horizontal atmospheric / ocean current belts
+            ctx.fillStyle = 'rgba(111, 168, 220, 0.36)'; // Primary blue zone
             ctx.fillRect(-r, -r * 0.38, r * 2, r * 0.16);
             ctx.fillRect(-r, r * 0.08, r * 2, r * 0.20);
             ctx.fillRect(-r, r * 0.48, r * 2, r * 0.12);
 
-            ctx.fillStyle = 'rgba(224, 242, 254, 0.26)'; // Bright white/cyan cloud sheen belt
+            ctx.fillStyle = 'rgba(241, 245, 249, 0.26)'; // Bright white cloud sheen belt
             ctx.fillRect(-r, -r * 0.18, r * 2, r * 0.14);
             ctx.fillRect(-r, r * 0.30, r * 2, r * 0.12);
 
             // Great Azure Spot / cyclone oval
-            ctx.fillStyle = 'rgba(56, 189, 248, 0.65)';
+            ctx.fillStyle = 'rgba(125, 211, 199, 0.65)';
             ctx.beginPath();
             ctx.ellipse(lightDx * 0.35 + 2.0, lightDy * 0.35 + r * 0.14, r * 0.22, r * 0.12, 0.05, 0, Math.PI * 2);
             ctx.fill();
 
             // Night-side volumetric shadow mask (clean 3D globe effect)
             const shadowGrad = ctx.createRadialGradient(-lightDx * 0.75, -lightDy * 0.75, r * 0.15, 0, 0, r);
-            shadowGrad.addColorStop(0, 'rgba(2, 6, 23, 0.98)');
-            shadowGrad.addColorStop(0.55, 'rgba(2, 6, 23, 0.75)');
+            shadowGrad.addColorStop(0, 'rgba(7, 11, 20, 0.98)');
+            shadowGrad.addColorStop(0.55, 'rgba(14, 21, 36, 0.75)');
             shadowGrad.addColorStop(1.0, 'transparent');
             ctx.fillStyle = shadowGrad;
             ctx.fill();
 
             ctx.restore();
 
-            // Delicate illuminated outer limb edge (clean and clear like planet 3)
+            // Delicate illuminated outer limb edge
             ctx.beginPath();
             ctx.arc(0, 0, r, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(147, 197, 253, 0.38)';
+            ctx.strokeStyle = 'rgba(125, 211, 199, 0.40)';
             ctx.lineWidth = 0.9;
             ctx.stroke();
 

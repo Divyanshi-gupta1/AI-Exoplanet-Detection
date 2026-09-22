@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExoDip - AI Exoplanet Transit Screening</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2238%22 fill=%22%2338bdf8%22/></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2238%22 fill=%22%236FA8DC%22/><circle cx=%2270%22 cy=%2250%22 r=%2210%22 fill=%22%23F4C95D%22/></svg>">
     <!-- Google Fonts: Inter, Plus Jakarta Sans, DM Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,22 +21,22 @@
                 <svg class="logo-icon" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <radialGradient id="planetSphere" cx="35%" cy="35%" r="65%">
-                            <stop offset="0%" stop-color="#38bdf8"/>
-                            <stop offset="60%" stop-color="#2563eb"/>
-                            <stop offset="100%" stop-color="#0b1329"/>
+                            <stop offset="0%" stop-color="#7DD3C7"/>
+                            <stop offset="60%" stop-color="#6FA8DC"/>
+                            <stop offset="100%" stop-color="#070B14"/>
                         </radialGradient>
                         <linearGradient id="orbitGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#38bdf8"/>
-                            <stop offset="50%" stop-color="#818cf8"/>
-                            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.3"/>
+                            <stop offset="0%" stop-color="#7DD3C7"/>
+                            <stop offset="50%" stop-color="#6FA8DC"/>
+                            <stop offset="100%" stop-color="#7DD3C7" stop-opacity="0.3"/>
                         </linearGradient>
                     </defs>
                     <!-- Background arc of tilted orbital ring -->
                     <path d="M 4 20 C 4.5 13 13 9 20 10.5 C 24.5 11.5 28 14 29 17.5" stroke="url(#orbitGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
                     <!-- Central Planet Sphere -->
-                    <circle cx="16" cy="16" r="8" fill="url(#planetSphere)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <circle cx="16" cy="16" r="8" fill="url(#planetSphere)" stroke="#6FA8DC" stroke-width="1.5"/>
                     <!-- Atmospheric rim crescent -->
-                    <path d="M 10 11.5 C 11.5 9 14.5 8.2 18 9.2" stroke="#bae6fd" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+                    <path d="M 10 11.5 C 11.5 9 14.5 8.2 18 9.2" stroke="#F1F5F9" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
                     <!-- Foreground arc of orbital ring (crosses in front) -->
                     <path d="M 3 15 C 4 21 12 24.5 19 23 C 24 22 27.5 19 29 15.5" stroke="url(#orbitGrad)" stroke-width="2.2" stroke-linecap="round"/>
                 </svg>
@@ -94,7 +94,7 @@
                 <div>
                     <div class="eyebrow">PHOTOMETRIC TRANSIT SCREENING</div>
                     <h1>Discover Worlds<br><span class="purple-gradient">Beyond Our Own</span></h1>
-                    <p style="font-size:1.15rem;font-weight:600;color:#38bdf8;margin:0.5rem 0 0.75rem;">Find the dip. Discover the world.</p>
+                    <p style="font-size:1.15rem;font-weight:600;color:#7DD3C7;margin:0.5rem 0 0.75rem;">Find the dip. Discover the world.</p>
                     <p class="lead">Analyze stellar light curves for periodic transit signals and screen potential exoplanet candidates.</p>
                     <div class="hero-actions">
                         <button class="btn btn-primary" onclick="navigateTo('Analyze')">Analyze Data</button>
@@ -152,8 +152,8 @@
                         <div id="analyze-tab-upload" class="tab-content active">
                             <input type="file" id="file-input" accept=".csv,.txt,.npy" style="display:none;" onchange="handleFileSelected(this.files[0])">
                             <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><br>
-                                <b style="color:#e2e8f0; font-size:1.05rem;">Drag and drop your light-curve file here</b><br>
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#6FA8DC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><br>
+                                <b style="color:#F1F5F9; font-size:1.05rem;">Drag and drop your light-curve file here</b><br>
                                 <span class="muted">Supports CSV with flux column, Kepler 1-row CSVs, whitespace-separated TXT, or NPY arrays</span>
                             </div>
 
@@ -161,14 +161,14 @@
                             <div id="file-preview-card" class="file-card" style="display:none;">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div>
-                                        <div style="font-size:0.78rem; color:#94a3b8; text-transform:uppercase;">File Details</div>
-                                        <b id="file-preview-name" style="font-size:1.12rem; color:#fff;">sample.csv</b>
+                                        <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase;">File Details</div>
+                                        <b id="file-preview-name" style="font-size:1.12rem; color:#F1F5F9;">sample.csv</b>
                                     </div>
                                     <span id="file-preview-size" class="model-chip">12.4 KB</span>
                                 </div>
                                 <div style="display:flex; gap:20px; margin-top:0.75rem; font-size:0.88rem;">
-                                    <div>Format: <b id="file-preview-format" style="color:#a78bfa;">CSV</b></div>
-                                    <div>Status: <b style="color:#34d399;">Ready for screening</b></div>
+                                    <div>Format: <b id="file-preview-format" style="color:#6FA8DC;">CSV</b></div>
+                                    <div>Status: <b style="color:#7DD3C7;">Ready for screening</b></div>
                                 </div>
                                 <div style="margin-top:1rem;">
                                     <button class="btn btn-primary btn-full" onclick="startFileAnalysis()">Analyze Light Curve</button>
@@ -184,7 +184,7 @@
                         <div id="analyze-tab-test-row" class="tab-content">
                             <p class="muted" style="margin-bottom:0.75rem;">Select an index from the held-out Kepler <code>exoTest.csv</code> dataset.</p>
                             <div style="margin-bottom: 1rem;">
-                                <label style="font-size:0.85rem; color:#cbd5e1; display:block; margin-bottom:0.35rem;">Held-out test dataset row ID</label>
+                                <label style="font-size:0.85rem; color:#94A3B8; display:block; margin-bottom:0.35rem;">Held-out test dataset row ID</label>
                                 <input type="number" id="test-row-id" min="0" value="0" step="1">
                                 <span id="test-row-hint" class="muted" style="font-size:0.82rem; margin-top:4px; display:block;">Range: 0 to 569</span>
                             </div>
@@ -195,7 +195,7 @@
                         <div id="analysis-loading-banner" class="loading-card" style="display:none;">
                             <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
                                 <div class="spinner"></div>
-                                <b style="color:#fff; font-size:1.05rem;">Screening candidate light curve…</b>
+                                <b style="color:#F1F5F9; font-size:1.05rem;">Screening candidate light curve…</b>
                             </div>
                             <div class="loading-step" id="step-1"><span>○</span> Reading raw photometry</div>
                             <div class="loading-step" id="step-2"><span>○</span> Normalizing flux & noise reduction</div>
@@ -208,9 +208,9 @@
                     <!-- Data Format Guide Panel -->
                     <div class="panel" style="margin-top: 1.5rem;">
                         <div class="eyebrow" style="margin-bottom:0.35rem;">Input Specification</div>
-                        <h3 style="color:#fff; margin-bottom:0.6rem;">Data Format Guide</h3>
+                        <h3 style="color:#F1F5F9; margin-bottom:0.6rem;">Data Format Guide</h3>
                         <p class="muted">For CSV files, include a numeric <code>flux</code> column. A <code>time</code> column is optional.</p>
-                        <pre class="mono" style="background:rgba(15,23,42,0.85); padding:0.85rem; border-radius:8px; border:1px solid rgba(255,255,255,0.06); margin:0.85rem 0; color:#38bdf8; font-size:0.9rem; line-height:1.6;">time,flux
+                        <pre class="mono" style="background:#0E1524; padding:0.85rem; border-radius:8px; border:1px solid #26344A; margin:0.85rem 0; color:#7DD3C7; font-size:0.9rem; line-height:1.6;">time,flux
 0.0,1.0002
 0.02,0.9998
 0.04,0.9912
@@ -224,7 +224,7 @@
                     <!-- Pipeline Flowchart Panel -->
                     <div class="panel">
                         <div class="eyebrow" style="margin-bottom:0.35rem;">Screening Stages</div>
-                        <h3 style="color:#fff; margin-bottom:1.15rem;">Detection Pipeline</h3>
+                        <h3 style="color:#F1F5F9; margin-bottom:1.15rem;">Detection Pipeline</h3>
                         <div class="v-flowchart">
                             <div class="v-flow-step v-step-1">
                                 <div class="v-flow-node">01</div>
@@ -267,8 +267,8 @@
                     <!-- Engine & Model Configuration Panel -->
                     <div class="panel" style="margin-top: 1.5rem;">
                         <div class="eyebrow" style="margin-bottom:0.35rem;">Engine Settings</div>
-                        <h3 style="color:#fff; margin-bottom:0.85rem;">Astrophysical Parameters</h3>
-                        <ul style="color:#cbd5e1; font-size:0.9rem; line-height:1.75; padding-left:1.2rem; margin:0;">
+                        <h3 style="color:#F1F5F9; margin-bottom:0.85rem;">Astrophysical Parameters</h3>
+                        <ul style="color:#94A3B8; font-size:0.9rem; line-height:1.75; padding-left:1.2rem; margin:0;">
                             <li><b>Transit Search Method:</b> Box Least Squares (Astropy BLS periodogram)</li>
                             <li><b>Period Search Grid:</b> 0.5 to 20.0 days (duration grid: 1 to 12 hours)</li>
                             <li><b>Primary Decision Model:</b> Tuned XGBoost Classifier (composite cross-validation score)</li>
@@ -284,7 +284,7 @@
         <main id="view-results" class="view-page" style="display:none;">
             <!-- Empty state fallback if no result yet -->
             <div id="results-empty" class="panel" style="text-align:center; padding:3rem 1.5rem;">
-                <p style="font-size:1.2rem; color:#fff; margin-bottom:0.5rem;">No analysis has been run yet.</p>
+                <p style="font-size:1.2rem; color:#F1F5F9; margin-bottom:0.5rem;">No analysis has been run yet.</p>
                 <p class="muted" style="margin-bottom:1.5rem;">Submit a light curve in the Analyze tab to view screening results.</p>
                 <button class="btn btn-primary" onclick="navigateTo('Analyze')">Go to Analyze</button>
             </div>
@@ -307,23 +307,23 @@
                     <!-- Left: Outcome & Telemetry -->
                     <div>
                         <div class="result-card">
-                            <div style="font-size:0.78rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">Screening Outcome</div>
+                            <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">Screening Outcome</div>
                             <div id="res-badge-container"></div>
-                            <p id="res-verdict-desc" style="color:#cbd5e1; font-size:0.88rem; margin:0.85rem 0 1rem; line-height:1.55;"></p>
-                            <div style="font-size:0.78rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em;">Screening Confidence</div>
-                            <div id="res-conf-value" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; font-size:2.35rem; color:#fff; margin:0.15rem 0;">99.8%</div>
+                            <p id="res-verdict-desc" style="color:#94A3B8; font-size:0.88rem; margin:0.85rem 0 1rem; line-height:1.55;"></p>
+                            <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em;">Screening Confidence</div>
+                            <div id="res-conf-value" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; font-size:2.35rem; color:#F1F5F9; margin:0.15rem 0;">99.8%</div>
                             <div class="progress-bar">
                                 <div id="res-conf-bar" class="progress-fill" style="width:99.8%;"></div>
                             </div>
                         </div>
 
                         <div class="result-card" style="margin-top:1.2rem;">
-                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 0.75rem; color:#fff;">Detection Telemetry</p>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Primary Model</span><b id="res-tele-model" style="color:#fff;">XGBoost</b></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Model Agreement</span><b id="res-tele-agree" style="color:#34d399;">Unanimous</b></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Detected Dips</span><b id="res-tele-dips" style="color:#fff;">0</b></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Noise Std Dev</span><b id="res-tele-noise" style="color:#fff;">0.0004</b></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Negative Ratio</span><b id="res-tele-neg" style="color:#fff;">0.49</b></div>
+                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 0.75rem; color:#F1F5F9;">Detection Telemetry</p>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Primary Model</span><b id="res-tele-model" style="color:#F1F5F9;">XGBoost</b></div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Model Agreement</span><b id="res-tele-agree" style="color:#7DD3C7;">Unanimous</b></div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Detected Dips</span><b id="res-tele-dips" style="color:#F1F5F9;">0</b></div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Noise Std Dev</span><b id="res-tele-noise" style="color:#F1F5F9;">0.0004</b></div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Negative Ratio</span><b id="res-tele-neg" style="color:#F1F5F9;">0.49</b></div>
                         </div>
                     </div>
 
@@ -336,7 +336,7 @@
                             <div class="metric-cell"><div class="metric-cell-label">Duration</div><div id="res-m-duration" class="metric-cell-value">3.8 h</div></div>
                             <div class="metric-cell"><div class="metric-cell-label">BLS SNR</div><div id="res-m-snr" class="metric-cell-value">14.8</div></div>
                             <div class="metric-cell"><div class="metric-cell-label">Dip Groups</div><div id="res-m-groups" class="metric-cell-value">3</div></div>
-                            <div class="metric-cell"><div class="metric-cell-label">Decision Model</div><div id="res-m-model" class="metric-cell-value" style="color:#a78bfa;">XGBoost</div></div>
+                            <div class="metric-cell"><div class="metric-cell-label">Decision Model</div><div id="res-m-model" class="metric-cell-value" style="color:#6FA8DC;">XGBoost</div></div>
                         </div>
 
                         <!-- Result Tabs -->
@@ -360,7 +360,7 @@
 
                         <!-- Tab 3: Models Comparison -->
                         <div id="res-tab-models" class="tab-content">
-                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; color:#fff; margin-bottom:0.5rem;">Model Benchmark Performance & Real-Time Verdict</p>
+                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; color:#F1F5F9; margin-bottom:0.5rem;">Model Benchmark Performance & Real-Time Verdict</p>
                             <div class="data-table-container">
                                 <table class="data-table" id="res-models-table">
                                     <thead>
@@ -372,13 +372,13 @@
                                 </table>
                             </div>
 
-                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:600; font-size:1.1rem; color:#fff; margin-top:1.25rem;">Candidate Probability by Model</p>
+                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:600; font-size:1.1rem; color:#F1F5F9; margin-top:1.25rem;">Candidate Probability by Model</p>
                             <div id="chart-probs" style="width:100%; height:260px;"></div>
                         </div>
 
                         <!-- Tab 4: Features Grid -->
                         <div id="res-tab-features" class="tab-content">
-                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; color:#fff; margin-bottom:0.75rem;">Astrophysical & Statistical Features</p>
+                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; color:#F1F5F9; margin-bottom:0.75rem;">Astrophysical & Statistical Features</p>
                             <div class="feature-grid">
                                 <div class="workflow-card">
                                     <b>Statistical</b>
@@ -432,8 +432,8 @@
 
             <div class="grid-history-stats">
                 <div class="stat-card"><div class="metric-cell-label">Total Analyses</div><div id="hist-total" class="metric-cell-value">0</div></div>
-                <div class="stat-card"><div class="metric-cell-label">Planet Candidates</div><div id="hist-planets" class="metric-cell-value" style="color:#34d399;">0</div></div>
-                <div class="stat-card"><div class="metric-cell-label">Candidate Rate</div><div id="hist-rate" class="metric-cell-value" style="color:#38bdf8;">0.0%</div></div>
+                <div class="stat-card"><div class="metric-cell-label">Planet Candidates</div><div id="hist-planets" class="metric-cell-value" style="color:#F4C95D;">0</div></div>
+                <div class="stat-card"><div class="metric-cell-label">Candidate Rate</div><div id="hist-rate" class="metric-cell-value" style="color:#6FA8DC;">0.0%</div></div>
             </div>
 
             <div style="margin: 1.25rem 0 0.75rem;">
@@ -457,7 +457,7 @@
             </div>
 
             <div id="history-empty" class="panel" style="display:none;">
-                <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:600; font-size:1.1rem; color:#fff; margin:0 0 0.35rem;">No analyses yet</p>
+                <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:600; font-size:1.1rem; color:#F1F5F9; margin:0 0 0.35rem;">No analyses yet</p>
                 <p class="muted">Submit a light curve in the Analyze tab to populate this session history.</p>
             </div>
         </main>
@@ -467,12 +467,12 @@
             <div class="eyebrow">Scientific Context</div>
             <h2>About ExoDip</h2>
             <div class="panel" style="margin-top:1rem;">
-                <p class="lead" style="color:#f1f5f9;">
+                <p class="lead" style="color:#F1F5F9;">
                     <b>ExoDip</b> is a candidate screening tool designed to help researchers, students, and astronomy enthusiasts analyze stellar light curves for signatures of transiting exoplanets. Using a combination of Box Least Squares (BLS) period searching, astrophysical feature extraction, and an ensemble of machine learning classifiers (including tuned XGBoost and Random Forest models), ExoDip evaluates raw photometry to identify candidate transit events.
                 </p>
-                <div style="background:rgba(239, 68, 68, 0.12); border-left:4px solid #f43f5e; padding:0.95rem 1.15rem; border-radius:6px; margin:1.35rem 0;">
-                    <b style="color:#fca5a5; font-size:1.02rem;">Scientific Notice:</b>
-                    <span style="color:#fecdd3; font-size:0.95rem; line-height:1.6; display:block; margin-top:4px;">
+                <div style="background:rgba(240, 128, 128, 0.12); border-left:4px solid #F08080; padding:0.95rem 1.15rem; border-radius:6px; margin:1.35rem 0;">
+                    <b style="color:#F08080; font-size:1.02rem;">Scientific Notice:</b>
+                    <span style="color:#F1F5F9; font-size:0.95rem; line-height:1.6; display:block; margin-top:4px;">
                         ExoDip is a candidate screening tool, not a confirmation pipeline. Exoplanet confirmation requires extensive follow-up observations, including high-resolution imaging, radial velocity spectroscopy, and statistical validation against astrophysical false positives (such as eclipsing binaries and background blended stars).
                     </span>
                 </div>
@@ -480,7 +480,7 @@
 
             <div class="panel" style="margin-top:2rem;">
                 <div class="eyebrow" style="margin-bottom:0.35rem;">Scientific Architecture</div>
-                <h3 style="color:#fff; margin-bottom:1.25rem;">Detection & Screening Pipeline</h3>
+                <h3 style="color:#F1F5F9; margin-bottom:1.25rem;">Detection & Screening Pipeline</h3>
                 <div class="v-flowchart">
                     <div class="v-flow-step v-step-1">
                         <div class="v-flow-node">01</div>
@@ -551,8 +551,8 @@
             </div>
 
             <div class="panel">
-                <div id="docs-tab-start" class="tab-content active" style="line-height:1.75; color:#cbd5e1;">
-                    <h3 style="color:#fff; margin-bottom:0.75rem;">Getting Started with ExoDip</h3>
+                <div id="docs-tab-start" class="tab-content active" style="line-height:1.75; color:#94A3B8;">
+                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Getting Started with ExoDip</h3>
                     <ol style="padding-left:1.3rem;">
                         <li><b>Prepare Photometric Data:</b> Obtain a time series of stellar brightness (Kepler, TESS, or ground-based photometry).</li>
                         <li><b>Navigate to Analyze:</b> Use the top navigation bar to select the <b>Analyze</b> page.</li>
@@ -563,11 +563,11 @@
                     </ol>
                 </div>
 
-                <div id="docs-tab-formats" class="tab-content" style="line-height:1.75; color:#cbd5e1;">
-                    <h3 style="color:#fff; margin-bottom:0.75rem;">Supported Input Formats</h3>
+                <div id="docs-tab-formats" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Supported Input Formats</h3>
                     <ul style="padding-left:1.3rem;">
                         <li><b>Standard CSV Format:</b> A comma-separated file with a <code>flux</code> column. A <code>time</code> column is optional.
-                            <pre class="mono" style="background:rgba(15,23,42,0.85); padding:0.6rem 0.9rem; border-radius:6px; margin:0.5rem 0; color:#38bdf8;">time,flux
+                            <pre class="mono" style="background:#0E1524; padding:0.6rem 0.9rem; border-radius:6px; margin:0.5rem 0; color:#7DD3C7; border:1px solid #26344A;">time,flux
 0.000,1.0002
 0.020,0.9998
 0.041,0.9912
@@ -579,8 +579,8 @@
                     </ul>
                 </div>
 
-                <div id="docs-tab-pipeline" class="tab-content" style="line-height:1.75; color:#cbd5e1;">
-                    <h3 style="color:#fff; margin-bottom:0.75rem;">How the Pipeline Works</h3>
+                <div id="docs-tab-pipeline" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">How the Pipeline Works</h3>
                     <ul style="padding-left:1.3rem;">
                         <li><b>Photometric Normalization:</b> Flux values are detrended and smoothed using a uniform box filter to isolate local fluctuations while preserving transit dip profiles.</li>
                         <li><b>Box Least Squares (BLS):</b> An Astropy BLS periodogram scans trial periods from 0.5 to 20 days with trial transit durations from 1 to 12 hours to search for periodic box-shaped occultations.</li>
@@ -589,8 +589,8 @@
                     </ul>
                 </div>
 
-                <div id="docs-tab-results" class="tab-content" style="line-height:1.75; color:#cbd5e1;">
-                    <h3 style="color:#fff; margin-bottom:0.75rem;">Understanding Results</h3>
+                <div id="docs-tab-results" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Understanding Results</h3>
                     <ul style="padding-left:1.3rem;">
                         <li><b>Period (Days):</b> The best-fit orbital period detected by the Box Least Squares periodogram.</li>
                         <li><b>Transit Depth (%):</b> The fraction of stellar flux blocked during transit mid-point: <i>δ = ΔF / F ≈ (R_p / R_*)^2</i></li>
@@ -599,8 +599,8 @@
                     </ul>
                 </div>
 
-                <div id="docs-tab-limitations" class="tab-content" style="line-height:1.75; color:#cbd5e1;">
-                    <h3 style="color:#fff; margin-bottom:0.75rem;">Important Limitations & Astrophysical Caveats</h3>
+                <div id="docs-tab-limitations" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Important Limitations & Astrophysical Caveats</h3>
                     <ul style="padding-left:1.3rem;">
                         <li><b>False Positives:</b> Eclipsing binary stars (EB), grazing binaries, and background blended stars can mimic planetary transits.</li>
                         <li><b>Stellar Activity:</b> Starspots, stellar flares, and rotation can introduce spurious periodic dips.</li>
@@ -608,8 +608,8 @@
                     </ul>
                 </div>
 
-                <div id="docs-tab-faq" class="tab-content" style="line-height:1.75; color:#cbd5e1;">
-                    <h3 style="color:#fff; margin-bottom:0.75rem;">Frequently Asked Questions</h3>
+                <div id="docs-tab-faq" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Frequently Asked Questions</h3>
                     <p><b>Q: What is the difference between an exoplanet candidate and a confirmed exoplanet?</b><br>
                     <i>A: A candidate exhibits transit-like signals in photometric data that have not yet undergone independent observational confirmation (such as spectroscopic mass determination).</i></p>
                     <p style="margin-top:1rem;"><b>Q: Why is XGBoost used as the primary decision model?</b><br>
