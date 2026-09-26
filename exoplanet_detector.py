@@ -34,7 +34,7 @@ SCORE_COLS = ["Accuracy", "Precision", "Recall", "F1 Score", "ROC-AUC"]
 
 
 # =====================================================================
-# 1. Feature Extraction (Matched to Notebook Feature Space)
+# 1. Feature Extraction 
 # =====================================================================
 
 def extract_features(flux: np.ndarray) -> dict[str, float]:

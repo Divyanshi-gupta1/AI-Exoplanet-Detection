@@ -40,6 +40,7 @@ function toggleMobileMenu() {
     } else {
         drawer.classList.add('open');
         if (btn) btn.classList.add('active');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
         if (backdrop) backdrop.classList.add('open');
         document.body.style.overflow = 'hidden';
     }
@@ -51,48 +52,104 @@ function closeMobileMenu() {
     const backdrop = document.getElementById('mobile-backdrop');
     if (drawer) drawer.classList.remove('open');
     if (btn) btn.classList.remove('active');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
     if (backdrop) backdrop.classList.remove('open');
     document.body.style.overflow = '';
 }
 
-function navigateTo(pageName) {
+const PAGE_HASH = {
+    Home: 'home',
+    Analyze: 'analyze',
+    Results: 'results',
+    History: 'history',
+    About: 'about',
+    Docs: 'docs'
+};
+
+const HASH_PAGE = {
+    home: 'Home',
+    analyze: 'Analyze',
+    results: 'Results',
+    history: 'History',
+    about: 'About',
+    docs: 'Docs',
+    documentation: 'Docs'
+};
+
+function navigateTo(pageName, options = {}) {
     state.page = pageName;
 
-    // Update navbar active state (desktop)
+    const targetId = `view-${pageName.toLowerCase()}`;
+    const skipLink = document.querySelector('.skip-link');
+    if (skipLink) skipLink.setAttribute('href', `#${targetId}`);
+
     document.querySelectorAll('.nav-item').forEach(el => {
-        if (el.getAttribute('data-page') === pageName) {
-            el.classList.add('active');
-        } else {
-            el.classList.remove('active');
-        }
+        const isActive = el.getAttribute('data-page') === pageName;
+        el.classList.toggle('active', isActive);
+        el.toggleAttribute('aria-current', isActive);
     });
 
-    // Update mobile drawer active state
     document.querySelectorAll('.mobile-nav-item').forEach(el => {
-        if (el.getAttribute('data-page') === pageName) {
-            el.classList.add('active');
-        } else {
-            el.classList.remove('active');
-        }
+        const isActive = el.getAttribute('data-page') === pageName;
+        el.classList.toggle('active', isActive);
+        el.toggleAttribute('aria-current', isActive);
     });
 
-    // Close mobile menu if open
     closeMobileMenu();
 
-    // Toggle view visibility
     document.querySelectorAll('.view-page').forEach(el => el.style.display = 'none');
-    const target = document.getElementById(`view-${pageName.toLowerCase()}`);
+    const target = document.getElementById(targetId);
     if (target) {
         target.style.display = 'block';
     }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const hash = PAGE_HASH[pageName] || 'home';
+    if (location.hash.replace('#', '') !== hash) {
+        history.replaceState(null, '', '#' + hash);
+    }
 
-    // Page-specific lifecycle hooks
+    if (!options.preserveScroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     if (pageName === 'Results') {
         renderResultsView();
+        setWorkspaceStep('results');
     } else if (pageName === 'History') {
         renderHistoryView();
+    } else if (pageName === 'Analyze' && !state.selectedFile) {
+        setWorkspaceStep('upload');
+    }
+}
+
+function scrollToSection(id) {
+    navigateTo('Home', { preserveScroll: true });
+    requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+}
+
+function openDocsTab(tabId) {
+    navigateTo('Docs');
+    switchDocsTab(tabId);
+}
+
+function setWorkspaceStep(current) {
+    const order = ['upload', 'configure', 'process', 'analyze', 'results'];
+    const idx = order.indexOf(current);
+    document.querySelectorAll('.wf-step').forEach(el => {
+        const stepIdx = order.indexOf(el.dataset.wf);
+        el.classList.toggle('is-current', el.dataset.wf === current);
+        el.classList.toggle('is-done', idx > -1 && stepIdx > -1 && stepIdx < idx);
+    });
+}
+
+function applyHashRoute() {
+    const raw = (location.hash || '#home').replace('#', '').toLowerCase();
+    const page = HASH_PAGE[raw] || 'Home';
+    if (state.page !== page) {
+        navigateTo(page, { preserveScroll: page === 'Home' && raw === 'home' });
     }
 }
 
@@ -107,9 +164,11 @@ function switchAnalyzeTab(tabId) {
     if (tabId === 'upload') {
         parent.querySelectorAll('.tab-btn')[0].classList.add('active');
         document.getElementById('analyze-tab-upload').classList.add('active');
+        setWorkspaceStep(state.selectedFile ? 'configure' : 'upload');
     } else {
         parent.querySelectorAll('.tab-btn')[1].classList.add('active');
         document.getElementById('analyze-tab-test-row').classList.add('active');
+        setWorkspaceStep('configure');
     }
 }
 
@@ -207,6 +266,7 @@ function handleFileSelected(file) {
     formatEl.textContent = ext;
 
     previewCard.style.display = 'block';
+    setWorkspaceStep('configure');
 }
 
 // ==========================================
@@ -221,6 +281,7 @@ async function animateProgressSteps() {
     });
 
     document.getElementById('analysis-loading-banner').style.display = 'block';
+    setWorkspaceStep('process');
 
     for (let i = 0; i < steps.length; i++) {
         const el = document.getElementById(steps[i]);
@@ -229,6 +290,7 @@ async function animateProgressSteps() {
         await new Promise(r => setTimeout(r, 220));
         el.className = 'loading-step done';
         el.querySelector('span').textContent = '✓';
+        if (i >= 2) setWorkspaceStep('analyze');
     }
 }
 
@@ -261,6 +323,7 @@ async function startFileAnalysis() {
 
     } catch (err) {
         document.getElementById('analysis-loading-banner').style.display = 'none';
+        setWorkspaceStep(state.selectedFile ? 'configure' : 'upload');
         alert('Error: ' + err.message);
     }
 }
@@ -295,6 +358,7 @@ async function startTestRowAnalysis() {
 
     } catch (err) {
         document.getElementById('analysis-loading-banner').style.display = 'none';
+        setWorkspaceStep('configure');
         alert('Error: ' + err.message);
     }
 }
@@ -346,8 +410,17 @@ function renderResultsView() {
     const r = state.activeResult;
     const isPlanet = r.prediction === 'Planet';
 
-    // Source line
     document.getElementById('res-source-line').textContent = `${r.source} · Analyzed on ${r.timestamp}`;
+    const liveBadge = document.getElementById('res-live-badge');
+    if (liveBadge) {
+        liveBadge.hidden = false;
+        const src = String(r.source || '').toLowerCase();
+        if (src.includes('test') || src.includes('row')) {
+            liveBadge.textContent = 'Live session · Held-out Kepler test set';
+        } else {
+            liveBadge.textContent = 'Live session analysis';
+        }
+    }
 
     // Verdict Badge
     const badgeContainer = document.getElementById('res-badge-container');
@@ -722,6 +795,12 @@ function downloadReport() {
 // 9. App Initialization
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    const mobileMenuButton = document.getElementById('mobile-menu-btn');
+    if (mobileMenuButton) mobileMenuButton.setAttribute('aria-expanded', 'false');
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeMobileMenu();
+    });
     // Fix the sample CSV download link to point to the right backend
     const sampleLink = document.querySelector('a[href="/api/sample-csv"]');
     if (sampleLink) {
@@ -770,6 +849,9 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.warn('Could not fetch test set info:', err));
 
+    window.addEventListener('hashchange', applyHashRoute);
+    applyHashRoute();
+
     // Handle mobile orientation changes & window resize for Plotly charts
     let resizeTimer;
     window.addEventListener('resize', () => {
@@ -786,4 +868,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 150);
     });
 });
-

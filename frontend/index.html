@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExoDip - AI Exoplanet Transit Screening</title>
+    <title>ExoDip — AI Exoplanet Transit Screening</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2238%22 fill=%22%236FA8DC%22/><circle cx=%2270%22 cy=%2250%22 r=%2210%22 fill=%22%23F4C95D%22/></svg>">
-    <!-- Google Fonts: Inter, Plus Jakarta Sans, DM Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
@@ -14,621 +13,875 @@
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- ================= NAVBAR ================= -->
-        <header class="navbar">
-            <div class="nav-brand-box" onclick="navigateTo('Home')">
-                <svg class="logo-icon" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <radialGradient id="planetSphere" cx="35%" cy="35%" r="65%">
-                            <stop offset="0%" stop-color="#7DD3C7"/>
-                            <stop offset="60%" stop-color="#6FA8DC"/>
-                            <stop offset="100%" stop-color="#070B14"/>
-                        </radialGradient>
-                        <linearGradient id="orbitGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#7DD3C7"/>
-                            <stop offset="50%" stop-color="#6FA8DC"/>
-                            <stop offset="100%" stop-color="#7DD3C7" stop-opacity="0.3"/>
-                        </linearGradient>
-                    </defs>
-                    <!-- Background arc of tilted orbital ring -->
-                    <path d="M 4 20 C 4.5 13 13 9 20 10.5 C 24.5 11.5 28 14 29 17.5" stroke="url(#orbitGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                    <!-- Central Planet Sphere -->
-                    <circle cx="16" cy="16" r="8" fill="url(#planetSphere)" stroke="#6FA8DC" stroke-width="1.5"/>
-                    <!-- Atmospheric rim crescent -->
-                    <path d="M 10 11.5 C 11.5 9 14.5 8.2 18 9.2" stroke="#F1F5F9" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
-                    <!-- Foreground arc of orbital ring (crosses in front) -->
-                    <path d="M 3 15 C 4 21 12 24.5 19 23 C 24 22 27.5 19 29 15.5" stroke="url(#orbitGrad)" stroke-width="2.2" stroke-linecap="round"/>
-                </svg>
-                <span class="brand-name">ExoDip</span>
-                <span class="brand-pill">Transit Screening</span>
+<a class="skip-link" href="#view-home">Skip to content</a>
+<div class="app-container">
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="navbar">
+        <button class="nav-brand-box" type="button" onclick="navigateTo('Home')" aria-label="ExoDip home">
+            <svg class="logo-icon" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="planetSphere" cx="35%" cy="35%" r="65%">
+                        <stop offset="0%" stop-color="#7DD3C7"/>
+                        <stop offset="60%" stop-color="#6FA8DC"/>
+                        <stop offset="100%" stop-color="#070B14"/>
+                    </radialGradient>
+                    <linearGradient id="orbitGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#7DD3C7"/>
+                        <stop offset="50%" stop-color="#6FA8DC"/>
+                        <stop offset="100%" stop-color="#7DD3C7" stop-opacity="0.3"/>
+                    </linearGradient>
+                </defs>
+                <path d="M 4 20 C 4.5 13 13 9 20 10.5 C 24.5 11.5 28 14 29 17.5" stroke="url(#orbitGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+                <circle cx="16" cy="16" r="8" fill="url(#planetSphere)" stroke="#6FA8DC" stroke-width="1.5"/>
+                <path d="M 10 11.5 C 11.5 9 14.5 8.2 18 9.2" stroke="#F1F5F9" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+                <path d="M 3 15 C 4 21 12 24.5 19 23 C 24 22 27.5 19 29 15.5" stroke="url(#orbitGrad)" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+            <span class="brand-name">ExoDip</span>
+            <span class="brand-pill">Transit Screening</span>
+        </button>
+
+        <!-- Desktop Nav Links -->
+        <nav class="nav-links">
+            <button class="nav-item active" data-page="Home" onclick="navigateTo('Home')">Home</button>
+            <button class="nav-item" data-page="Analyze" onclick="navigateTo('Analyze')">Analyze</button>
+            <button class="nav-item" data-page="Docs" onclick="navigateTo('Docs')">Documentation</button>
+            <button class="nav-item" data-page="About" onclick="navigateTo('About')">About</button>
+        </nav>
+
+        <div class="nav-actions">
+            <div id="api-status" class="api-status-badge">
+                <span id="api-status-dot" class="status-dot"></span>
+                <span id="api-status-text">Engine: Initializing…</span>
             </div>
+            <!-- Hamburger for mobile -->
+            <button class="hamburger-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-controls="mobile-drawer" onclick="toggleMobileMenu()">
+                <span class="ham-bar"></span>
+                <span class="ham-bar"></span>
+                <span class="ham-bar"></span>
+            </button>
+        </div>
+    </header>
 
-            <!-- Desktop Nav Links -->
-            <nav class="nav-links">
-                <button class="nav-item active" data-page="Home" onclick="navigateTo('Home')">Home</button>
-                <button class="nav-item" data-page="Analyze" onclick="navigateTo('Analyze')">Analyze</button>
-                <button class="nav-item" data-page="Results" onclick="navigateTo('Results')">Results</button>
-                <button class="nav-item" data-page="History" onclick="navigateTo('History')">History</button>
-                <button class="nav-item" data-page="About" onclick="navigateTo('About')">About</button>
-                <button class="nav-item" data-page="Docs" onclick="navigateTo('Docs')">Docs</button>
-            </nav>
-
-            <div class="nav-actions">
-                <div id="api-status" class="api-status-badge">
-                    <span id="api-status-dot" class="status-dot"></span>
-                    <span id="api-status-text">Engine: Initializing…</span>
-                </div>
-
-                <!-- Hamburger Button for Phones -->
-                <button class="hamburger-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
-                    <span class="ham-bar"></span>
-                    <span class="ham-bar"></span>
-                    <span class="ham-bar"></span>
-                </button>
-            </div>
-        </header>
-
-        <!-- Mobile Drawer Navigation (2 tags per row) -->
-        <div class="mobile-nav-drawer" id="mobile-drawer">
-            <div class="mobile-nav-items">
-                <button class="mobile-nav-item active" data-page="Home" onclick="navigateTo('Home')">Home</button>
-                <button class="mobile-nav-item" data-page="Analyze" onclick="navigateTo('Analyze')">Analyze</button>
-                <button class="mobile-nav-item" data-page="Results" onclick="navigateTo('Results')">Results</button>
-                <button class="mobile-nav-item" data-page="History" onclick="navigateTo('History')">History</button>
-                <button class="mobile-nav-item" data-page="About" onclick="navigateTo('About')">About</button>
-                <button class="mobile-nav-item" data-page="Docs" onclick="navigateTo('Docs')">Docs</button>
-            </div>
-            <div class="mobile-nav-footer">
-                <div class="mobile-status">
-                    <span class="status-dot mobile-status-dot"></span>
-                    <span class="mobile-status-text">Engine: Initializing…</span>
-                </div>
+    <!-- Mobile Drawer Navigation -->
+    <div class="mobile-nav-drawer" id="mobile-drawer">
+        <div class="mobile-nav-items">
+            <button class="mobile-nav-item active" data-page="Home" onclick="navigateTo('Home')">Home</button>
+            <button class="mobile-nav-item" data-page="Analyze" onclick="navigateTo('Analyze')">Analyze</button>
+            <button class="mobile-nav-item" data-page="Docs" onclick="navigateTo('Docs')">Docs</button>
+            <button class="mobile-nav-item" data-page="About" onclick="navigateTo('About')">About</button>
+        </div>
+        <div class="mobile-nav-footer">
+            <div class="mobile-status">
+                <span class="status-dot mobile-status-dot"></span>
+                <span class="mobile-status-text">Engine: Initializing…</span>
             </div>
         </div>
-        <div class="mobile-backdrop" id="mobile-backdrop" onclick="closeMobileMenu()"></div>
+    </div>
+    <div class="mobile-backdrop" id="mobile-backdrop" onclick="closeMobileMenu()"></div>
 
-        <!-- ================= VIEW: HOME ================= -->
-        <main id="view-home" class="view-page">
+    <!-- ================= VIEW: HOME ================= -->
+    <main id="view-home" class="view-page" tabindex="-1">
+
+        <!-- Hero Section -->
+        <section class="hero-section" id="home-hero">
             <div class="grid-hero">
-                <div>
-                    <div class="eyebrow">PHOTOMETRIC TRANSIT SCREENING</div>
-                    <h1>Discover Worlds<br><span class="purple-gradient">Beyond Our Own</span></h1>
-                    <p style="font-size:1.15rem;font-weight:600;color:#7DD3C7;margin:0.5rem 0 0.75rem;">Find the dip. Discover the world.</p>
-                    <p class="lead">Analyze stellar light curves for periodic transit signals and screen potential exoplanet candidates.</p>
+                <div class="hero-text">
+                    <div class="eyebrow">Exoplanet Transit Analysis</div>
+                    <h1>ExoDip</h1>
+                    <p class="hero-tagline">Explore stellar light curves and screen periodic transit signals for potential exoplanet candidates.</p>
+                    <p class="lead">ExoDip combines Box Least Squares period search, astrophysical feature extraction, and an ensemble of machine-learning classifiers to evaluate raw stellar photometry.</p>
                     <div class="hero-actions">
-                        <button class="btn btn-primary" onclick="navigateTo('Analyze')">Analyze Data</button>
-                        <button class="btn" onclick="navigateTo('Docs')">Learn More</button>
+                        <button class="btn btn-primary" onclick="navigateTo('Analyze')">Analyze Light Curve</button>
+                        <button class="btn btn-ghost" onclick="scrollToSection('how-exodip-works')">Explore How It Works</button>
+                    </div>
+                    <div class="hero-meta">
+                        <div class="hero-meta-item">
+                            <span class="hero-meta-label">Models</span>
+                            <span class="hero-meta-val">XGBoost · RF · CNN · SVM</span>
+                        </div>
+                        <div class="hero-meta-sep"></div>
+                        <div class="hero-meta-item">
+                            <span class="hero-meta-label">Transit Search</span>
+                            <span class="hero-meta-val">BLS 0.5 – 20 days</span>
+                        </div>
+                        <div class="hero-meta-sep"></div>
+                        <div class="hero-meta-item">
+                            <span class="hero-meta-label">Features</span>
+                            <span class="hero-meta-val">15 astrophysical metrics</span>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <canvas id="c"></canvas>
+                <div class="hero-canvas-wrap">
+                    <canvas id="c" aria-label="Interactive planetary system simulation"></canvas>
+                    <div class="canvas-caption">Planetary system simulation — a transiting world around its host star</div>
                 </div>
             </div>
+        </section>
 
-            <div style="height: 2.5rem;"></div>
-            <h3 style="margin-bottom: 1rem;">Core Capabilities</h3>
+        <!-- What Is ExoDip -->
+        <section class="home-section" id="what-is-exodip">
+            <div class="section-header">
+                <div class="eyebrow">What Is ExoDip?</div>
+                <h2 class="section-title">Photometric transit screening<br>for candidate exoplanet signals</h2>
+                <p class="section-lead">ExoDip processes raw stellar photometry to identify characteristic brightness dips caused by exoplanet transits — when a planet crosses in front of its host star along our line of sight. It is a screening engine, not a confirmation pipeline.</p>
+            </div>
+        </section>
+
+        <!-- Why transit detection -->
+        <section class="home-section home-section--split" id="why-transit">
+            <div class="split-copy">
+                <div class="eyebrow">Why Transit Detection?</div>
+                <h2 class="section-title">Most planets are found by watching stars, not planets</h2>
+                <p>Direct imaging of exoplanets is rare. The transit method instead measures a star’s brightness over time. If a planet periodically blocks a fraction of that light, the resulting light curve encodes orbital period, transit depth, and duration.</p>
+                <p class="muted">Those signals are small — often well below 1% of the star’s flux — and sit on top of stellar variability, instrumental drift, and astrophysical false positives. That is the problem ExoDip is built to screen.</p>
+            </div>
+            <div class="split-aside">
+                <div class="fact-row"><span>Typical Jupiter-size transit</span><b>~1% dip</b></div>
+                <div class="fact-row"><span>Typical Earth-size transit</span><b>~0.01% dip</b></div>
+                <div class="fact-row"><span>Search window</span><b>0.5–20 day periods</b></div>
+                <div class="fact-row"><span>Primary surveys</span><b>Kepler · TESS</b></div>
+            </div>
+        </section>
+
+        <!-- How transits work -->
+        <section class="home-section" id="how-transits-work">
+            <div class="section-header">
+                <div class="eyebrow">How Transits Work</div>
+                <h2 class="section-title">Why a planet creates a dip</h2>
+                <p class="section-lead">When a planet passes between its host star and the observer, it blocks a small amount of starlight. That produces a characteristic decrease in observed brightness — the dip that gives ExoDip its name.</p>
+            </div>
+
+            <div class="dip-diagram-wrap">
+                <img class="transit-dip-illustration" src="assets/transit-dip-illustration.svg" alt="A planet crossing its host star and the corresponding dip in the observed stellar light curve">
+            </div>
+
+            <div class="transit-explainer">
+                <div class="transit-stage">
+                    <img class="transit-stage-image" src="assets/transit-stage-baseline.svg" alt="Planet before transit, with baseline brightness">
+                    <div class="transit-label">Baseline Flux</div>
+                    <div class="transit-desc">Constant stellar brightness before the event</div>
+                </div>
+                <div class="transit-arrow" aria-hidden="true">→</div>
+                <div class="transit-stage">
+                    <img class="transit-stage-image" src="assets/transit-stage-ingress.svg" alt="Planet beginning to cover the star, with brightness falling">
+                    <div class="transit-label">Transit Ingress</div>
+                    <div class="transit-desc">Planet begins crossing the stellar disk; flux drops</div>
+                </div>
+                <div class="transit-arrow" aria-hidden="true">→</div>
+                <div class="transit-stage">
+                    <img class="transit-stage-image" src="assets/transit-stage-midpoint.svg" alt="Planet at the middle of transit, with the deepest brightness dip">
+                    <div class="transit-label">Transit Mid-point</div>
+                    <div class="transit-desc">Deepest dip — depth ≈ (R<sub>p</sub>/R<sub>★</sub>)²</div>
+                </div>
+                <div class="transit-arrow" aria-hidden="true">→</div>
+                <div class="transit-stage">
+                    <img class="transit-stage-image" src="assets/transit-stage-egress.svg" alt="Planet leaving the star, with brightness recovering">
+                    <div class="transit-label">Transit Egress</div>
+                    <div class="transit-desc">Planet exits; flux recovers to baseline</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How ExoDip works / pipeline -->
+        <section class="home-section" id="how-exodip-works">
+            <div class="section-header">
+                <div class="eyebrow">Detection Pipeline</div>
+                <h2 class="section-title">How ExoDip works</h2>
+                <p class="section-lead">Six automated stages from raw photometry to a calibrated candidate assessment. Technical detail lives in Documentation.</p>
+            </div>
+            <div class="pipeline-steps">
+                <div class="pipeline-step">
+                    <div class="ps-number">01</div>
+                    <div class="ps-body">
+                        <div class="ps-title">Light Curve Input</div>
+                        <div class="ps-desc">Upload time-series stellar flux from Kepler, TESS, or ground-based surveys in CSV, TXT, or NPY format.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="ps-number">02</div>
+                    <div class="ps-body">
+                        <div class="ps-title">Detrending</div>
+                        <div class="ps-desc">Filter instrumental drift, sensor artifacts, and stellar variability while preserving transit dip profiles.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="ps-number">03</div>
+                    <div class="ps-body">
+                        <div class="ps-title">BLS Period Search</div>
+                        <div class="ps-desc">Astropy Box Least Squares scans trial periods (0.5–20 days) to find recurring box-shaped flux dips.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="ps-number">04</div>
+                    <div class="ps-body">
+                        <div class="ps-title">Feature Extraction</div>
+                        <div class="ps-desc">Compute 15 astrophysical and statistical features: depth, duration, SNR, signal energy, spectral entropy, skewness.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="ps-number">05</div>
+                    <div class="ps-body">
+                        <div class="ps-title">ML Screening</div>
+                        <div class="ps-desc">Calibrated ensemble (XGBoost, Random Forest, CNN, SVM) evaluates the feature vector against transit-like profiles.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="ps-number">06</div>
+                    <div class="ps-body">
+                        <div class="ps-title">Candidate Assessment</div>
+                        <div class="ps-desc">Produce a candidate / non-candidate verdict, confidence score, diagnostic plots, and a downloadable JSON report.</div>
+                    </div>
+                </div>
+            </div>
+            <p class="section-more"><button class="text-link" onclick="openDocsTab('pipeline')">Learn more about the pipeline →</button></p>
+        </section>
+
+        <!-- Core Capabilities -->
+        <section class="home-section" id="core-capabilities">
+            <div class="section-header">
+                <div class="eyebrow">Core Capabilities</div>
+                <h2 class="section-title">What you can do with ExoDip</h2>
+            </div>
             <div class="feature-grid">
                 <div class="feature-card">
                     <div class="feature-num">01</div>
                     <h4>Transit Signal Detection</h4>
-                    <p>Identify periodic brightness dips that may indicate planetary transits.</p>
+                    <p>Identify periodic brightness dips in stellar light curves using Box Least Squares (BLS) periodogram analysis.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-num">02</div>
                     <h4>Ensemble Screening</h4>
-                    <p>Use trained models to distinguish candidate signals from non-planetary patterns.</p>
+                    <p>Consensus across tuned XGBoost, Random Forest, CNN, and SVM classifiers to distinguish genuine signals from noise.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-num">03</div>
                     <h4>Light-Curve Analysis</h4>
-                    <p>Visualize and inspect stellar brightness variations and detected transit characteristics.</p>
+                    <p>Inspect brightness variations, transit depth, duration, and detected dip profiles with interactive diagnostic plots.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-num">04</div>
                     <h4>Candidate Insights</h4>
-                    <p>Review metrics such as period, transit depth, duration, BLS power/SNR, and model outputs.</p>
+                    <p>Review orbital period, BLS SNR, 15 astrophysical features, and export a JSON telemetry report for follow-up.</p>
                 </div>
             </div>
-        </main>
+        </section>
 
-        <!-- ================= VIEW: ANALYZE ================= -->
-        <main id="view-analyze" class="view-page" style="display:none;">
-            <div class="eyebrow">Screening Workspace</div>
-            <h2>Analyze Light Curve</h2>
-            <p class="muted" style="margin-bottom: 1.5rem;">Submit raw photometric flux measurements for exoplanet transit candidate screening.</p>
-
-            <div class="grid-analyze">
-                <!-- Left Column: Input Workspace + Data Format Guide -->
+        <!-- Analyze portal -->
+        <section class="home-section" id="analyze-portal">
+            <div class="analyze-portal">
                 <div>
-                    <div class="panel">
-                        <!-- Analyze Tabs -->
-                        <div class="tab-nav">
-                            <button class="tab-btn active" onclick="switchAnalyzeTab('upload')">Upload Photometry (CSV, TXT, NPY)</button>
-                            <button class="tab-btn" onclick="switchAnalyzeTab('test-row')">Pre-loaded Test Set Row</button>
+                    <div class="eyebrow">Workspace</div>
+                    <h2 class="cta-title">Analyze a light curve</h2>
+                    <p class="cta-sub">Upload stellar photometry and let ExoDip search for periodic transit-like signals. The full screening workspace — upload, preprocessing, BLS, features, and ML results — lives on a dedicated page.</p>
+                </div>
+                <button class="btn btn-primary" onclick="navigateTo('Analyze')">Analyze Light Curve →</button>
+            </div>
+        </section>
+
+        <!-- Example / results explanation -->
+        <section class="home-section" id="example-analysis">
+            <div class="section-header">
+                <div class="eyebrow">Example of Analysis</div>
+                <h2 class="section-title">What a screening result looks like</h2>
+                <p class="section-lead">This is an <strong>illustrative example</strong> of typical outputs. It is not a live analysis from this session.</p>
+            </div>
+            <div class="example-grid">
+                <div class="example-outcome">
+                    <span class="example-badge">Example · Candidate</span>
+                    <p class="muted">A periodic dip with sufficient BLS SNR and classifier agreement is labeled an exoplanet <em>candidate</em> — a recommendation for follow-up, not a confirmed planet.</p>
+                </div>
+                <div class="metric-strip example-metrics">
+                    <div class="metric-cell"><div class="metric-cell-label">Period</div><div class="metric-cell-value">3.52 d</div></div>
+                    <div class="metric-cell"><div class="metric-cell-label">Transit Depth</div><div class="metric-cell-value">1.20%</div></div>
+                    <div class="metric-cell"><div class="metric-cell-label">Duration</div><div class="metric-cell-value">3.8 h</div></div>
+                    <div class="metric-cell"><div class="metric-cell-label">BLS SNR</div><div class="metric-cell-value">14.8</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scientific methodology -->
+        <section class="home-section home-section--prose" id="methodology">
+            <div class="section-header">
+                <div class="eyebrow">Scientific Methodology</div>
+                <h2 class="section-title">How the science is structured</h2>
+            </div>
+            <div class="prose-cols">
+                <div>
+                    <h4>Period search</h4>
+                    <p>Box Least Squares (Kovács et al. 2002) is the standard algorithm for detecting box-shaped transits in unevenly sampled photometry. ExoDip uses Astropy BLS over 0.5–20 day periods and 1–12 hour durations.</p>
+                </div>
+                <div>
+                    <h4>Feature vector</h4>
+                    <p>Fifteen morphological and statistical descriptors — including depth, duration, noise, skewness, kurtosis, signal energy, and spectral entropy — summarize the light curve for the classifiers.</p>
+                </div>
+                <div>
+                    <h4>Model evaluation</h4>
+                    <p>Ensemble models were trained and compared on Kepler photometry. XGBoost is the primary decision model based on held-out composite score (accuracy, precision–recall, and ROC-AUC).</p>
+                </div>
+            </div>
+            <p class="section-more"><button class="text-link" onclick="openDocsTab('formats')">Input formats, metrics, and caveats →</button></p>
+        </section>
+
+        <!-- Limitations -->
+        <section class="home-section" id="limitations">
+            <div class="limitations-block">
+                <div class="eyebrow">Limitations</div>
+                <h2 class="section-title">Screening is not confirmation</h2>
+                <ul class="limit-list">
+                    <li><b>False positives:</b> eclipsing binaries, grazing binaries, and blended background stars can mimic planetary transits.</li>
+                    <li><b>Stellar activity:</b> starspots, flares, and rotation can introduce spurious periodic dips.</li>
+                    <li><b>Follow-up required:</b> radial-velocity mass measurement and high-resolution imaging remain necessary for confirmation.</li>
+                </ul>
+                <p class="section-more"><button class="text-link" onclick="openDocsTab('limitations')">Full limitations &amp; FAQ →</button></p>
+            </div>
+        </section>
+
+        <!-- Documentation teaser -->
+        <section class="home-section" id="home-docs">
+            <div class="section-header">
+                <div class="eyebrow">Documentation</div>
+                <h2 class="section-title">Go deeper when you need the details</h2>
+            </div>
+            <div class="docs-teaser">
+                <button class="docs-teaser-item" onclick="openDocsTab('start')">Getting started</button>
+                <button class="docs-teaser-item" onclick="openDocsTab('formats')">Input formats</button>
+                <button class="docs-teaser-item" onclick="openDocsTab('pipeline')">Pipeline internals</button>
+                <button class="docs-teaser-item" onclick="openDocsTab('results')">Reading results</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= VIEW: ANALYZE ================= -->
+    <main id="view-analyze" class="view-page" style="display:none;" tabindex="-1">
+        <div class="page-header page-header--workspace">
+            <div>
+                <div class="eyebrow">Screening Workspace</div>
+                <h2>Analyze Light Curve</h2>
+                <p class="muted page-header-sub">Upload photometry, run the detection pipeline, then inspect the light curve, BLS signal, features, and ML screening on the Results page.</p>
+            </div>
+            <button class="text-link session-link" type="button" onclick="navigateTo('History')">View session history →</button>
+        </div>
+
+        <ol class="workspace-flow" aria-label="Analysis workflow">
+            <li class="wf-step is-current" data-wf="upload">1. Upload</li>
+            <li class="wf-step" data-wf="configure">2. Configure</li>
+            <li class="wf-step" data-wf="process">3. Process</li>
+            <li class="wf-step" data-wf="analyze">4. Analyze</li>
+            <li class="wf-step" data-wf="results">5. Results</li>
+        </ol>
+
+        <div class="grid-analyze">
+            <!-- Left Column: Input + Data Format -->
+            <div>
+                <div class="panel">
+                    <!-- Analyze Tabs -->
+                    <div class="tab-nav">
+                        <button class="tab-btn active" onclick="switchAnalyzeTab('upload')">Upload Photometry</button>
+                        <button class="tab-btn" onclick="switchAnalyzeTab('test-row')">Pre-loaded Test Row</button>
+                    </div>
+
+                    <!-- Tab 1: Upload -->
+                    <div id="analyze-tab-upload" class="tab-content active">
+                        <input type="file" id="file-input" accept=".csv,.txt,.npy" style="display:none;" onchange="handleFileSelected(this.files[0])">
+                        <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#6FA8DC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><br>
+                            <b style="color:#F1F5F9; font-size:1.05rem;">Drag and drop your light-curve file here</b><br>
+                            <span class="muted">CSV (flux column), Kepler 1-row CSV, whitespace TXT, or NPY arrays</span>
                         </div>
 
-                        <!-- Tab 1: Upload -->
-                        <div id="analyze-tab-upload" class="tab-content active">
-                            <input type="file" id="file-input" accept=".csv,.txt,.npy" style="display:none;" onchange="handleFileSelected(this.files[0])">
-                            <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#6FA8DC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><br>
-                                <b style="color:#F1F5F9; font-size:1.05rem;">Drag and drop your light-curve file here</b><br>
-                                <span class="muted">Supports CSV with flux column, Kepler 1-row CSVs, whitespace-separated TXT, or NPY arrays</span>
+                        <!-- File Selected Preview Card -->
+                        <div id="file-preview-card" class="file-card" style="display:none;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase;">File Details</div>
+                                    <b id="file-preview-name" style="font-size:1.12rem; color:#F1F5F9;">sample.csv</b>
+                                </div>
+                                <span id="file-preview-size" class="model-chip">12.4 KB</span>
                             </div>
-
-                            <!-- File Selected Preview Card -->
-                            <div id="file-preview-card" class="file-card" style="display:none;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <div>
-                                        <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase;">File Details</div>
-                                        <b id="file-preview-name" style="font-size:1.12rem; color:#F1F5F9;">sample.csv</b>
-                                    </div>
-                                    <span id="file-preview-size" class="model-chip">12.4 KB</span>
-                                </div>
-                                <div style="display:flex; gap:20px; margin-top:0.75rem; font-size:0.88rem;">
-                                    <div>Format: <b id="file-preview-format" style="color:#6FA8DC;">CSV</b></div>
-                                    <div>Status: <b style="color:#7DD3C7;">Ready for screening</b></div>
-                                </div>
-                                <div style="margin-top:1rem;">
-                                    <button class="btn btn-primary btn-full" onclick="startFileAnalysis()">Analyze Light Curve</button>
-                                </div>
+                            <div style="display:flex; gap:20px; margin-top:0.75rem; font-size:0.88rem;">
+                                <div>Format: <b id="file-preview-format" style="color:#6FA8DC;">CSV</b></div>
+                                <div>Status: <b style="color:#7DD3C7;">Ready for screening</b></div>
                             </div>
-
-                            <div style="margin-top: 1rem;">
-                                <a href="/api/sample-csv" class="btn" style="font-size:0.92rem; width:100%;">Download Sample Kepler Transit CSV</a>
+                            <div style="margin-top:1rem;">
+                                <button class="btn btn-primary btn-full" onclick="startFileAnalysis()">Analyze Light Curve</button>
                             </div>
                         </div>
 
-                        <!-- Tab 2: Test Row -->
-                        <div id="analyze-tab-test-row" class="tab-content">
-                            <p class="muted" style="margin-bottom:0.75rem;">Select an index from the held-out Kepler <code>exoTest.csv</code> dataset.</p>
-                            <div style="margin-bottom: 1rem;">
-                                <label style="font-size:0.85rem; color:#94A3B8; display:block; margin-bottom:0.35rem;">Held-out test dataset row ID</label>
-                                <input type="number" id="test-row-id" min="0" value="0" step="1">
-                                <span id="test-row-hint" class="muted" style="font-size:0.82rem; margin-top:4px; display:block;">Range: 0 to 569</span>
-                            </div>
-                            <button class="btn btn-primary" onclick="startTestRowAnalysis()">Analyze Test-Set Row</button>
-                        </div>
-
-                        <!-- Step-by-Step Screening Progress Banner -->
-                        <div id="analysis-loading-banner" class="loading-card" style="display:none;">
-                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
-                                <div class="spinner"></div>
-                                <b style="color:#F1F5F9; font-size:1.05rem;">Screening candidate light curve…</b>
-                            </div>
-                            <div class="loading-step" id="step-1"><span>○</span> Reading raw photometry</div>
-                            <div class="loading-step" id="step-2"><span>○</span> Normalizing flux & noise reduction</div>
-                            <div class="loading-step" id="step-3"><span>○</span> Box Least Squares (BLS) periodic transit search</div>
-                            <div class="loading-step" id="step-4"><span>○</span> Extracting transit depth, duration, and shape features</div>
-                            <div class="loading-step" id="step-5"><span>○</span> Executing ML model ensemble (XGBoost, RF, CNN, SVM)</div>
+                        <div style="margin-top: 1rem;">
+                            <a href="/api/sample-csv" class="btn" style="font-size:0.92rem; width:100%;">Download Sample Kepler Transit CSV</a>
                         </div>
                     </div>
 
-                    <!-- Data Format Guide Panel -->
-                    <div class="panel" style="margin-top: 1.5rem;">
-                        <div class="eyebrow" style="margin-bottom:0.35rem;">Input Specification</div>
-                        <h3 style="color:#F1F5F9; margin-bottom:0.6rem;">Data Format Guide</h3>
-                        <p class="muted">For CSV files, include a numeric <code>flux</code> column. A <code>time</code> column is optional.</p>
-                        <pre class="mono" style="background:#0E1524; padding:0.85rem; border-radius:8px; border:1px solid #26344A; margin:0.85rem 0; color:#7DD3C7; font-size:0.9rem; line-height:1.6;">time,flux
+                    <!-- Tab 2: Test Row -->
+                    <div id="analyze-tab-test-row" class="tab-content">
+                        <p class="muted" style="margin-bottom:0.75rem;">Select an index from the held-out Kepler <code>exoTest.csv</code> dataset.</p>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-size:0.85rem; color:#94A3B8; display:block; margin-bottom:0.35rem;">Held-out test dataset row ID</label>
+                            <input type="number" id="test-row-id" min="0" value="0" step="1">
+                            <span id="test-row-hint" class="muted" style="font-size:0.82rem; margin-top:4px; display:block;">Range: 0 to 569</span>
+                        </div>
+                        <button class="btn btn-primary" onclick="startTestRowAnalysis()">Analyze Test-Set Row</button>
+                    </div>
+
+                    <!-- Loading Banner -->
+                    <div id="analysis-loading-banner" class="loading-card" style="display:none;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+                            <div class="spinner"></div>
+                            <b style="color:#F1F5F9; font-size:1.05rem;">Screening candidate light curve…</b>
+                        </div>
+                        <div class="loading-step" id="step-1"><span>○</span> Reading raw photometry</div>
+                        <div class="loading-step" id="step-2"><span>○</span> Normalizing flux & noise reduction</div>
+                        <div class="loading-step" id="step-3"><span>○</span> Box Least Squares (BLS) periodic transit search</div>
+                        <div class="loading-step" id="step-4"><span>○</span> Extracting transit depth, duration, and shape features</div>
+                        <div class="loading-step" id="step-5"><span>○</span> Executing ML model ensemble (XGBoost, RF, CNN, SVM)</div>
+                    </div>
+                </div>
+
+                <!-- Data Format Guide -->
+                <div class="panel" style="margin-top: 1.5rem;">
+                    <div class="eyebrow" style="margin-bottom:0.35rem;">Input Specification</div>
+                    <h3 style="color:#F1F5F9; margin-bottom:0.6rem;">Data Format Guide</h3>
+                    <p class="muted">For CSV files, include a numeric <code>flux</code> column. A <code>time</code> column is optional.</p>
+                    <pre class="mono" style="background:#0E1524; padding:0.85rem; border-radius:8px; border:1px solid #26344A; margin:0.85rem 0; color:#7DD3C7; font-size:0.9rem; line-height:1.6;">time,flux
 0.0,1.0002
 0.02,0.9998
 0.04,0.9912
 0.06,0.9915</pre>
-                        <p class="muted" style="margin-top:0.75rem;">Minimum 30 data points are required. Kepler 3197-cadence observations are fully supported.</p>
+                    <p class="muted" style="margin-top:0.75rem;">Minimum 30 data points required. Kepler 3197-cadence observations fully supported.</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Pipeline Flowchart + Engine Parameters -->
+            <div>
+                <!-- Pipeline Flowchart -->
+                <div class="panel">
+                    <div class="eyebrow" style="margin-bottom:0.35rem;">Screening Stages</div>
+                    <h3 style="color:#F1F5F9; margin-bottom:1.15rem;">Detection Pipeline</h3>
+                    <div class="v-flowchart">
+                        <div class="v-flow-step v-step-1">
+                            <div class="v-flow-node">01</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Photometry Ingestion</div>
+                                <p class="v-flow-desc">Upload time-series stellar flux from Kepler, TESS, or ground-based surveys.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-2">
+                            <div class="v-flow-node">02</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Noise Detrending</div>
+                                <p class="v-flow-desc">Filter instrumental noise, sensor drift, and low-frequency stellar pulsations.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-3">
+                            <div class="v-flow-node">03</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">BLS Transit Search</div>
+                                <p class="v-flow-desc">Scan trial periods (0.5–20 days) with Box Least Squares to detect recurring transit dips.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-4">
+                            <div class="v-flow-node">04</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Feature Extraction</div>
+                                <p class="v-flow-desc">Calculate transit depth, duration, ingress/egress ratios, and signal-to-noise metrics.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-5">
+                            <div class="v-flow-node">05</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">ML Screening</div>
+                                <p class="v-flow-desc">Evaluate the feature vector through tuned XGBoost, Random Forest, CNN, and SVM models.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-6">
+                            <div class="v-flow-node">06</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Candidate Assessment</div>
+                                <p class="v-flow-desc">Calibrated verdict, confidence, diagnostic plots, and downloadable JSON report.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Right Column: Vertical Flowchart + Engine Parameters -->
+                <!-- Engine Parameters -->
+                <div class="panel" style="margin-top: 1.5rem;">
+                    <div class="eyebrow" style="margin-bottom:0.35rem;">Engine Settings</div>
+                    <h3 style="color:#F1F5F9; margin-bottom:0.85rem;">Astrophysical Parameters</h3>
+                    <ul style="color:#94A3B8; font-size:0.9rem; line-height:1.75; padding-left:1.2rem; margin:0;">
+                        <li><b>Transit Search Method:</b> Box Least Squares (Astropy BLS periodogram)</li>
+                        <li><b>Period Search Grid:</b> 0.5 to 20.0 days (duration grid: 1 to 12 hours)</li>
+                        <li><b>Primary Decision Model:</b> Tuned XGBoost Classifier (composite cross-validation score)</li>
+                        <li><b>Feature Pipeline:</b> 15 astrophysical and statistical indicators (energy, entropy, depth, duration)</li>
+                        <li><b>Candidate Vetting Criteria:</b> Periodic dip + BLS SNR ≥ 3.0 + ML classification confidence</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= VIEW: RESULTS ================= -->
+    <main id="view-results" class="view-page" style="display:none;" tabindex="-1">
+        <!-- Empty state -->
+        <div id="results-empty" class="panel" style="text-align:center; padding:3rem 1.5rem;">
+            <p style="font-size:1.2rem; color:#F1F5F9; margin-bottom:0.5rem;">No analysis has been run yet.</p>
+            <p class="muted" style="margin-bottom:1.5rem;">Submit a light curve in the Analyze tab to view screening results.</p>
+            <button class="btn btn-primary" onclick="navigateTo('Analyze')">Go to Analyze</button>
+        </div>
+
+        <!-- Results Content -->
+        <div id="results-content" style="display:none;">
+            <div class="page-header page-header--results">
                 <div>
-                    <!-- Pipeline Flowchart Panel -->
-                    <div class="panel">
-                        <div class="eyebrow" style="margin-bottom:0.35rem;">Screening Stages</div>
-                        <h3 style="color:#F1F5F9; margin-bottom:1.15rem;">Detection Pipeline</h3>
-                        <div class="v-flowchart">
-                            <div class="v-flow-step v-step-1">
-                                <div class="v-flow-node">01</div>
-                                <div class="v-flow-content">
-                                    <div class="v-flow-title">Photometry Ingestion</div>
-                                    <p class="v-flow-desc">Upload time-series stellar flux measurements from Kepler, TESS, or ground-based surveys.</p>
-                                </div>
-                            </div>
-                            <div class="v-flow-step v-step-2">
-                                <div class="v-flow-node">02</div>
-                                <div class="v-flow-content">
-                                    <div class="v-flow-title">Noise Detrending</div>
-                                    <p class="v-flow-desc">Filter instrumental noise, sensor drift, and low-frequency stellar pulsations.</p>
-                                </div>
-                            </div>
-                            <div class="v-flow-step v-step-3">
-                                <div class="v-flow-node">03</div>
-                                <div class="v-flow-content">
-                                    <div class="v-flow-title">BLS Transit Search</div>
-                                    <p class="v-flow-desc">Scan trial periods (0.5 to 20 days) with Box Least Squares to detect recurring transit dips.</p>
-                                </div>
-                            </div>
-                            <div class="v-flow-step v-step-4">
-                                <div class="v-flow-node">04</div>
-                                <div class="v-flow-content">
-                                    <div class="v-flow-title">Feature Extraction</div>
-                                    <p class="v-flow-desc">Calculate transit depth, duration, ingress/egress ratios, and signal-to-noise metrics.</p>
-                                </div>
-                            </div>
-                            <div class="v-flow-step v-step-5">
-                                <div class="v-flow-node">05</div>
-                                <div class="v-flow-content">
-                                    <div class="v-flow-title">Ensemble Screening</div>
-                                    <p class="v-flow-desc">Evaluate signal through tuned XGBoost, Random Forest, and CNN models for candidate verdict.</p>
-                                </div>
-                            </div>
+                    <div class="eyebrow">Screening Assessment</div>
+                    <h2>Candidate Screening Results</h2>
+                    <p id="res-source-line" class="muted">No live analysis loaded</p>
+                    <p id="res-live-badge" class="session-badge" hidden></p>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button class="btn" onclick="navigateTo('Analyze')">&larr; Back to Analyze</button>
+                    <button class="btn" onclick="navigateTo('History')">Session History</button>
+                    <button class="btn btn-primary" onclick="downloadReport()">Download Report</button>
+                </div>
+            </div>
+
+            <div class="grid-results">
+                <!-- Left: Outcome & Telemetry -->
+                <div>
+                    <div class="result-card">
+                        <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">Screening Outcome</div>
+                        <div id="res-badge-container"></div>
+                        <p id="res-verdict-desc" style="color:#94A3B8; font-size:0.88rem; margin:0.85rem 0 1rem; line-height:1.55;"></p>
+                        <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em;">Screening Confidence</div>
+                        <div id="res-conf-value" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; font-size:2.35rem; color:#F1F5F9; margin:0.15rem 0;">—</div>
+                        <div class="progress-bar">
+                            <div id="res-conf-bar" class="progress-fill" style="width:0%;"></div>
                         </div>
                     </div>
 
-                    <!-- Engine & Model Configuration Panel -->
-                    <div class="panel" style="margin-top: 1.5rem;">
-                        <div class="eyebrow" style="margin-bottom:0.35rem;">Engine Settings</div>
-                        <h3 style="color:#F1F5F9; margin-bottom:0.85rem;">Astrophysical Parameters</h3>
-                        <ul style="color:#94A3B8; font-size:0.9rem; line-height:1.75; padding-left:1.2rem; margin:0;">
-                            <li><b>Transit Search Method:</b> Box Least Squares (Astropy BLS periodogram)</li>
-                            <li><b>Period Search Grid:</b> 0.5 to 20.0 days (duration grid: 1 to 12 hours)</li>
-                            <li><b>Primary Decision Model:</b> Tuned XGBoost Classifier (composite cross-validation score)</li>
-                            <li><b>Feature Pipeline:</b> 15 astrophysical and statistical indicators (energy, entropy, depth, duration)</li>
-                            <li><b>Candidate Vetting Criteria:</b> Periodic dip + BLS SNR ≥ 3.0 + ML classification confidence</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- ================= VIEW: RESULTS ================= -->
-        <main id="view-results" class="view-page" style="display:none;">
-            <!-- Empty state fallback if no result yet -->
-            <div id="results-empty" class="panel" style="text-align:center; padding:3rem 1.5rem;">
-                <p style="font-size:1.2rem; color:#F1F5F9; margin-bottom:0.5rem;">No analysis has been run yet.</p>
-                <p class="muted" style="margin-bottom:1.5rem;">Submit a light curve in the Analyze tab to view screening results.</p>
-                <button class="btn btn-primary" onclick="navigateTo('Analyze')">Go to Analyze</button>
-            </div>
-
-            <!-- Results Content Container -->
-            <div id="results-content" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:16px;">
-                    <div>
-                        <div class="eyebrow">Screening Assessment</div>
-                        <h2>Candidate Screening Results</h2>
-                        <p id="res-source-line" class="muted">sample.csv · Analyzed on Sep 20, 2026</p>
-                    </div>
-                    <div style="display:flex; gap:12px;">
-                        <button class="btn" onclick="navigateTo('Analyze')">&larr; Back to Analyze</button>
-                        <button class="btn btn-primary" onclick="downloadReport()">Download Report</button>
+                    <div class="result-card" style="margin-top:1.2rem;">
+                        <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 0.75rem; color:#F1F5F9;">Detection Telemetry</p>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Primary Model</span><b id="res-tele-model" style="color:#F1F5F9;">—</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Model Agreement</span><b id="res-tele-agree" style="color:#7DD3C7;">—</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Detected Dips</span><b id="res-tele-dips" style="color:#F1F5F9;">—</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Noise Std Dev</span><b id="res-tele-noise" style="color:#F1F5F9;">—</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Negative Ratio</span><b id="res-tele-neg" style="color:#F1F5F9;">—</b></div>
                     </div>
                 </div>
 
-                <div class="grid-results">
-                    <!-- Left: Outcome & Telemetry -->
-                    <div>
-                        <div class="result-card">
-                            <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">Screening Outcome</div>
-                            <div id="res-badge-container"></div>
-                            <p id="res-verdict-desc" style="color:#94A3B8; font-size:0.88rem; margin:0.85rem 0 1rem; line-height:1.55;"></p>
-                            <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em;">Screening Confidence</div>
-                            <div id="res-conf-value" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; font-size:2.35rem; color:#F1F5F9; margin:0.15rem 0;">99.8%</div>
-                            <div class="progress-bar">
-                                <div id="res-conf-bar" class="progress-fill" style="width:99.8%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="result-card" style="margin-top:1.2rem;">
-                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 0.75rem; color:#F1F5F9;">Detection Telemetry</p>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Primary Model</span><b id="res-tele-model" style="color:#F1F5F9;">XGBoost</b></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Model Agreement</span><b id="res-tele-agree" style="color:#7DD3C7;">Unanimous</b></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Detected Dips</span><b id="res-tele-dips" style="color:#F1F5F9;">0</b></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Noise Std Dev</span><b id="res-tele-noise" style="color:#F1F5F9;">0.0004</b></div>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Negative Ratio</span><b id="res-tele-neg" style="color:#F1F5F9;">0.49</b></div>
-                        </div>
+                <!-- Right: Metrics Strip & Chart Tabs -->
+                <div>
+                    <!-- Signal Metrics Strip -->
+                    <div class="metric-strip">
+                        <div class="metric-cell"><div class="metric-cell-label">Period</div><div id="res-m-period" class="metric-cell-value">—</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Transit Depth</div><div id="res-m-depth" class="metric-cell-value">—</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Duration</div><div id="res-m-duration" class="metric-cell-value">—</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">BLS SNR</div><div id="res-m-snr" class="metric-cell-value">—</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Dip Groups</div><div id="res-m-groups" class="metric-cell-value">—</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Decision Model</div><div id="res-m-model" class="metric-cell-value" style="color:#6FA8DC;">—</div></div>
                     </div>
 
-                    <!-- Right: Metrics Strip & Charts Tabs -->
-                    <div>
-                        <!-- Signal Metrics Strip -->
-                        <div class="metric-strip">
-                            <div class="metric-cell"><div class="metric-cell-label">Period</div><div id="res-m-period" class="metric-cell-value">3.52 d</div></div>
-                            <div class="metric-cell"><div class="metric-cell-label">Transit Depth</div><div id="res-m-depth" class="metric-cell-value">1.200%</div></div>
-                            <div class="metric-cell"><div class="metric-cell-label">Duration</div><div id="res-m-duration" class="metric-cell-value">3.8 h</div></div>
-                            <div class="metric-cell"><div class="metric-cell-label">BLS SNR</div><div id="res-m-snr" class="metric-cell-value">14.8</div></div>
-                            <div class="metric-cell"><div class="metric-cell-label">Dip Groups</div><div id="res-m-groups" class="metric-cell-value">3</div></div>
-                            <div class="metric-cell"><div class="metric-cell-label">Decision Model</div><div id="res-m-model" class="metric-cell-value" style="color:#6FA8DC;">XGBoost</div></div>
-                        </div>
+                    <!-- Result Tabs -->
+                    <div class="tab-nav" style="margin-top:1.2rem;">
+                        <button class="tab-btn active" onclick="switchResultTab('full')">Full Light Curve</button>
+                        <button class="tab-btn" onclick="switchResultTab('zoom')">Transit Dip View</button>
+                        <button class="tab-btn" onclick="switchResultTab('models')">Model Comparison</button>
+                        <button class="tab-btn" onclick="switchResultTab('features')">Extracted Features</button>
+                    </div>
 
-                        <!-- Result Tabs -->
-                        <div class="tab-nav" style="margin-top:1.2rem;">
-                            <button class="tab-btn active" onclick="switchResultTab('full')">Full Light Curve</button>
-                            <button class="tab-btn" onclick="switchResultTab('zoom')">Transit Dip View</button>
-                            <button class="tab-btn" onclick="switchResultTab('models')">Model Comparison & Consensus</button>
-                            <button class="tab-btn" onclick="switchResultTab('features')">Extracted Features</button>
+                    <div id="res-tab-full" class="tab-content active">
+                        <div id="chart-full" style="width:100%; height:400px;"></div>
+                    </div>
+                    <div id="res-tab-zoom" class="tab-content">
+                        <div id="chart-zoom" style="width:100%; height:380px;"></div>
+                        <p class="muted" style="margin-top:0.5rem; font-size:0.85rem;">Zoomed photometric profile centered on the deepest transit event, highlighting ingress and egress boundaries.</p>
+                    </div>
+                    <div id="res-tab-models" class="tab-content">
+                        <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; color:#F1F5F9; margin-bottom:0.5rem;">Model Benchmark Performance & Real-Time Verdict</p>
+                        <div class="data-table-container">
+                            <table class="data-table" id="res-models-table">
+                                <thead>
+                                    <tr>
+                                        <th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1 Score</th><th>ROC-AUC</th><th>Composite</th><th>Model Verdict</th><th>Probability</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="res-models-tbody"></tbody>
+                            </table>
                         </div>
-
-                        <!-- Tab 1: Full Light Curve Plotly Chart -->
-                        <div id="res-tab-full" class="tab-content active">
-                            <div id="chart-full" style="width:100%; height:400px;"></div>
-                        </div>
-
-                        <!-- Tab 2: Transit Dip View Plotly Chart -->
-                        <div id="res-tab-zoom" class="tab-content">
-                            <div id="chart-zoom" style="width:100%; height:380px;"></div>
-                            <p class="muted" style="margin-top:0.5rem; font-size:0.85rem;">Zoomed photometric profile centered on the deepest transit event, highlighting ingress and egress boundaries.</p>
-                        </div>
-
-                        <!-- Tab 3: Models Comparison -->
-                        <div id="res-tab-models" class="tab-content">
-                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; color:#F1F5F9; margin-bottom:0.5rem;">Model Benchmark Performance & Real-Time Verdict</p>
-                            <div class="data-table-container">
-                                <table class="data-table" id="res-models-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1 Score</th><th>ROC-AUC</th><th>Composite</th><th>Model Verdict</th><th>Probability</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="res-models-tbody"></tbody>
-                                </table>
+                        <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:600; font-size:1.1rem; color:#F1F5F9; margin-top:1.25rem;">Candidate Probability by Model</p>
+                        <div id="chart-probs" style="width:100%; height:260px;"></div>
+                    </div>
+                    <div id="res-tab-features" class="tab-content">
+                        <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; color:#F1F5F9; margin-bottom:0.75rem;">Astrophysical & Statistical Features</p>
+                        <div class="feature-grid">
+                            <div class="workflow-card">
+                                <b>Statistical</b>
+                                <div class="muted" style="margin-top:6px; font-size:0.85rem; line-height:1.7;">
+                                    Mean: <span id="feat-mean">0.0</span><br>
+                                    Median: <span id="feat-median">0.0</span><br>
+                                    Variance: <span id="feat-var">0.0</span><br>
+                                    Skewness: <span id="feat-skew">0.0</span><br>
+                                    Kurtosis: <span id="feat-kurt">0.0</span>
+                                </div>
                             </div>
-
-                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:600; font-size:1.1rem; color:#F1F5F9; margin-top:1.25rem;">Candidate Probability by Model</p>
-                            <div id="chart-probs" style="width:100%; height:260px;"></div>
-                        </div>
-
-                        <!-- Tab 4: Features Grid -->
-                        <div id="res-tab-features" class="tab-content">
-                            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; color:#F1F5F9; margin-bottom:0.75rem;">Astrophysical & Statistical Features</p>
-                            <div class="feature-grid">
-                                <div class="workflow-card">
-                                    <b>Statistical</b>
-                                    <div class="muted" style="margin-top:6px; font-size:0.85rem; line-height:1.7;">
-                                        Mean: <span id="feat-mean">0.0</span><br>
-                                        Median: <span id="feat-median">0.0</span><br>
-                                        Variance: <span id="feat-var">0.0</span><br>
-                                        Skewness: <span id="feat-skew">0.0</span><br>
-                                        Kurtosis: <span id="feat-kurt">0.0</span>
-                                    </div>
+                            <div class="workflow-card">
+                                <b>Signal Dynamics</b>
+                                <div class="muted" style="margin-top:6px; font-size:0.85rem; line-height:1.7;">
+                                    Signal Energy: <span id="feat-energy">0.0</span><br>
+                                    Spectral Entropy: <span id="feat-entropy">0.0</span><br>
+                                    Negative Ratio: <span id="feat-neg">0.0</span><br>
+                                    Noise Level: <span id="feat-noise">0.0</span>
                                 </div>
-                                <div class="workflow-card">
-                                    <b>Signal Dynamics</b>
-                                    <div class="muted" style="margin-top:6px; font-size:0.85rem; line-height:1.7;">
-                                        Signal Energy: <span id="feat-energy">0.0</span><br>
-                                        Spectral Entropy: <span id="feat-entropy">0.0</span><br>
-                                        Negative Ratio: <span id="feat-neg">0.0</span><br>
-                                        Noise Level: <span id="feat-noise">0.0</span>
-                                    </div>
+                            </div>
+                            <div class="workflow-card">
+                                <b>Transit Dips</b>
+                                <div class="muted" style="margin-top:6px; font-size:0.85rem; line-height:1.7;">
+                                    Avg Depth: <span id="feat-depth">0.0</span><br>
+                                    Avg Duration: <span id="feat-dur">0.0</span><br>
+                                    Num Dips: <span id="feat-dips">0</span><br>
+                                    Min Flux: <span id="feat-min">0.0</span>
                                 </div>
-                                <div class="workflow-card">
-                                    <b>Transit Dips</b>
-                                    <div class="muted" style="margin-top:6px; font-size:0.85rem; line-height:1.7;">
-                                        Avg Depth: <span id="feat-depth">0.0</span><br>
-                                        Avg Duration: <span id="feat-dur">0.0</span><br>
-                                        Num Dips: <span id="feat-dips">0</span><br>
-                                        Min Flux: <span id="feat-min">0.0</span>
-                                    </div>
-                                </div>
-                                <div class="workflow-card">
-                                    <b>BLS Parameters</b>
-                                    <div class="muted" style="margin-top:6px; font-size:0.85rem; line-height:1.7;">
-                                        Period: <span id="feat-bls-p">0.0</span><br>
-                                        Duration: <span id="feat-bls-dur">0.0</span><br>
-                                        Transit SNR: <span id="feat-bls-snr">0.0</span><br>
-                                        BLS Power: <span id="feat-bls-pow">0.0</span>
-                                    </div>
+                            </div>
+                            <div class="workflow-card">
+                                <b>BLS Parameters</b>
+                                <div class="muted" style="margin-top:6px; font-size:0.85rem; line-height:1.7;">
+                                    Period: <span id="feat-bls-p">0.0</span><br>
+                                    Duration: <span id="feat-bls-dur">0.0</span><br>
+                                    Transit SNR: <span id="feat-bls-snr">0.0</span><br>
+                                    BLS Power: <span id="feat-bls-pow">0.0</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
+    </main>
 
-        <!-- ================= VIEW: HISTORY ================= -->
-        <main id="view-history" class="view-page" style="display:none;">
+    <!-- ================= VIEW: HISTORY ================= -->
+    <main id="view-history" class="view-page" style="display:none;" tabindex="-1">
+        <div class="page-header">
             <div class="eyebrow">Session Storage</div>
             <h2>Analysis History</h2>
-            <p class="muted" style="margin-bottom: 1.5rem;">Review light curves evaluated during this active browser session.</p>
+            <p class="muted page-header-sub">Analyses stored in this browser. This list stays empty until you run a screening.</p>
+        </div>
 
-            <div class="grid-history-stats">
-                <div class="stat-card"><div class="metric-cell-label">Total Analyses</div><div id="hist-total" class="metric-cell-value">0</div></div>
-                <div class="stat-card"><div class="metric-cell-label">Planet Candidates</div><div id="hist-planets" class="metric-cell-value" style="color:#F4C95D;">0</div></div>
-                <div class="stat-card"><div class="metric-cell-label">Candidate Rate</div><div id="hist-rate" class="metric-cell-value" style="color:#6FA8DC;">0.0%</div></div>
+        <div class="grid-history-stats">
+            <div class="stat-card"><div class="metric-cell-label">Total Analyses</div><div id="hist-total" class="metric-cell-value">0</div></div>
+            <div class="stat-card"><div class="metric-cell-label">Planet Candidates</div><div id="hist-planets" class="metric-cell-value" style="color:#F4C95D;">0</div></div>
+            <div class="stat-card"><div class="metric-cell-label">Candidate Rate</div><div id="hist-rate" class="metric-cell-value" style="color:#6FA8DC;">0.0%</div></div>
+        </div>
+
+        <div style="margin: 1.25rem 0 0.75rem;">
+            <span class="model-chip">Active Decision Model: <b>XGBoost</b></span>
+        </div>
+
+        <div id="history-table-container">
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Source</th><th>Verdict</th><th>Confidence</th><th>Decision Model</th><th>Date</th><th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody"></tbody>
+                </table>
             </div>
-
-            <div style="margin: 1.25rem 0 0.75rem;">
-                <span class="model-chip">Active Decision Model: <b>XGBoost</b></span>
+            <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+                <button class="btn" onclick="clearHistory()">Clear History</button>
             </div>
+        </div>
 
-            <div id="history-table-container">
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Source</th><th>Verdict</th><th>Confidence</th><th>Decision Model</th><th>Date</th><th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-tbody"></tbody>
-                    </table>
-                </div>
-                <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
-                    <button class="btn" onclick="clearHistory()">Clear History</button>
-                </div>
-            </div>
+        <div id="history-empty" class="panel" style="display:none;">
+            <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:600; font-size:1.1rem; color:#F1F5F9; margin:0 0 0.35rem;">No analyses yet</p>
+            <p class="muted">Submit a light curve in the Analyze tab to populate this session history.</p>
+        </div>
+    </main>
 
-            <div id="history-empty" class="panel" style="display:none;">
-                <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:600; font-size:1.1rem; color:#F1F5F9; margin:0 0 0.35rem;">No analyses yet</p>
-                <p class="muted">Submit a light curve in the Analyze tab to populate this session history.</p>
-            </div>
-        </main>
-
-        <!-- ================= VIEW: ABOUT ================= -->
-        <main id="view-about" class="view-page" style="display:none;">
+    <!-- ================= VIEW: ABOUT ================= -->
+    <main id="view-about" class="view-page" style="display:none;" tabindex="-1">
+        <div class="page-header">
             <div class="eyebrow">Scientific Context</div>
             <h2>About ExoDip</h2>
-            <div class="panel" style="margin-top:1rem;">
-                <p class="lead" style="color:#F1F5F9;">
-                    <b>ExoDip</b> is a candidate screening tool designed to help researchers, students, and astronomy enthusiasts analyze stellar light curves for signatures of transiting exoplanets. Using a combination of Box Least Squares (BLS) period searching, astrophysical feature extraction, and an ensemble of machine learning classifiers (including tuned XGBoost and Random Forest models), ExoDip evaluates raw photometry to identify candidate transit events.
-                </p>
-                <div style="background:rgba(240, 128, 128, 0.12); border-left:4px solid #F08080; padding:0.95rem 1.15rem; border-radius:6px; margin:1.35rem 0;">
-                    <b style="color:#F08080; font-size:1.02rem;">Scientific Notice:</b>
-                    <span style="color:#F1F5F9; font-size:0.95rem; line-height:1.6; display:block; margin-top:4px;">
-                        ExoDip is a candidate screening tool, not a confirmation pipeline. Exoplanet confirmation requires extensive follow-up observations, including high-resolution imaging, radial velocity spectroscopy, and statistical validation against astrophysical false positives (such as eclipsing binaries and background blended stars).
-                    </span>
-                </div>
-            </div>
+        </div>
 
-            <div class="panel" style="margin-top:2rem;">
-                <div class="eyebrow" style="margin-bottom:0.35rem;">Scientific Architecture</div>
-                <h3 style="color:#F1F5F9; margin-bottom:1.25rem;">Detection & Screening Pipeline</h3>
-                <div class="v-flowchart">
-                    <div class="v-flow-step v-step-1">
-                        <div class="v-flow-node">01</div>
-                        <div class="v-flow-content">
-                            <div class="v-flow-title">Photometric Ingestion</div>
-                            <p class="v-flow-desc">High-precision stellar flux measurements collected across long baselines by space-borne (Kepler, TESS) or ground observatories.</p>
-                        </div>
+        <div class="grid-about">
+            <!-- Left column: Description + notice -->
+            <div>
+                <div class="panel">
+                    <p class="lead" style="color:#F1F5F9;">
+                        <b>ExoDip</b> is a candidate screening tool designed to help researchers, students, and astronomy enthusiasts analyze stellar light curves for signatures of transiting exoplanets. Using a combination of Box Least Squares (BLS) period searching, astrophysical feature extraction, and an ensemble of machine learning classifiers, ExoDip evaluates raw photometry to identify candidate transit events.
+                    </p>
+                    <div class="notice-block" style="margin-top:1.35rem;">
+                        <b style="color:#F08080; font-size:1.02rem;">Scientific Notice:</b>
+                        <span style="color:#F1F5F9; font-size:0.95rem; line-height:1.6; display:block; margin-top:4px;">
+                            ExoDip is a candidate screening tool, not a confirmation pipeline. Exoplanet confirmation requires extensive follow-up observations, including high-resolution imaging, radial velocity spectroscopy, and statistical validation against astrophysical false positives (such as eclipsing binaries and background blended stars).
+                        </span>
                     </div>
-                    <div class="v-flow-step v-step-2">
-                        <div class="v-flow-node">02</div>
-                        <div class="v-flow-content">
-                            <div class="v-flow-title">Detrending & Calibration</div>
-                            <p class="v-flow-desc">Systematic noise mitigation, baseline normalization, and removal of instrumental artifacts and stellar flare activity.</p>
-                        </div>
-                    </div>
-                    <div class="v-flow-step v-step-3">
-                        <div class="v-flow-node">03</div>
-                        <div class="v-flow-content">
-                            <div class="v-flow-title">BLS Periodic Dip Search</div>
-                            <p class="v-flow-desc">Astropy Box Least Squares periodogram algorithm scans trial orbital periods (0.5 to 20 days) to detect periodic box-shaped dips.</p>
-                        </div>
-                    </div>
-                    <div class="v-flow-step v-step-4">
-                        <div class="v-flow-node">04</div>
-                        <div class="v-flow-content">
-                            <div class="v-flow-title">Morphological Profiling</div>
-                            <p class="v-flow-desc">Calculation of 15 key astrophysical features: transit depth, transit duration, SNR, signal energy, Shannon entropy, and skewness.</p>
-                        </div>
-                    </div>
-                    <div class="v-flow-step v-step-5">
-                        <div class="v-flow-node">05</div>
-                        <div class="v-flow-content">
-                            <div class="v-flow-title">Machine Learning Ensemble</div>
-                            <p class="v-flow-desc">Supervised consensus voting combining tuned XGBoost, Random Forest, Support Vector Machines, and Deep Convolutional Networks.</p>
-                        </div>
-                    </div>
-                    <div class="v-flow-step v-step-6">
-                        <div class="v-flow-node">06</div>
-                        <div class="v-flow-content">
-                            <div class="v-flow-title">Candidate Screening Verdict</div>
-                            <p class="v-flow-desc">Generation of calibrated confidence scores, detection telemetry, diagnostic transit charts, and downloadable JSON reports.</p>
-                        </div>
+                </div>
+
+                <!-- Core Technologies -->
+                <div class="panel" style="margin-top:1.5rem;">
+                    <div class="eyebrow" style="margin-bottom:0.75rem;">Core Technologies</div>
+                    <div class="tech-grid">
+                        <div class="tech-item"><b>Python 3</b><p class="muted" style="margin-top:0.3rem;">Modern scientific runtime and high-performance computing environment.</p></div>
+                        <div class="tech-item"><b>Lightkurve & Astropy</b><p class="muted" style="margin-top:0.3rem;">Photometric transit modeling, BLS search, and astronomical time-series tools.</p></div>
+                        <div class="tech-item"><b>NumPy & Pandas</b><p class="muted" style="margin-top:0.3rem;">Array processing, mathematical transformations, and tabular metadata management.</p></div>
+                        <div class="tech-item"><b>Scikit-learn & XGBoost</b><p class="muted" style="margin-top:0.3rem;">Supervised gradient boosting, random forests, and calibrated decision boundaries.</p></div>
                     </div>
                 </div>
             </div>
 
-            <h3 style="margin: 2rem 0 1rem;">Core Technologies</h3>
-            <div class="feature-grid">
-                <div class="stat-card"><b>Python 3</b><p class="muted" style="margin-top:0.4rem;">Modern scientific runtime and high-performance computing environment.</p></div>
-                <div class="stat-card"><b>Lightkurve & Astropy</b><p class="muted" style="margin-top:0.4rem;">Photometric transit modeling, BLS search, and astronomical time-series tools.</p></div>
-                <div class="stat-card"><b>NumPy & Pandas</b><p class="muted" style="margin-top:0.4rem;">Array processing, mathematical transformations, and tabular metadata management.</p></div>
-                <div class="stat-card"><b>Scikit-learn & XGBoost</b><p class="muted" style="margin-top:0.4rem;">Supervised gradient boosting, random forests, and calibrated decision boundaries.</p></div>
+            <!-- Right column: Pipeline Flowchart -->
+            <div>
+                <div class="panel">
+                    <div class="eyebrow" style="margin-bottom:0.35rem;">Scientific Architecture</div>
+                    <h3 style="color:#F1F5F9; margin-bottom:1.25rem;">Detection & Screening Pipeline</h3>
+                    <div class="v-flowchart">
+                        <div class="v-flow-step v-step-1">
+                            <div class="v-flow-node">01</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Photometric Ingestion</div>
+                                <p class="v-flow-desc">High-precision stellar flux measurements from space-borne (Kepler, TESS) or ground observatories.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-2">
+                            <div class="v-flow-node">02</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Detrending & Calibration</div>
+                                <p class="v-flow-desc">Systematic noise mitigation, baseline normalization, and removal of instrumental artifacts and stellar flares.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-3">
+                            <div class="v-flow-node">03</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">BLS Periodic Dip Search</div>
+                                <p class="v-flow-desc">Astropy BLS periodogram scans trial orbital periods (0.5–20 days) to detect periodic box-shaped dips.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-4">
+                            <div class="v-flow-node">04</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Morphological Profiling</div>
+                                <p class="v-flow-desc">Calculation of 15 key astrophysical features: transit depth, duration, SNR, signal energy, Shannon entropy, and skewness.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-5">
+                            <div class="v-flow-node">05</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Machine Learning Ensemble</div>
+                                <p class="v-flow-desc">Supervised consensus combining tuned XGBoost, Random Forest, Support Vector Machines, and Deep Convolutional Networks.</p>
+                            </div>
+                        </div>
+                        <div class="v-flow-step v-step-6">
+                            <div class="v-flow-node">06</div>
+                            <div class="v-flow-content">
+                                <div class="v-flow-title">Candidate Screening Verdict</div>
+                                <p class="v-flow-desc">Calibrated confidence scores, detection telemetry, diagnostic transit charts, and downloadable JSON reports.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </main>
+        </div>
+    </main>
 
-        <!-- ================= VIEW: DOCS ================= -->
-        <main id="view-docs" class="view-page" style="display:none;">
+    <!-- ================= VIEW: DOCS ================= -->
+    <main id="view-docs" class="view-page" style="display:none;" tabindex="-1">
+        <div class="page-header">
             <div class="eyebrow">User & Methodological Guide</div>
             <h2>Documentation</h2>
+        </div>
 
-            <div class="tab-nav" style="margin-top:1.2rem;">
-                <button class="tab-btn active" onclick="switchDocsTab('start')">Getting Started</button>
-                <button class="tab-btn" onclick="switchDocsTab('formats')">Input Formats</button>
-                <button class="tab-btn" onclick="switchDocsTab('pipeline')">How It Works</button>
-                <button class="tab-btn" onclick="switchDocsTab('results')">Understanding Results</button>
-                <button class="tab-btn" onclick="switchDocsTab('limitations')">Limitations</button>
-                <button class="tab-btn" onclick="switchDocsTab('faq')">FAQ</button>
+        <div class="tab-nav" style="margin-top:1.2rem;">
+            <button class="tab-btn active" onclick="switchDocsTab('start')">Getting Started</button>
+            <button class="tab-btn" onclick="switchDocsTab('formats')">Input Formats</button>
+            <button class="tab-btn" onclick="switchDocsTab('pipeline')">How It Works</button>
+            <button class="tab-btn" onclick="switchDocsTab('results')">Understanding Results</button>
+            <button class="tab-btn" onclick="switchDocsTab('limitations')">Limitations</button>
+            <button class="tab-btn" onclick="switchDocsTab('faq')">FAQ</button>
+        </div>
+
+        <div class="panel">
+            <div id="docs-tab-start" class="tab-content active" style="line-height:1.75; color:#94A3B8;">
+                <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Getting Started with ExoDip</h3>
+                <ol style="padding-left:1.3rem;">
+                    <li><b>Prepare Photometric Data:</b> Obtain a time series of stellar brightness (Kepler, TESS, or ground-based photometry).</li>
+                    <li><b>Navigate to Analyze:</b> Use the top navigation bar to select the <b>Analyze</b> page.</li>
+                    <li><b>Upload or Select:</b> Drop your CSV, TXT, or NPY file into the uploader, or choose a held-out test set row.</li>
+                    <li><b>Initiate Screening:</b> Click the <b>Analyze Light Curve</b> button.</li>
+                    <li><b>Inspect Detection Telemetry:</b> Review the detected dips, transit depth, duration, and BLS period.</li>
+                    <li><b>Export Findings:</b> Download the complete JSON telemetry report using the <b>Download Report</b> button.</li>
+                </ol>
             </div>
 
-            <div class="panel">
-                <div id="docs-tab-start" class="tab-content active" style="line-height:1.75; color:#94A3B8;">
-                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Getting Started with ExoDip</h3>
-                    <ol style="padding-left:1.3rem;">
-                        <li><b>Prepare Photometric Data:</b> Obtain a time series of stellar brightness (Kepler, TESS, or ground-based photometry).</li>
-                        <li><b>Navigate to Analyze:</b> Use the top navigation bar to select the <b>Analyze</b> page.</li>
-                        <li><b>Upload or Select:</b> Drop your CSV, TXT, or NPY file into the uploader, or choose a held-out test set row.</li>
-                        <li><b>Initiate Screening:</b> Click the <b>Analyze Light Curve</b> button.</li>
-                        <li><b>Inspect Detection Telemetry:</b> Review the detected dips, transit depth, duration, and BLS period.</li>
-                        <li><b>Export Findings:</b> Download the complete JSON telemetry report using the <b>Download Report</b> button.</li>
-                    </ol>
-                </div>
-
-                <div id="docs-tab-formats" class="tab-content" style="line-height:1.75; color:#94A3B8;">
-                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Supported Input Formats</h3>
-                    <ul style="padding-left:1.3rem;">
-                        <li><b>Standard CSV Format:</b> A comma-separated file with a <code>flux</code> column. A <code>time</code> column is optional.
-                            <pre class="mono" style="background:#0E1524; padding:0.6rem 0.9rem; border-radius:6px; margin:0.5rem 0; color:#7DD3C7; border:1px solid #26344A;">time,flux
+            <div id="docs-tab-formats" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Supported Input Formats</h3>
+                <ul style="padding-left:1.3rem;">
+                    <li><b>Standard CSV Format:</b> A comma-separated file with a <code>flux</code> column. A <code>time</code> column is optional.
+                        <pre class="mono" style="background:#0E1524; padding:0.6rem 0.9rem; border-radius:6px; margin:0.5rem 0; color:#7DD3C7; border:1px solid #26344A;">time,flux
 0.000,1.0002
 0.020,0.9998
 0.041,0.9912
 0.061,0.9915</pre>
-                        </li>
-                        <li><b>Kepler Test Set Row (exoTest format):</b> 1 row with 3197 whitespace or comma-separated flux values (<code>FLUX.1</code> to <code>FLUX.3197</code>).</li>
-                        <li><b>Numpy Array (.npy):</b> 1-D array of float flux values or 2-D array of shape <code>(N, 1)</code>.</li>
-                        <li><b>Whitespace-separated TXT:</b> Space-delimited numeric columns containing flux measurements.</li>
-                    </ul>
-                </div>
-
-                <div id="docs-tab-pipeline" class="tab-content" style="line-height:1.75; color:#94A3B8;">
-                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">How the Pipeline Works</h3>
-                    <ul style="padding-left:1.3rem;">
-                        <li><b>Photometric Normalization:</b> Flux values are detrended and smoothed using a uniform box filter to isolate local fluctuations while preserving transit dip profiles.</li>
-                        <li><b>Box Least Squares (BLS):</b> An Astropy BLS periodogram scans trial periods from 0.5 to 20 days with trial transit durations from 1 to 12 hours to search for periodic box-shaped occultations.</li>
-                        <li><b>Feature Extraction:</b> 15 distinct morphological and statistical features are computed, including transit depth, duration, noise standard deviation, skewness, kurtosis, signal energy, and spectral entropy.</li>
-                        <li><b>Ensemble Decision Logic:</b> Calibrated XGBoost and Random Forest models evaluate the feature vector alongside BLS transit significance to assign the final candidate classification.</li>
-                    </ul>
-                </div>
-
-                <div id="docs-tab-results" class="tab-content" style="line-height:1.75; color:#94A3B8;">
-                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Understanding Results</h3>
-                    <ul style="padding-left:1.3rem;">
-                        <li><b>Period (Days):</b> The best-fit orbital period detected by the Box Least Squares periodogram.</li>
-                        <li><b>Transit Depth (%):</b> The fraction of stellar flux blocked during transit mid-point: <i>δ = ΔF / F ≈ (R_p / R_*)^2</i></li>
-                        <li><b>BLS SNR:</b> The signal-to-noise ratio of the transit dip relative to residual stellar noise. High SNR values (> 5.0) indicate statistically significant transit shapes.</li>
-                        <li><b>Screening Confidence:</b> The model's calibrated probabilistic assessment that the signal matches bona fide planetary transit profiles rather than stellar variability or noise.</li>
-                    </ul>
-                </div>
-
-                <div id="docs-tab-limitations" class="tab-content" style="line-height:1.75; color:#94A3B8;">
-                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Important Limitations & Astrophysical Caveats</h3>
-                    <ul style="padding-left:1.3rem;">
-                        <li><b>False Positives:</b> Eclipsing binary stars (EB), grazing binaries, and background blended stars can mimic planetary transits.</li>
-                        <li><b>Stellar Activity:</b> Starspots, stellar flares, and rotation can introduce spurious periodic dips.</li>
-                        <li><b>Confirmation Required:</b> Candidate status is an initial screening recommendation. Confirmation requires high-precision radial velocity spectroscopy (to measure planetary mass) and high-resolution imaging (to rule out background companions).</li>
-                    </ul>
-                </div>
-
-                <div id="docs-tab-faq" class="tab-content" style="line-height:1.75; color:#94A3B8;">
-                    <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Frequently Asked Questions</h3>
-                    <p><b>Q: What is the difference between an exoplanet candidate and a confirmed exoplanet?</b><br>
-                    <i>A: A candidate exhibits transit-like signals in photometric data that have not yet undergone independent observational confirmation (such as spectroscopic mass determination).</i></p>
-                    <p style="margin-top:1rem;"><b>Q: Why is XGBoost used as the primary decision model?</b><br>
-                    <i>A: On our held-out benchmark evaluation, tuned XGBoost achieved the highest composite score (balanced accuracy, precision, recall, and ROC-AUC) across diverse light curve morphologies.</i></p>
-                    <p style="margin-top:1rem;"><b>Q: Can I analyze multi-quarter Kepler or TESS full-frame images?</b><br>
-                    <i>A: ExoDip accepts 1-D light curves extracted from calibrated photometry (such as Lightkurve PDCSAP flux).</i></p>
-                </div>
+                    </li>
+                    <li><b>Kepler Test Set Row (exoTest format):</b> 1 row with 3197 whitespace or comma-separated flux values (<code>FLUX.1</code> to <code>FLUX.3197</code>).</li>
+                    <li><b>Numpy Array (.npy):</b> 1-D array of float flux values or 2-D array of shape <code>(N, 1)</code>.</li>
+                    <li><b>Whitespace-separated TXT:</b> Space-delimited numeric columns containing flux measurements.</li>
+                </ul>
             </div>
-        </main>
 
-        <!-- ================= FOOTER ================= -->
-        <footer class="app-footer">
-            <b>ExoDip</b> &bull; Candidate screening and photometric transit analysis &bull; Developed for astrophysics research and candidate vetting.
-        </footer>
-    </div>
+            <div id="docs-tab-pipeline" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">How the Pipeline Works</h3>
+                <ul style="padding-left:1.3rem;">
+                    <li><b>Photometric Normalization:</b> Flux values are detrended and smoothed using a uniform box filter to isolate local fluctuations while preserving transit dip profiles.</li>
+                    <li><b>Box Least Squares (BLS):</b> An Astropy BLS periodogram scans trial periods from 0.5 to 20 days with trial transit durations from 1 to 12 hours to search for periodic box-shaped occultations.</li>
+                    <li><b>Feature Extraction:</b> 15 distinct morphological and statistical features are computed, including transit depth, duration, noise standard deviation, skewness, kurtosis, signal energy, and spectral entropy.</li>
+                    <li><b>Ensemble Decision Logic:</b> Calibrated XGBoost and Random Forest models evaluate the feature vector alongside BLS transit significance to assign the final candidate classification.</li>
+                </ul>
+            </div>
 
-    <!-- Scripts -->
-    <script src="config.js"></script>
-    <script src="planetary.js"></script>
-    <script src="app.js"></script>
+            <div id="docs-tab-results" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Understanding Results</h3>
+                <ul style="padding-left:1.3rem;">
+                    <li><b>Period (Days):</b> The best-fit orbital period detected by the Box Least Squares periodogram.</li>
+                    <li><b>Transit Depth (%):</b> The fraction of stellar flux blocked during transit mid-point: <i>δ = ΔF / F ≈ (R_p / R_*)^2</i></li>
+                    <li><b>BLS SNR:</b> The signal-to-noise ratio of the transit dip relative to residual stellar noise. High SNR values (&gt; 5.0) indicate statistically significant transit shapes.</li>
+                    <li><b>Screening Confidence:</b> The model's calibrated probabilistic assessment that the signal matches bona fide planetary transit profiles rather than stellar variability or noise.</li>
+                </ul>
+            </div>
+
+            <div id="docs-tab-limitations" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Important Limitations & Astrophysical Caveats</h3>
+                <ul style="padding-left:1.3rem;">
+                    <li><b>False Positives:</b> Eclipsing binary stars (EB), grazing binaries, and background blended stars can mimic planetary transits.</li>
+                    <li><b>Stellar Activity:</b> Starspots, stellar flares, and rotation can introduce spurious periodic dips.</li>
+                    <li><b>Confirmation Required:</b> Candidate status is an initial screening recommendation. Confirmation requires high-precision radial velocity spectroscopy (to measure planetary mass) and high-resolution imaging (to rule out background companions).</li>
+                </ul>
+            </div>
+
+            <div id="docs-tab-faq" class="tab-content" style="line-height:1.75; color:#94A3B8;">
+                <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Frequently Asked Questions</h3>
+                <p><b>Q: What is the difference between an exoplanet candidate and a confirmed exoplanet?</b><br>
+                <i>A: A candidate exhibits transit-like signals in photometric data that have not yet undergone independent observational confirmation (such as spectroscopic mass determination).</i></p>
+                <p style="margin-top:1rem;"><b>Q: Why is XGBoost used as the primary decision model?</b><br>
+                <i>A: On our held-out benchmark evaluation, tuned XGBoost achieved the highest composite score (balanced accuracy, precision-recall, and ROC-AUC) among the ensemble classifiers tested on the Kepler dataset.</i></p>
+                <p style="margin-top:1rem;"><b>Q: What photometric precision is required?</b><br>
+                <i>A: ExoDip can detect transit depths as low as ~0.1% (1000 ppm) in clean photometry. Space-based observations (Kepler, TESS) generally meet this requirement; ground-based data may require additional preprocessing to achieve comparable sensitivity.</i></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="app-footer">
+        <span>ExoDip — Photometric Transit Screening &nbsp;·&nbsp; Not a confirmed discovery pipeline &nbsp;·&nbsp; Built for educational and research use</span>
+    </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="planetary.js"></script>
 </body>
 </html>

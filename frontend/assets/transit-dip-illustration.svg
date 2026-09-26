@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 440" role="img" aria-labelledby="title desc">
+  <title id="title">A planet transit produces a measurable dip in stellar brightness</title>
+  <desc id="desc">A planet crosses in front of a star at left. At right, the observed light curve falls during transit and returns to its baseline.</desc>
+  <defs>
+    <radialGradient id="star" cx="35%" cy="30%" r="70%"><stop stop-color="#fff4bf"/><stop offset=".45" stop-color="#F4C95D"/><stop offset="1" stop-color="#b77628"/></radialGradient>
+    <linearGradient id="curve" x1="0" x2="1"><stop stop-color="#6FA8DC"/><stop offset=".48" stop-color="#F4C95D"/><stop offset="1" stop-color="#7DD3C7"/></linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <rect width="1080" height="440" rx="22" fill="#0E1524"/>
+  <rect x="1" y="1" width="1078" height="438" rx="21" fill="none" stroke="#26344A"/>
+  <text x="44" y="48" fill="#F1F5F9" font-family="Inter, sans-serif" font-size="20" font-weight="700">A transit blocks a small fraction of starlight</text>
+  <text x="44" y="76" fill="#94A3B8" font-family="Inter, sans-serif" font-size="14">The dimming is recorded as a dip in the star's light curve.</text>
+  <line x1="496" y1="105" x2="496" y2="388" stroke="#26344A"/>
+  <text x="84" y="123" fill="#94A3B8" font-family="Inter, sans-serif" font-size="13" letter-spacing="1.5">STAR AND TRANSITING PLANET</text>
+  <circle cx="230" cy="245" r="104" fill="#F4C95D" opacity=".14" filter="url(#soft)"/>
+  <circle cx="230" cy="245" r="72" fill="url(#star)"/>
+  <circle cx="230" cy="245" r="72" fill="none" stroke="#F4C95D" stroke-width="2"/>
+  <circle cx="230" cy="245" r="19" fill="#070B14" stroke="#7DD3C7" stroke-width="2"/>
+  <path d="M89 245h67M304 245h104" stroke="#6FA8DC" stroke-width="2" stroke-dasharray="7 7"/>
+  <path d="M399 237l15 8-15 8" fill="none" stroke="#6FA8DC" stroke-width="2"/>
+  <text x="94" y="276" fill="#94A3B8" font-family="Inter, sans-serif" font-size="13">planet path</text>
+  <text x="174" y="352" fill="#F1F5F9" font-family="Inter, sans-serif" font-size="14" font-weight="600">Planet in front of star</text>
+  <text x="540" y="123" fill="#94A3B8" font-family="Inter, sans-serif" font-size="13" letter-spacing="1.5">OBSERVED RELATIVE FLUX</text>
+  <line x1="555" y1="342" x2="1024" y2="342" stroke="#26344A" stroke-width="2"/>
+  <line x1="555" y1="150" x2="555" y2="342" stroke="#26344A" stroke-width="2"/>
+  <line x1="555" y1="185" x2="1024" y2="185" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 6" opacity=".8"/>
+  <text x="565" y="176" fill="#94A3B8" font-family="Inter, sans-serif" font-size="13">baseline</text>
+  <path d="M565 185 H684 C710 185 723 197 737 232 C748 260 759 278 778 278 H812 C829 278 840 260 851 232 C865 198 877 185 904 185 H1013" fill="none" stroke="url(#curve)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M715 150V328M778 150V328M843 150V328" stroke="#26344A" stroke-width="1" stroke-dasharray="4 6"/>
+  <text x="715" y="378" fill="#6FA8DC" font-family="Inter, sans-serif" font-size="13" text-anchor="middle">Ingress</text>
+  <text x="778" y="378" fill="#F4C95D" font-family="Inter, sans-serif" font-size="13" text-anchor="middle">Mid-transit</text>
+  <text x="843" y="378" fill="#7DD3C7" font-family="Inter, sans-serif" font-size="13" text-anchor="middle">Egress</text>
+  <path d="M778 284v34M770 310l8 8 8-8" fill="none" stroke="#F4C95D" stroke-width="2"/>
+  <text x="790" y="307" fill="#F4C95D" font-family="Inter, sans-serif" font-size="13">transit depth</text>
+  <text x="790" y="330" fill="#94A3B8" font-family="Inter, sans-serif" font-size="12">δ ≈ (Rₚ / R★)²</text>
+  <text x="1007" y="367" fill="#94A3B8" font-family="Inter, sans-serif" font-size="12" text-anchor="end">time</text>
+</svg>
