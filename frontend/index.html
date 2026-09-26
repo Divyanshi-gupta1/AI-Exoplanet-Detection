@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExoDip — AI Exoplanet Transit Screening</title>
+    <title>ExoDip AI Exoplanet Transit Screening</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2238%22 fill=%22%236FA8DC%22/><circle cx=%2270%22 cy=%2250%22 r=%2210%22 fill=%22%23F4C95D%22/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,24 +19,7 @@
     <!-- ================= NAVBAR ================= -->
     <header class="navbar">
         <button class="nav-brand-box" type="button" onclick="navigateTo('Home')" aria-label="ExoDip home">
-            <svg class="logo-icon" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <radialGradient id="planetSphere" cx="35%" cy="35%" r="65%">
-                        <stop offset="0%" stop-color="#7DD3C7"/>
-                        <stop offset="60%" stop-color="#6FA8DC"/>
-                        <stop offset="100%" stop-color="#070B14"/>
-                    </radialGradient>
-                    <linearGradient id="orbitGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stop-color="#7DD3C7"/>
-                        <stop offset="50%" stop-color="#6FA8DC"/>
-                        <stop offset="100%" stop-color="#7DD3C7" stop-opacity="0.3"/>
-                    </linearGradient>
-                </defs>
-                <path d="M 4 20 C 4.5 13 13 9 20 10.5 C 24.5 11.5 28 14 29 17.5" stroke="url(#orbitGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                <circle cx="16" cy="16" r="8" fill="url(#planetSphere)" stroke="#6FA8DC" stroke-width="1.5"/>
-                <path d="M 10 11.5 C 11.5 9 14.5 8.2 18 9.2" stroke="#F1F5F9" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
-                <path d="M 3 15 C 4 21 12 24.5 19 23 C 24 22 27.5 19 29 15.5" stroke="url(#orbitGrad)" stroke-width="2.2" stroke-linecap="round"/>
-            </svg>
+            <img class="logo-icon logo-icon--saturn" src="assets/exodip-saturn-logo.svg" alt="">
             <span class="brand-name">ExoDip</span>
             <span class="brand-pill">Transit Screening</span>
         </button>
@@ -114,7 +97,7 @@
                 </div>
                 <div class="hero-canvas-wrap">
                     <canvas id="c" aria-label="Interactive planetary system simulation"></canvas>
-                    <div class="canvas-caption">Planetary system simulation — a transiting world around its host star</div>
+                    <div class="canvas-caption">Planetary system simulation, a transiting world around its host star</div>
                 </div>
             </div>
         </section>
@@ -124,7 +107,7 @@
             <div class="section-header">
                 <div class="eyebrow">What Is ExoDip?</div>
                 <h2 class="section-title">Photometric transit screening<br>for candidate exoplanet signals</h2>
-                <p class="section-lead">ExoDip processes raw stellar photometry to identify characteristic brightness dips caused by exoplanet transits — when a planet crosses in front of its host star along our line of sight. It is a screening engine, not a confirmation pipeline.</p>
+                <p class="section-lead">ExoDip processes raw stellar photometry to identify characteristic brightness dips caused when an exoplanet crosses in front of its host star along our line of sight. It is a screening engine, not a confirmation pipeline.</p>
             </div>
         </section>
 
@@ -134,7 +117,7 @@
                 <div class="eyebrow">Why Transit Detection?</div>
                 <h2 class="section-title">Most planets are found by watching stars, not planets</h2>
                 <p>Direct imaging of exoplanets is rare. The transit method instead measures a star’s brightness over time. If a planet periodically blocks a fraction of that light, the resulting light curve encodes orbital period, transit depth, and duration.</p>
-                <p class="muted">Those signals are small — often well below 1% of the star’s flux — and sit on top of stellar variability, instrumental drift, and astrophysical false positives. That is the problem ExoDip is built to screen.</p>
+                <p class="muted">Those signals are small, often well below 1% of the star’s flux, and sit on top of stellar variability, instrumental drift, and astrophysical false positives. That is the problem ExoDip is built to screen.</p>
             </div>
             <div class="split-aside">
                 <div class="fact-row"><span>Typical Jupiter-size transit</span><b>~1% dip</b></div>
@@ -149,7 +132,7 @@
             <div class="section-header">
                 <div class="eyebrow">How Transits Work</div>
                 <h2 class="section-title">Why a planet creates a dip</h2>
-                <p class="section-lead">When a planet passes between its host star and the observer, it blocks a small amount of starlight. That produces a characteristic decrease in observed brightness — the dip that gives ExoDip its name.</p>
+                <p class="section-lead">When a planet passes between its host star and the observer, it blocks a small amount of starlight. That produces a characteristic decrease in observed brightness, the dip that gives ExoDip its name.</p>
             </div>
 
             <div class="dip-diagram-wrap">
@@ -172,7 +155,7 @@
                 <div class="transit-stage">
                     <img class="transit-stage-image" src="assets/transit-stage-midpoint.svg" alt="Planet at the middle of transit, with the deepest brightness dip">
                     <div class="transit-label">Transit Mid-point</div>
-                    <div class="transit-desc">Deepest dip — depth ≈ (R<sub>p</sub>/R<sub>★</sub>)²</div>
+                    <div class="transit-desc">Deepest dip. Depth ≈ (R<sub>p</sub>/R<sub>★</sub>)²</div>
                 </div>
                 <div class="transit-arrow" aria-hidden="true">→</div>
                 <div class="transit-stage">
@@ -273,7 +256,7 @@
                 <div>
                     <div class="eyebrow">Workspace</div>
                     <h2 class="cta-title">Analyze a light curve</h2>
-                    <p class="cta-sub">Upload stellar photometry and let ExoDip search for periodic transit-like signals. The full screening workspace — upload, preprocessing, BLS, features, and ML results — lives on a dedicated page.</p>
+                    <p class="cta-sub">Upload stellar photometry and let ExoDip search for periodic transit-like signals. The full screening workspace includes upload, preprocessing, BLS, features, and ML results on a dedicated page.</p>
                 </div>
                 <button class="btn btn-primary" onclick="navigateTo('Analyze')">Analyze Light Curve →</button>
             </div>
@@ -289,7 +272,7 @@
             <div class="example-grid">
                 <div class="example-outcome">
                     <span class="example-badge">Example · Candidate</span>
-                    <p class="muted">A periodic dip with sufficient BLS SNR and classifier agreement is labeled an exoplanet <em>candidate</em> — a recommendation for follow-up, not a confirmed planet.</p>
+                    <p class="muted">A periodic dip with sufficient BLS SNR and classifier agreement is labeled an exoplanet <em>candidate</em>, a recommendation for follow-up, not a confirmed planet.</p>
                 </div>
                 <div class="metric-strip example-metrics">
                     <div class="metric-cell"><div class="metric-cell-label">Period</div><div class="metric-cell-value">3.52 d</div></div>
@@ -313,7 +296,7 @@
                 </div>
                 <div>
                     <h4>Feature vector</h4>
-                    <p>Fifteen morphological and statistical descriptors — including depth, duration, noise, skewness, kurtosis, signal energy, and spectral entropy — summarize the light curve for the classifiers.</p>
+                    <p>Fifteen morphological and statistical descriptors, including depth, duration, noise, skewness, kurtosis, signal energy, and spectral entropy, summarize the light curve for the classifiers.</p>
                 </div>
                 <div>
                     <h4>Model evaluation</h4>
@@ -554,7 +537,7 @@
                         <div id="res-badge-container"></div>
                         <p id="res-verdict-desc" style="color:#94A3B8; font-size:0.88rem; margin:0.85rem 0 1rem; line-height:1.55;"></p>
                         <div style="font-size:0.78rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em;">Screening Confidence</div>
-                        <div id="res-conf-value" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; font-size:2.35rem; color:#F1F5F9; margin:0.15rem 0;">—</div>
+                        <div id="res-conf-value" style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; font-size:2.35rem; color:#F1F5F9; margin:0.15rem 0;">Not available</div>
                         <div class="progress-bar">
                             <div id="res-conf-bar" class="progress-fill" style="width:0%;"></div>
                         </div>
@@ -562,11 +545,11 @@
 
                     <div class="result-card" style="margin-top:1.2rem;">
                         <p style="font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 0.75rem; color:#F1F5F9;">Detection Telemetry</p>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Primary Model</span><b id="res-tele-model" style="color:#F1F5F9;">—</b></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Model Agreement</span><b id="res-tele-agree" style="color:#7DD3C7;">—</b></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Detected Dips</span><b id="res-tele-dips" style="color:#F1F5F9;">—</b></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Noise Std Dev</span><b id="res-tele-noise" style="color:#F1F5F9;">—</b></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Negative Ratio</span><b id="res-tele-neg" style="color:#F1F5F9;">—</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Primary Model</span><b id="res-tele-model" style="color:#F1F5F9;">Not available</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Model Agreement</span><b id="res-tele-agree" style="color:#7DD3C7;">Not available</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Detected Dips</span><b id="res-tele-dips" style="color:#F1F5F9;">Not available</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Noise Std Dev</span><b id="res-tele-noise" style="color:#F1F5F9;">Not available</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span class="muted">Negative Ratio</span><b id="res-tele-neg" style="color:#F1F5F9;">Not available</b></div>
                     </div>
                 </div>
 
@@ -574,12 +557,12 @@
                 <div>
                     <!-- Signal Metrics Strip -->
                     <div class="metric-strip">
-                        <div class="metric-cell"><div class="metric-cell-label">Period</div><div id="res-m-period" class="metric-cell-value">—</div></div>
-                        <div class="metric-cell"><div class="metric-cell-label">Transit Depth</div><div id="res-m-depth" class="metric-cell-value">—</div></div>
-                        <div class="metric-cell"><div class="metric-cell-label">Duration</div><div id="res-m-duration" class="metric-cell-value">—</div></div>
-                        <div class="metric-cell"><div class="metric-cell-label">BLS SNR</div><div id="res-m-snr" class="metric-cell-value">—</div></div>
-                        <div class="metric-cell"><div class="metric-cell-label">Dip Groups</div><div id="res-m-groups" class="metric-cell-value">—</div></div>
-                        <div class="metric-cell"><div class="metric-cell-label">Decision Model</div><div id="res-m-model" class="metric-cell-value" style="color:#6FA8DC;">—</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Period</div><div id="res-m-period" class="metric-cell-value">Not available</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Transit Depth</div><div id="res-m-depth" class="metric-cell-value">Not available</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Duration</div><div id="res-m-duration" class="metric-cell-value">Not available</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">BLS SNR</div><div id="res-m-snr" class="metric-cell-value">Not available</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Dip Groups</div><div id="res-m-groups" class="metric-cell-value">Not available</div></div>
+                        <div class="metric-cell"><div class="metric-cell-label">Decision Model</div><div id="res-m-model" class="metric-cell-value" style="color:#6FA8DC;">Not available</div></div>
                     </div>
 
                     <!-- Result Tabs -->
@@ -875,7 +858,7 @@
 
     <!-- Global Footer -->
     <footer class="app-footer">
-        <span>ExoDip — Photometric Transit Screening &nbsp;·&nbsp; Not a confirmed discovery pipeline &nbsp;·&nbsp; Built for educational and research use</span>
+        <span>ExoDip Photometric Transit Screening &nbsp;·&nbsp; Not a confirmed discovery pipeline &nbsp;·&nbsp; Built for educational and research use</span>
     </footer>
 
 </div>

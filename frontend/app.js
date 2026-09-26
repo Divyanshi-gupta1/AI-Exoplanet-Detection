@@ -189,13 +189,15 @@ function switchResultTab(tabKey) {
         parent.querySelectorAll('.tab-nav .tab-btn')[target.index].classList.add('active');
         document.getElementById(target.id).classList.add('active');
 
-        // Trigger Plotly relayout to ensure proper dimensions on tab reveal
-        if (tabKey === 'full' && document.getElementById('chart-full')) {
-            Plotly.Plots.resize('chart-full');
-        } else if (tabKey === 'zoom' && document.getElementById('chart-zoom')) {
-            Plotly.Plots.resize('chart-zoom');
-        } else if (tabKey === 'models' && document.getElementById('chart-probs')) {
-            Plotly.Plots.resize('chart-probs');
+        // Resize after the tab is visible; prevents a hidden desktop-width plot
+        // from overflowing a phone viewport when the user changes result tabs.
+        const chartByTab = { full: 'chart-full', zoom: 'chart-zoom', models: 'chart-probs' };
+        const chartId = chartByTab[tabKey];
+        if (chartId && window.Plotly) {
+            requestAnimationFrame(() => {
+                const chart = document.getElementById(chartId);
+                if (chart && chart.data) Plotly.Plots.resize(chart);
+            });
         }
     }
 }
@@ -521,11 +523,11 @@ function renderModelsTable(r) {
 
         rows.push({
             modelName: (isSelected ? '<span style="color:#7DD3C7;margin-right:4px;">●</span> ' : '') + mname,
-            acc: sc.Accuracy != null ? sc.Accuracy.toFixed(4) : '-',
-            prec: sc.Precision != null ? sc.Precision.toFixed(4) : '-',
-            rec: sc.Recall != null ? sc.Recall.toFixed(4) : '-',
-            f1: sc['F1 Score'] != null ? sc['F1 Score'].toFixed(4) : '-',
-            auc: sc['ROC-AUC'] != null ? sc['ROC-AUC'].toFixed(4) : '-',
+            acc: sc.Accuracy != null ? sc.Accuracy.toFixed(4) : 'N/A',
+            prec: sc.Precision != null ? sc.Precision.toFixed(4) : 'N/A',
+            rec: sc.Recall != null ? sc.Recall.toFixed(4) : 'N/A',
+            f1: sc['F1 Score'] != null ? sc['F1 Score'].toFixed(4) : 'N/A',
+            auc: sc['ROC-AUC'] != null ? sc['ROC-AUC'].toFixed(4) : 'N/A',
             comp: sc.Composite != null ? sc.Composite.toFixed(4) : '0',
             compNum: sc.Composite || 0,
             verdict: verdict,
@@ -728,7 +730,7 @@ function renderHistoryView() {
     state.history.forEach((item, idx) => {
         const tr = document.createElement('tr');
         const verdictText = item.prediction === 'Planet' ? 'Candidate' : 'Non-Candidate';
-        const confText = item.confidence != null ? `${item.confidence.toFixed(1)}%` : '-';
+        const confText = item.confidence != null ? `${item.confidence.toFixed(1)}%` : 'N/A';
 
         tr.innerHTML = `
             <td><b>${item.source}</b></td>

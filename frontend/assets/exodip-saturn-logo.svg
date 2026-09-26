@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 192" role="img" aria-labelledby="title">
+  <title id="title">ExoDip Saturn logo</title>
+  <defs>
+    <radialGradient id="planet" cx="35%" cy="25%" r="72%">
+      <stop offset="0" stop-color="#F1E5BF"/>
+      <stop offset=".48" stop-color="#D4B67B"/>
+      <stop offset=".78" stop-color="#9A7A50"/>
+      <stop offset="1" stop-color="#4C3B34"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="16" y1="95" x2="240" y2="95" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#585963"/>
+      <stop offset=".26" stop-color="#AAA5A3"/>
+      <stop offset=".5" stop-color="#EFE6D5"/>
+      <stop offset=".72" stop-color="#AAA5A3"/>
+      <stop offset="1" stop-color="#494A54"/>
+    </linearGradient>
+  </defs>
+  <!-- Back half of Saturn's rings: continuous and intentionally uncropped. -->
+  <ellipse cx="128" cy="101" rx="118" ry="33" transform="rotate(-17 128 101)" fill="none" stroke="#484952" stroke-width="19"/>
+  <ellipse cx="128" cy="101" rx="118" ry="33" transform="rotate(-17 128 101)" fill="none" stroke="url(#ring)" stroke-width="12"/>
+  <ellipse cx="128" cy="101" rx="87" ry="24" transform="rotate(-17 128 101)" fill="none" stroke="#D8D0C1" stroke-opacity=".82" stroke-width="3"/>
+  <!-- Planet masks the rear ring, creating the correct depth relationship. -->
+  <circle cx="128" cy="91" r="58" fill="url(#planet)" stroke="#E9D8AA" stroke-width="1.5"/>
+  <path d="M75 100C101 109 153 110 181 96" fill="none" stroke="#806246" stroke-opacity=".36" stroke-width="10"/>
+  <path d="M79 81C102 90 153 91 177 77" fill="none" stroke="#F1E5BF" stroke-opacity=".32" stroke-width="5"/>
+  <!-- Front ring restores the foreground arc after the planet. -->
+  <path d="M20 125C65 153 190 159 237 109" fill="none" stroke="#45464F" stroke-width="19" stroke-linecap="round"/>
+  <path d="M20 125C65 153 190 159 237 109" fill="none" stroke="url(#ring)" stroke-width="12" stroke-linecap="round"/>
+  <path d="M28 126C72 147 183 151 228 111" fill="none" stroke="#EEE5D4" stroke-opacity=".55" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

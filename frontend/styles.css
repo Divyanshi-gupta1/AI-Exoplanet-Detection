@@ -181,7 +181,11 @@ h4 { font-size: 1.15rem; font-weight: 600; }
     justify-content: space-between;
     background: rgba(7, 11, 20, 0.94);
     border-bottom: 1px solid rgba(38, 52, 74, 0.82);
-    padding: 0.7rem 0;
+    width: 100vw;
+    margin-top: -0.9rem;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding: 0.7rem max(2rem, calc((100vw - 1440px) / 2 + 2rem));
     margin-bottom: 2rem;
     position: sticky;
     top: 0;
@@ -206,10 +210,11 @@ h4 { font-size: 1.15rem; font-weight: 600; }
     text-align: left;
 }
 .nav-brand-box .logo-icon {
-    width: 28px;
+    width: 34px;
     height: 28px;
     flex-shrink: 0;
-    filter: drop-shadow(0 0 10px rgba(111, 168, 220, 0.65));
+    filter: none;
+    object-fit: contain;
 }
 .brand-name {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -707,6 +712,22 @@ h4 { font-size: 1.15rem; font-weight: 600; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
+/* Results must never force a viewport-width overflow on phones. */
+#view-results,
+#view-results .grid-results,
+#view-results .grid-results > div,
+#view-results .tab-content {
+    min-width: 0;
+    max-width: 100%;
+}
+#view-results .tab-content { overflow: hidden; }
+#view-results .js-plotly-plot,
+#view-results .plot-container,
+#view-results .svg-container {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
 /* Drag & Drop Upload Zone */
 .upload-zone {
     border: 1px dashed var(--border-subtle);
@@ -969,6 +990,7 @@ input[type="number"]:focus, select:focus {
 /* Tablet & Mobile (under 860px) */
 @media (max-width: 860px) {
     .navbar {
+        margin-top: -0.9rem;
         margin-bottom: 1.4rem;
     }
 
@@ -1063,6 +1085,14 @@ input[type="number"]:focus, select:focus {
     .app-container {
         padding: 0.75rem 1rem 2rem;
     }
+    .navbar {
+        margin-top: -0.75rem;
+        padding: 0.7rem 1rem;
+    }
+    #view-results .data-table-container {
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
 
     h1 {
         font-size: 2.9rem;
@@ -1111,6 +1141,10 @@ input[type="number"]:focus, select:focus {
 @media (max-width: 520px) {
     .app-container {
         padding: 0.5rem 0.75rem 1.8rem;
+    }
+    .navbar {
+        margin-top: -0.5rem;
+        padding: 0.65rem 0.75rem;
     }
 
     .brand-name {
@@ -1404,7 +1438,7 @@ input[type="number"]:focus, select:focus {
 .dip-diagram-wrap { margin-bottom: 1.5rem; }
 .transit-dip-illustration {
     display: block;
-    width: min(100%, 1080px);
+    width: 100%;
     height: auto;
     border-radius: 16px;
 }
@@ -1414,7 +1448,8 @@ input[type="number"]:focus, select:focus {
     grid-template-columns: minmax(0, 1fr) 1.75rem minmax(0, 1fr) 1.75rem minmax(0, 1fr) 1.75rem minmax(0, 1fr);
     gap: 0.6rem;
     align-items: start;
-    max-width: 1080px;
+    width: 100%;
+    max-width: none;
 }
 .transit-stage { min-width: 0; padding-top: 0.2rem; }
 .transit-stage-image {
@@ -1429,7 +1464,7 @@ input[type="number"]:focus, select:focus {
     position: static;
     align-self: start;
     justify-self: center;
-    margin-top: clamp(68px, 7vw, 80px);
+    margin-top: clamp(64px, 7vw, 100px);
     color: var(--primary-blue);
     font-size: 1.2rem;
     line-height: 1;
