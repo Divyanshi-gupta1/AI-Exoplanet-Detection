@@ -28,7 +28,7 @@ The platform bridges physics-based transit modeling (**Astropy Box Least Squares
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - 📤 **Multi-Format Photometric Ingestion**
   - Upload CSV time-series with a `flux` column (and optional `time` column).
@@ -272,12 +272,6 @@ Benchmark evaluation on the held-out Kepler test set (570 stars):
 - [NASA Kepler Mission Documentation](https://www.nasa.gov/mission_pages/kepler/main/index.html)
 - [Astropy: Box Least Squares Periodogram](https://docs.astropy.org/en/stable/timeseries/bls.html)
 - Kovács, G., Zucker, S., & Mazeh, T. (2002). *A box-fitting algorithm in the search for periodic transits*. A&A, 391, 369–377.
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License for educational and research use.
 
 ---
 
