@@ -598,10 +598,10 @@ function renderCharts(r) {
         paper_bgcolor: '#0E1524',
         plot_bgcolor: '#070B14',
         height: 400,
-        margin: { l: 45, r: 15, t: 42, b: 40 },
+        margin: { l: 52, r: 15, t: 42, b: 42 },
         legend: { orientation: 'h', y: 1.05, font: { color: '#94A3B8' } },
-        xaxis: { title: { text: 'Time / Sample Index', font: { color: '#94A3B8' } }, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
-        yaxis: { title: { text: 'Normalized Relative Flux', font: { color: '#94A3B8' } }, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
+        xaxis: { title: { text: 'Time / Idx', font: { color: '#94A3B8' } }, automargin: true, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
+        yaxis: { title: { text: 'Norm. Flux', font: { color: '#94A3B8' } }, automargin: true, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
         font: { family: 'Inter, sans-serif', color: '#94A3B8' }
     };
 
@@ -655,10 +655,10 @@ function renderCharts(r) {
         paper_bgcolor: '#0E1524',
         plot_bgcolor: '#070B14',
         height: 380,
-        margin: { l: 45, r: 20, t: 40, b: 40 },
+        margin: { l: 52, r: 20, t: 40, b: 42 },
         legend: { orientation: 'h', y: 1.05, font: { color: '#94A3B8' } },
-        xaxis: { title: { text: 'Sample Index', font: { color: '#94A3B8' } }, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
-        yaxis: { title: { text: 'Normalized Relative Flux', font: { color: '#94A3B8' } }, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
+        xaxis: { title: { text: 'Sample Idx', font: { color: '#94A3B8' } }, automargin: true, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
+        yaxis: { title: { text: 'Norm. Flux', font: { color: '#94A3B8' } }, automargin: true, gridcolor: '#26344A', zeroline: false, tickfont: { color: '#94A3B8' } },
         font: { family: 'Inter, sans-serif', color: '#94A3B8' }
     };
 
@@ -675,15 +675,28 @@ function renderCharts(r) {
         return Math.round(p * 1000) / 10;
     });
 
+    const MODEL_SHORT_NAMES = {
+        'XGBoost': 'XGB',
+        'Random Forest': 'RF',
+        'Tuned Random Forest': 'TRF',
+        'Support Vector Machine': 'SVM',
+        'Logistic Regression': 'LR',
+        '1D CNN': 'CNN',
+        'CNN': 'CNN'
+    };
+    const shortNames = modelNames.map(name => MODEL_SHORT_NAMES[name] || name);
+
     const probTraces = [
         {
-            x: modelNames,
+            x: shortNames,
             y: probValues,
             type: 'bar',
             marker: { color: '#6FA8DC', opacity: 0.9 },
             text: probValues.map(v => `${v}%`),
             textposition: 'auto',
-            textfont: { color: '#F1F5F9' }
+            textfont: { color: '#F1F5F9' },
+            customdata: modelNames,
+            hovertemplate: '<b>%{customdata}</b><br>Probability: %{y:.1f}%<extra></extra>'
         }
     ];
 
@@ -692,9 +705,9 @@ function renderCharts(r) {
         paper_bgcolor: '#0E1524',
         plot_bgcolor: '#070B14',
         height: 250,
-        margin: { l: 40, r: 20, t: 20, b: 45 },
-        xaxis: { gridcolor: '#26344A', tickfont: { color: '#94A3B8' } },
-        yaxis: { title: { text: 'Probability (%)', font: { color: '#94A3B8' } }, range: [0, 100], gridcolor: '#26344A', tickfont: { color: '#94A3B8' } },
+        margin: { l: 48, r: 20, t: 20, b: 38 },
+        xaxis: { automargin: true, gridcolor: '#26344A', tickfont: { color: '#94A3B8' } },
+        yaxis: { title: { text: 'Prob. (%)', font: { color: '#94A3B8' } }, range: [0, 100], automargin: true, gridcolor: '#26344A', tickfont: { color: '#94A3B8' } },
         font: { family: 'Inter, sans-serif', color: '#94A3B8' }
     };
 
