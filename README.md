@@ -252,16 +252,21 @@ Each observation consists of **3,197 continuous flux measurements** sampled at K
 
 ## 🤖 Model Benchmark Performance
 
-Benchmark evaluation on the held-out Kepler test set (570 stars):
+Benchmark evaluation on the held-out Kepler test set (`exoTest.csv` — 570 stars: 5 confirmed planet transits vs. 565 non-planets):
 
-| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC | Composite Rank |
-|---|---|---|---|---|---|---|
-| **XGBoost (Primary)** | **99.65%** | **100.0%** | **80.0%** | **0.889** | **0.995** | **0.937** |
-| **Tuned Random Forest** | 99.30% | 100.0% | 60.0% | 0.750 | 0.994 | 0.869 |
-| **Baseline Random Forest** | 99.12% | 100.0% | 40.0% | 0.571 | 0.988 | 0.790 |
-| **Support Vector Machine** | 99.12% | 100.0% | 40.0% | 0.571 | 0.957 | 0.780 |
-| **1D CNN (NumPy Inference)** | 98.95% | 75.0% | 60.0% | 0.667 | 0.977 | 0.799 |
-| **Logistic Regression** | 97.89% | 28.6% | 40.0% | 0.333 | 0.852 | 0.570 |
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+|---|---|---|---|---|---|
+| **1D CNN** | **100.0%** | **100.0%** | **100.0%** | **1.000** | **1.000** |
+| **Random Forest** | 99.65% | 100.0% | 60.0% | 0.750 | 0.935 |
+| **Tuned Random Forest** | 99.65% | 100.0% | 60.0% | 0.750 | 0.923 |
+| **Voting Ensemble** | 99.65% | 100.0% | 60.0% | 0.750 | 0.913 |
+| **XGBoost (Primary Engine)** | 99.65% | 100.0% | 60.0% | 0.750 | 0.906 |
+| **Support Vector Machine** | 98.95% | 44.4% | 80.0% | 0.571 | 0.878 |
+| **Logistic Regression** | 85.96% | 3.7% | 60.0% | 0.070 | 0.697 |
+
+> **Astrophysical & ML Notes on the Benchmark:**
+> - **1D CNN Performance:** The 1D CNN correctly classified all 5 positive exoplanet transits in `exoTest.csv` with zero false positives across the 565 non-planets, yielding mathematical scores of 1.0. However, because the test set contains only $N=5$ confirmed planet instances, evaluating deep networks on such small positive samples has high sample variance.
+> - **Why XGBoost / Ensemble as the Primary Engine?** While the 1D CNN operates on raw 1D arrays, **XGBoost and Random Forest** evaluate 33 explicit physical features (transit depth $\delta$, BLS orbital period, duration, SNR, energy, spectral entropy). Astronomers prioritize physical interpretability over black-box raw signals to reject astrophysical false positives (e.g. eclipsing binaries). Additionally, tree models provide lightweight, sub-second inference in serverless production without requiring heavy deep-learning dependencies.
 
 ---
 
