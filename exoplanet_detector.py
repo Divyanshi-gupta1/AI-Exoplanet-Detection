@@ -2,7 +2,7 @@
 
 Combines astronomical physical transit verification (two-pass detrending,
 duration/depth consistency, SNR, Box Least Squares) with trained ensemble machine learning models
-(Random Forest, XGBoost, Support Vector Machine, Logistic Regression, and 1D CNN).
+(Random Forest, XGBoost, Support Vector Machine, and Logistic Regression).
 
 Designed for zero false positives on non-planets and robust screening of real exoplanet candidates
 across arbitrary-length light curves (Kepler, TESS, MAST, relative or raw flux).
@@ -329,7 +329,7 @@ def matches_confirmed_catalog(flux: np.ndarray) -> bool:
 
 
 # =====================================================================
-# 4. Model Loading & 1D CNN Inference
+# 4. Model Loading & Benchmark Evaluation
 # =====================================================================
 
 @lru_cache(maxsize=1)
@@ -357,10 +357,6 @@ def load_evaluation_metrics():
     """Load model benchmark metrics from model_comparison.csv + fallback defaults."""
     csv_path = DATA_DIR / "model_comparison.csv"
     scores = {
-        "1D CNN": {
-            "Accuracy": 0.9931, "Precision": 0.5185, "Recall": 0.7568,
-            "F1 Score": 0.6154, "ROC-AUC": 0.9770, "Composite": 0.7722,
-        },
         "Random Forest": {
             "Accuracy": 0.9965, "Precision": 1.0000, "Recall": 0.6000,
             "F1 Score": 0.7500, "ROC-AUC": 0.9350, "Composite": 0.8563,
@@ -391,86 +387,12 @@ def load_evaluation_metrics():
             df = pd.read_csv(csv_path, usecols=lambda c: c in ["Model"] + SCORE_COLS)
             for _, row in df.iterrows():
                 name = row["Model"]
-                if name == "1D CNN":
-                    continue  # preserve 1D CNN test benchmark
                 item = {col: float(row[col]) for col in SCORE_COLS if col in row.index and pd.notna(row[col])}
                 item["Composite"] = sum(item.values()) / max(len(item), 1)
                 scores[name] = item
         except Exception:
             pass
     return scores
-
-
-@lru_cache(maxsize=1)
-def _load_cnn_weights():
-    """Load pre-trained CNN weights from keras archive into memory."""
-    import zipfile, h5py, io
-    path = DATA_DIR / "cnn_exoplanet.keras"
-    if not path.exists():
-        return None
-    z = zipfile.ZipFile(path)
-    f = h5py.File(io.BytesIO(z.read("model.weights.h5")), "r")
-    L = f["layers"]
-    weights = {
-        "conv1_w": np.array(L["conv1d/vars/0"]), "conv1_b": np.array(L["conv1d/vars/1"]),
-        "bn1_gamma": np.array(L["batch_normalization/vars/0"]), "bn1_beta": np.array(L["batch_normalization/vars/1"]),
-        "bn1_mean": np.array(L["batch_normalization/vars/2"]), "bn1_var": np.array(L["batch_normalization/vars/3"]),
-        "conv2_w": np.array(L["conv1d_1/vars/0"]), "conv2_b": np.array(L["conv1d_1/vars/1"]),
-        "bn2_gamma": np.array(L["batch_normalization_1/vars/0"]), "bn2_beta": np.array(L["batch_normalization_1/vars/1"]),
-        "bn2_mean": np.array(L["batch_normalization_1/vars/2"]), "bn2_var": np.array(L["batch_normalization_1/vars/3"]),
-        "conv3_w": np.array(L["conv1d_2/vars/0"]), "conv3_b": np.array(L["conv1d_2/vars/1"]),
-        "bn3_gamma": np.array(L["batch_normalization_2/vars/0"]), "bn3_beta": np.array(L["batch_normalization_2/vars/1"]),
-        "bn3_mean": np.array(L["batch_normalization_2/vars/2"]), "bn3_var": np.array(L["batch_normalization_2/vars/3"]),
-        "dense1_w": np.array(L["dense/vars/0"]), "dense1_b": np.array(L["dense/vars/1"]),
-        "dense2_w": np.array(L["dense_1/vars/0"]), "dense2_b": np.array(L["dense_1/vars/1"]),
-    }
-    f.close()
-    return weights
-
-
-def cnn_infer(flux_3197: np.ndarray) -> tuple[float, str | None]:
-    """Execute 1D CNN inference using pure NumPy."""
-    w = _load_cnn_weights()
-    if w is None:
-        return 0.0, "CNN weights not available"
-
-    x = (flux_3197 - flux_3197.mean()) / (flux_3197.std() + 1e-8)
-    x = x.reshape(-1, 1).astype(np.float32)
-
-    # Conv1 -> BN -> ReLU -> MaxPool2
-    k1, _, out1 = w["conv1_w"].shape
-    L1 = x.shape[0] - k1 + 1
-    c1 = np.empty((L1, out1), dtype=np.float32)
-    for i in range(L1):
-        c1[i] = np.tensordot(x[i:i + k1], w["conv1_w"], axes=([0, 1], [0, 1])) + w["conv1_b"]
-    c1 = w["bn1_gamma"] * (c1 - w["bn1_mean"]) / np.sqrt(w["bn1_var"] + 1e-3) + w["bn1_beta"]
-    c1 = np.maximum(c1, 0)
-    p1 = c1[:(c1.shape[0] // 2) * 2].reshape(-1, 2, out1).max(axis=1)
-
-    # Conv2 -> BN -> ReLU -> MaxPool2
-    k2, _, out2 = w["conv2_w"].shape
-    L2 = p1.shape[0] - k2 + 1
-    c2 = np.empty((L2, out2), dtype=np.float32)
-    for i in range(L2):
-        c2[i] = np.tensordot(p1[i:i + k2], w["conv2_w"], axes=([0, 1], [0, 1])) + w["conv2_b"]
-    c2 = w["bn2_gamma"] * (c2 - w["bn2_mean"]) / np.sqrt(w["bn2_var"] + 1e-3) + w["bn2_beta"]
-    c2 = np.maximum(c2, 0)
-    p2 = c2[:(c2.shape[0] // 2) * 2].reshape(-1, 2, out2).max(axis=1)
-
-    # Conv3 -> BN -> ReLU -> GlobalAvgPool
-    k3, _, out3 = w["conv3_w"].shape
-    L3 = p2.shape[0] - k3 + 1
-    c3 = np.empty((L3, out3), dtype=np.float32)
-    for i in range(L3):
-        c3[i] = np.tensordot(p2[i:i + k3], w["conv3_w"], axes=([0, 1], [0, 1])) + w["conv3_b"]
-    c3 = w["bn3_gamma"] * (c3 - w["bn3_mean"]) / np.sqrt(w["bn3_var"] + 1e-3) + w["bn3_beta"]
-    c3 = np.maximum(c3, 0).mean(axis=0)
-
-    # Dense layers
-    d1 = np.maximum(c3 @ w["dense1_w"] + w["dense1_b"], 0)
-    logit = float((d1 @ w["dense2_w"] + w["dense2_b"]).item())
-    prob = float(1.0 / (1.0 + np.exp(-logit)))
-    return prob, None
 
 
 # =====================================================================
@@ -599,21 +521,14 @@ def detect_exoplanet(raw_flux: np.ndarray) -> dict:
         inp = scaled_frame if details["input_type"] == "scaled" else frame
         raw_probs[model_name] = float(details["model"].predict_proba(inp)[0, 1])
 
-    # ── 6. 1D CNN inference ──
-    cnn_prob, cnn_err = cnn_infer(flux_for_ml)
-    if cnn_err:
-        unavailable["1D CNN"] = cnn_err
-    else:
-        raw_probs["1D CNN"] = cnn_prob
-
-    # ── 7. Model evaluation & decision maker selection ──
+    # ── 6. Model evaluation & decision maker selection ──
     scores = load_evaluation_metrics()
     available_models = list(raw_probs.keys())
 
     # Select best model based on model comparison factors (Accuracy, Precision, Recall, F1, ROC-AUC)
-    # XGBoost and Random Forest achieve top Accuracy (99.65%) and Precision (100%).
-    # We prefer XGBoost as primary decision maker among the top models.
-    best_model = "XGBoost" if "XGBoost" in available_models else "Tuned Random Forest"
+    # Random Forest achieves top Accuracy (99.65%), Precision (100%), and highest ROC-AUC (0.935).
+    # We set Random Forest as the primary decision maker among the ensemble models.
+    best_model = "Random Forest" if "Random Forest" in available_models else ("Tuned Random Forest" if "Tuned Random Forest" in available_models else "XGBoost")
     best_composite = scores.get(best_model, {}).get("Composite", 0.85)
 
     # ── 8. Decision logic ──
@@ -653,8 +568,6 @@ def detect_exoplanet(raw_flux: np.ndarray) -> dict:
             if is_relative:
                 if "Forest" in m:
                     calibrated_probs[m] = float(np.clip(planet_prob * 0.95, 0.75, 0.99))
-                elif "CNN" in m:
-                    calibrated_probs[m] = float(np.clip(max(p, 0.75 * planet_prob), 0.65, 0.99))
                 elif "SVM" in m:
                     calibrated_probs[m] = float(np.clip(planet_prob * 0.90, 0.70, 0.98))
                 elif "Logistic" in m:

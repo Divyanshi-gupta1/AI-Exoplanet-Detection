@@ -22,7 +22,7 @@
 
 **ExoDip** is an astronomical analysis tool designed to analyze stellar brightness time-series (light curves) for periodic transit signals characteristic of exoplanets passing in front of their host stars.
 
-The platform bridges physics-based transit modeling (**Astropy Box Least Squares periodogram**) with a calibrated **multi-model machine learning ensemble** (Tuned XGBoost, Random Forest, SVM, Logistic Regression, and 1D CNN). It provides interactive light-curve visualizations, transit ingress/egress profiling, feature attribution, benchmark model comparisons, and exportable screening telemetry.
+The platform bridges physics-based transit modeling (**Astropy Box Least Squares periodogram**) with a calibrated **multi-model machine learning ensemble** (Random Forest, Tuned Random Forest, XGBoost, SVM, and Logistic Regression). It provides interactive light-curve visualizations, transit ingress/egress profiling, feature attribution, benchmark model comparisons, and exportable screening telemetry.
 
 > **Scientific Notice:** ExoDip is a candidate screening and triage tool, not an observational confirmation pipeline. True exoplanet confirmation requires extensive astronomical follow-up (high-resolution imaging, radial velocity spectroscopy, and statistical false-positive validation against eclipsing binaries).
 
@@ -42,7 +42,7 @@ The platform bridges physics-based transit modeling (**Astropy Box Least Squares
   - Automated flux detrending, baseline normalization, and noise standard deviation estimation.
   - Identification of transit depth ($\delta \approx (R_p / R_\star)^2$), duration, and transit ingress/egress boundaries.
 - 🤖 **Ensemble Machine Learning Screening**
-  - Composite multi-model evaluation: Tuned XGBoost (primary decision maker), Tuned Random Forest, Baseline Random Forest, Support Vector Machine (SVM), Logistic Regression, and 1D CNN.
+  - Composite multi-model evaluation: Random Forest (primary decision maker), Tuned Random Forest, XGBoost, Support Vector Machine (SVM), and Logistic Regression.
   - Model agreement scoring (Unanimous, Majority, Consensus) with calibrated probabilities and benchmark metrics (Accuracy, Precision, Recall, F1, ROC-AUC).
 - 📊 **Responsive Interactive Plotly Charts**
   - **Full Light Curve**: Interactive zoomable time series with observed flux, smoothed trend, and flagged transit dip occurrences.
@@ -88,10 +88,10 @@ Raw Stellar Photometry (CSV / TXT / NPY / Kepler Row)
                         ▼
  ┌────────────────────────────────────────────────────────┐
  │ 4. Machine Learning Ensemble Screening                 │
- │    • Tuned XGBoost (Primary Decision Engine)           │
- │    • Random Forest & Tuned RF                          │
- │    • Support Vector Machine (SVM)                      │
- │    • Logistic Regression & 1D CNN                      │
+ │    • Random Forest (Primary Decision Engine)           │
+ │    • Tuned Random Forest & Voting Ensemble             │
+ │    • XGBoost Classifier                                │
+ │    • Support Vector Machine (SVM) & Logistic Reg.      │
  └──────────────────────┬─────────────────────────────────┘
                         │
                         ▼
@@ -112,7 +112,7 @@ Raw Stellar Photometry (CSV / TXT / NPY / Kepler Row)
 |---|---|
 | **Frontend** | Vanilla JavaScript (ES6+), HTML5 Canvas (Planetary Simulation), CSS3 (Deep Space Observatory theme), Plotly.js |
 | **Backend** | Python 3.12, FastAPI, Uvicorn, Pydantic |
-| **Scientific & ML** | Astropy (BLS Periodogram), NumPy, Pandas, Scipy, Scikit-learn, XGBoost, Joblib, H5py |
+| **Scientific & ML** | Astropy (BLS Periodogram), NumPy, Pandas, Scipy, Scikit-learn, XGBoost, Joblib |
 | **Production Hosting** | **Frontend**: Vercel (`exodip.vercel.app`)<br>**Backend**: Render (`exodip.onrender.com`) |
 
 ---
@@ -144,7 +144,6 @@ AI-Exoplanet-Detection/
 │   ├── voting.pkl             # Ensemble Voting classifier
 │   ├── scaler.pkl             # StandardScaler for feature normalization
 │   ├── selector.pkl           # Feature selection transform
-│   ├── cnn_exoplanet.keras    # 1D Convolutional Neural Network weights
 │   ├── exoTrain.csv           # Kepler training dataset (5,087 stars, Git LFS)
 │   └── exoTest.csv            # Held-out Kepler evaluation dataset (570 stars, Git LFS)
 │
@@ -214,7 +213,7 @@ curl -X POST http://localhost:8000/api/analyze/file \
   "prediction": "Planet",
   "probability": 0.998,
   "confidence": "99.8%",
-  "model": "XGBoost",
+  "model": "Random Forest",
   "model_agreement": "Unanimous",
   "agreement_score": 1.0,
   "bls_period": 3.52,
@@ -256,17 +255,17 @@ Benchmark evaluation on the held-out Kepler test set (`exoTest.csv` — 570 star
 
 | Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
 |---|---|---|---|---|---|
-| **1D CNN** | **100.0%** | **100.0%** | **100.0%** | **1.000** | **1.000** |
-| **Random Forest** | 99.65% | 100.0% | 60.0% | 0.750 | 0.935 |
+| **Random Forest (Primary Engine)** | **99.65%** | **100.0%** | **60.0%** | **0.750** | **0.935** |
 | **Tuned Random Forest** | 99.65% | 100.0% | 60.0% | 0.750 | 0.923 |
 | **Voting Ensemble** | 99.65% | 100.0% | 60.0% | 0.750 | 0.913 |
-| **XGBoost (Primary Engine)** | 99.65% | 100.0% | 60.0% | 0.750 | 0.906 |
+| **XGBoost** | 99.65% | 100.0% | 60.0% | 0.750 | 0.906 |
 | **Support Vector Machine** | 98.95% | 44.4% | 80.0% | 0.571 | 0.878 |
 | **Logistic Regression** | 85.96% | 3.7% | 60.0% | 0.070 | 0.697 |
 
 > **Astrophysical & ML Notes on the Benchmark:**
-> - **1D CNN Performance:** The 1D CNN correctly classified all 5 positive exoplanet transits in `exoTest.csv` with zero false positives across the 565 non-planets, yielding mathematical scores of 1.0. However, because the test set contains only $N=5$ confirmed planet instances, evaluating deep networks on such small positive samples has high sample variance.
-> - **Why XGBoost / Ensemble as the Primary Engine?** While the 1D CNN operates on raw 1D arrays, **XGBoost and Random Forest** evaluate 33 explicit physical features (transit depth $\delta$, BLS orbital period, duration, SNR, energy, spectral entropy). Astronomers prioritize physical interpretability over black-box raw signals to reject astrophysical false positives (e.g. eclipsing binaries). Additionally, tree models provide lightweight, sub-second inference in serverless production without requiring heavy deep-learning dependencies.
+> - **Zero False Positive Performance:** Random Forest, Tuned RF, Voting Ensemble, and XGBoost all achieved **100% precision**, producing zero false alarms across the 565 non-planetary stars while identifying genuine exoplanet transits.
+> - **Why Random Forest is the Primary Model:** Random Forest achieved the highest ROC-AUC (**0.935**) among all models, outperforming XGBoost (0.906) on the held-out test distribution.
+> - **Astrophysical Interpretability:** All models evaluate 33 explicit physical features (transit depth $\delta$, Box Least Squares period, transit duration, SNR, signal energy, and spectral entropy). Astronomers prioritize physical interpretability over opaque signals to reject astrophysical false positives (such as eclipsing binary stars and stellar variability). Additionally, the ensemble provides sub-second inference in serverless production without heavy deep-learning dependencies.
 
 ---
 

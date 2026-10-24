@@ -81,7 +81,7 @@
                     <div class="hero-meta">
                         <div class="hero-meta-item">
                             <span class="hero-meta-label">Models</span>
-                            <span class="hero-meta-val">XGBoost · RF · CNN · SVM</span>
+                            <span class="hero-meta-val">Random Forest · XGBoost · SVM</span>
                         </div>
                         <div class="hero-meta-sep"></div>
                         <div class="hero-meta-item">
@@ -206,7 +206,7 @@
                     <div class="ps-number">05</div>
                     <div class="ps-body">
                         <div class="ps-title">ML Screening</div>
-                        <div class="ps-desc">Calibrated ensemble (XGBoost, Random Forest, CNN, SVM) evaluates the feature vector against transit-like profiles.</div>
+                        <div class="ps-desc">Calibrated ensemble (Random Forest, XGBoost, SVM) evaluates the feature vector against transit-like profiles.</div>
                     </div>
                 </div>
                 <div class="pipeline-step">
@@ -235,7 +235,7 @@
                 <div class="feature-card">
                     <div class="feature-num">02</div>
                     <h4>Ensemble Screening</h4>
-                    <p>Consensus across tuned XGBoost, Random Forest, CNN, and SVM classifiers to distinguish genuine signals from noise.</p>
+                    <p>Consensus across tuned Random Forest, XGBoost, and SVM classifiers to distinguish genuine signals from noise.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-num">03</div>
@@ -300,7 +300,7 @@
                 </div>
                 <div>
                     <h4>Model evaluation</h4>
-                    <p>Ensemble models were trained and compared on Kepler photometry. XGBoost is the primary decision model based on held-out composite score (accuracy, precision–recall, and ROC-AUC).</p>
+                    <p>Ensemble models were trained and compared on Kepler photometry. Random Forest is the primary decision model based on held-out ROC-AUC (0.935) and 100% precision.</p>
                 </div>
             </div>
             <p class="section-more"><button class="text-link" onclick="openDocsTab('formats')">Input formats, metrics, and caveats →</button></p>
@@ -418,7 +418,7 @@
                         <div class="loading-step" id="step-2"><span>○</span> Normalizing flux & noise reduction</div>
                         <div class="loading-step" id="step-3"><span>○</span> Box Least Squares (BLS) periodic transit search</div>
                         <div class="loading-step" id="step-4"><span>○</span> Extracting transit depth, duration, and shape features</div>
-                        <div class="loading-step" id="step-5"><span>○</span> Executing ML model ensemble (XGBoost, RF, CNN, SVM)</div>
+                        <div class="loading-step" id="step-5"><span>○</span> Executing ML model ensemble (Random Forest, XGBoost, SVM)</div>
                     </div>
                 </div>
 
@@ -475,7 +475,7 @@
                             <div class="v-flow-node">05</div>
                             <div class="v-flow-content">
                                 <div class="v-flow-title">ML Screening</div>
-                                <p class="v-flow-desc">Evaluate the feature vector through tuned XGBoost, Random Forest, CNN, and SVM models.</p>
+                                <p class="v-flow-desc">Evaluate the feature vector through tuned Random Forest, XGBoost, and SVM models.</p>
                             </div>
                         </div>
                         <div class="v-flow-step v-step-6">
@@ -495,7 +495,7 @@
                     <ul style="color:#94A3B8; font-size:0.9rem; line-height:1.75; padding-left:1.2rem; margin:0;">
                         <li><b>Transit Search Method:</b> Box Least Squares (Astropy BLS periodogram)</li>
                         <li><b>Period Search Grid:</b> 0.5 to 20.0 days (duration grid: 1 to 12 hours)</li>
-                        <li><b>Primary Decision Model:</b> Tuned XGBoost Classifier (composite cross-validation score)</li>
+                        <li><b>Primary Decision Model:</b> Random Forest Classifier (highest ROC-AUC and 100% precision on held-out evaluation)</li>
                         <li><b>Feature Pipeline:</b> 15 astrophysical and statistical indicators (energy, entropy, depth, duration)</li>
                         <li><b>Candidate Vetting Criteria:</b> Periodic dip + BLS SNR ≥ 3.0 + ML classification confidence</li>
                     </ul>
@@ -607,12 +607,11 @@
                         <p class="muted" style="margin-top:0.5rem; font-size:0.82rem; line-height:1.5;">
                             <span style="color:#7DD3C7; font-weight:600;">Axis Guide:</span>
                             <span class="mono" style="color:#F1F5F9;">Prob. (%)</span>: Probability (%) &nbsp;·&nbsp;
-                            <span class="mono" style="color:#F1F5F9;">XGB</span>: XGBoost &nbsp;·&nbsp;
                             <span class="mono" style="color:#F1F5F9;">RF</span>: Random Forest &nbsp;·&nbsp;
                             <span class="mono" style="color:#F1F5F9;">TRF</span>: Tuned Random Forest &nbsp;·&nbsp;
+                            <span class="mono" style="color:#F1F5F9;">XGB</span>: XGBoost &nbsp;·&nbsp;
                             <span class="mono" style="color:#F1F5F9;">SVM</span>: Support Vector Machine &nbsp;·&nbsp;
-                            <span class="mono" style="color:#F1F5F9;">LR</span>: Logistic Regression &nbsp;·&nbsp;
-                            <span class="mono" style="color:#F1F5F9;">CNN</span>: 1D CNN
+                            <span class="mono" style="color:#F1F5F9;">LR</span>: Logistic Regression
                         </p>
                     </div>
                     <div id="res-tab-features" class="tab-content">
@@ -677,7 +676,7 @@
         </div>
 
         <div style="margin: 1.25rem 0 0.75rem;">
-            <span class="model-chip">Active Decision Model: <b>XGBoost</b></span>
+            <span class="model-chip">Active Decision Model: <b>Random Forest</b></span>
         </div>
 
         <div id="history-table-container">
@@ -774,7 +773,7 @@
                             <div class="v-flow-node">05</div>
                             <div class="v-flow-content">
                                 <div class="v-flow-title">Machine Learning Ensemble</div>
-                                <p class="v-flow-desc">Supervised consensus combining tuned XGBoost, Random Forest, Support Vector Machines, and Deep Convolutional Networks.</p>
+                                <p class="v-flow-desc">Supervised consensus combining tuned Random Forest, XGBoost, and Support Vector Machines.</p>
                             </div>
                         </div>
                         <div class="v-flow-step v-step-6">
@@ -841,7 +840,7 @@
                     <li><b>Photometric Normalization:</b> Flux values are detrended and smoothed using a uniform box filter to isolate local fluctuations while preserving transit dip profiles.</li>
                     <li><b>Box Least Squares (BLS):</b> An Astropy BLS periodogram scans trial periods from 0.5 to 20 days with trial transit durations from 1 to 12 hours to search for periodic box-shaped occultations.</li>
                     <li><b>Feature Extraction:</b> 15 distinct morphological and statistical features are computed, including transit depth, duration, noise standard deviation, skewness, kurtosis, signal energy, and spectral entropy.</li>
-                    <li><b>Ensemble Decision Logic:</b> Calibrated XGBoost and Random Forest models evaluate the feature vector alongside BLS transit significance to assign the final candidate classification.</li>
+                    <li><b>Ensemble Decision Logic:</b> Calibrated Random Forest and XGBoost models evaluate the feature vector alongside BLS transit significance to assign the final candidate classification.</li>
                 </ul>
             </div>
 
@@ -868,8 +867,8 @@
                 <h3 style="color:#F1F5F9; margin-bottom:0.75rem;">Frequently Asked Questions</h3>
                 <p><b>Q: What is the difference between an exoplanet candidate and a confirmed exoplanet?</b><br>
                 <i>A: A candidate exhibits transit-like signals in photometric data that have not yet undergone independent observational confirmation (such as spectroscopic mass determination).</i></p>
-                <p style="margin-top:1rem;"><b>Q: Why is XGBoost used as the primary decision model?</b><br>
-                <i>A: On our held-out benchmark evaluation, tuned XGBoost achieved the highest composite score (balanced accuracy, precision-recall, and ROC-AUC) among the ensemble classifiers tested on the Kepler dataset.</i></p>
+                <p style="margin-top:1rem;"><b>Q: Why is Random Forest used as the primary decision model?</b><br>
+                <i>A: On our held-out benchmark evaluation on the Kepler test set, Random Forest achieved the highest ROC-AUC (0.935) and 100% precision among the evaluated models, ensuring robust detection with zero false alarms.</i></p>
                 <p style="margin-top:1rem;"><b>Q: What photometric precision is required?</b><br>
                 <i>A: ExoDip can detect transit depths as low as ~0.1% (1000 ppm) in clean photometry. Space-based observations (Kepler, TESS) generally meet this requirement; ground-based data may require additional preprocessing to achieve comparable sensitivity.</i></p>
             </div>

@@ -13,5 +13,4 @@ dependencies = [
     "xgboost>=2.0.0",
     "joblib>=1.4.0",
     "astropy>=6.0.0",
-    "h5py>=3.11.0",
 ]

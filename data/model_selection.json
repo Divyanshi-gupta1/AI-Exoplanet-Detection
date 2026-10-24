@@ -1,16 +1,8 @@
 {
-  "best_model": "1D CNN",
-  "selection_metric": "F1 Score",
+  "best_model": "Random Forest",
+  "selection_metric": "F1 Score & ROC-AUC",
   "selection_dataset": "exoTest.csv (held-out evaluation)",
   "ranking": [
-    {
-      "Model": "1D CNN",
-      "Accuracy": 1.0,
-      "Precision": 1.0,
-      "Recall": 1.0,
-      "F1 Score": 1.0,
-      "ROC-AUC": 1.0
-    },
     {
       "Model": "Random Forest",
       "Accuracy": 0.9964912280701754,

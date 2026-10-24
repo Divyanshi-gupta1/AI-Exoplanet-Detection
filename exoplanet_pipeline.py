@@ -195,99 +195,8 @@ def load_model_scores():
         individual["Composite"] = sum(individual.values()) / max(len(individual), 1)
         scores[name] = individual
 
-    if "1D CNN" not in scores:
-        scores["1D CNN"] = {
-            "Accuracy": 0.9931,
-            "Precision": 0.5185,
-            "Recall": 0.7568,
-            "F1 Score": 0.6154,
-            "ROC-AUC": 0.9770,
-            "Composite": 0.7722,
-        }
     return scores
 
-@lru_cache(maxsize=1)
-def _load_cnn_weights():
-    import zipfile, h5py, io
-
-    model_path = DATA_DIR / "cnn_exoplanet.keras"
-    if not model_path.exists():
-        return None
-    
-    z = zipfile.ZipFile(model_path)
-    f = h5py.File(io.BytesIO(z.read("model.weights.h5")), "r")
-    L = f["layers"]
-
-    w = {
-        "conv1_w": np.array(L["conv1d/vars/0"]), "conv1_b": np.array(L["conv1d/vars/1"]),
-        "bn1_gamma": np.array(L["batch_normalization/vars/0"]), "bn1_beta": np.array(L["batch_normalization/vars/1"]),
-        "bn1_mean": np.array(L["batch_normalization/vars/2"]), "bn1_var": np.array(L["batch_normalization/vars/3"]),
-        "conv2_w": np.array(L["conv1d_1/vars/0"]), "conv2_b": np.array(L["conv1d_1/vars/1"]),
-        "bn2_gamma": np.array(L["batch_normalization_1/vars/0"]), "bn2_beta": np.array(L["batch_normalization_1/vars/1"]),
-        "bn2_mean": np.array(L["batch_normalization_1/vars/2"]), "bn2_var": np.array(L["batch_normalization_1/vars/3"]),
-        "conv3_w": np.array(L["conv1d_2/vars/0"]), "conv3_b": np.array(L["conv1d_2/vars/1"]),
-        "bn3_gamma": np.array(L["batch_normalization_2/vars/0"]), "bn3_beta": np.array(L["batch_normalization_2/vars/1"]),
-        "bn3_mean": np.array(L["batch_normalization_2/vars/2"]), "bn3_var": np.array(L["batch_normalization_2/vars/3"]),
-        "dense1_w": np.array(L["dense/vars/0"]), "dense1_b": np.array(L["dense/vars/1"]),
-        "dense2_w": np.array(L["dense_1/vars/0"]), "dense2_b": np.array(L["dense_1/vars/1"]),
-    }
-    f.close()
-    return w
-
-def _conv1d(x, w, b):
-    k, _, out_ch = w.shape
-    out_len = x.shape[0] - k + 1
-    out = np.empty((out_len, out_ch), dtype=np.float32)
-
-    for i in range(out_len):
-        out[i] = np.tensordot(x[i:i + k], w, axes=([0, 1], [0, 1])) + b
-    return out
-
-def _batch_norm(x, gamma, beta, mean, var, eps=1e-3):
-    return gamma * (x - mean) / np.sqrt(var + eps) + beta
-
-def _maxpool1d(x, pool=2):
-    L = (x.shape[0] // pool) * pool
-
-    return x[:L].reshape(-1, pool, x.shape[1]).max(axis=1)
-
-def cnn_probability(raw_flux):
-    weights = _load_cnn_weights()
-
-    if weights is None:
-        return None, "cnn_exoplanet.keras is not saved"
-
-    flux = np.asarray(raw_flux, dtype=np.float32).ravel()
-    expected = 3197
-
-    if len(flux) != expected:
-        from scipy.interpolate import interp1d
-        f_interp = interp1d(np.linspace(0.0, 1.0, len(flux)), flux, kind="linear")
-        flux = f_interp(np.linspace(0.0, 1.0, expected)).astype(np.float32)
-
-    x = (flux - flux.mean()) / (flux.std() + 1e-8)
-    x = x.reshape(-1, 1)  # (3197, 1)
-
-    x = _conv1d(x, weights["conv1_w"], weights["conv1_b"])
-    x = _batch_norm(x, weights["bn1_gamma"], weights["bn1_beta"], weights["bn1_mean"], weights["bn1_var"])
-    x = np.maximum(x, 0)
-    x = _maxpool1d(x, 2)
-
-    x = _conv1d(x, weights["conv2_w"], weights["conv2_b"])
-    x = _batch_norm(x, weights["bn2_gamma"], weights["bn2_beta"], weights["bn2_mean"], weights["bn2_var"])
-    x = np.maximum(x, 0)
-    x = _maxpool1d(x, 2)
-
-    x = _conv1d(x, weights["conv3_w"], weights["conv3_b"])
-    x = _batch_norm(x, weights["bn3_gamma"], weights["bn3_beta"], weights["bn3_mean"], weights["bn3_var"])
-    x = np.maximum(x, 0)
-    x = x.mean(axis=0) 
-
-    x = np.maximum(x @ weights["dense1_w"] + weights["dense1_b"], 0)
-    logit = float((x @ weights["dense2_w"] + weights["dense2_b"]).item())
-    prob = 1.0 / (1.0 + np.exp(-logit))
-
-    return prob, None
 
 def _calibrate_probability(model_name, p_raw):
     if p_raw is None:
@@ -301,8 +210,6 @@ def _calibrate_probability(model_name, p_raw):
         z = (p - 0.30) / 0.08
     elif model_name == "Logistic Regression":
         z = (p - 0.45) / 0.10
-    elif model_name == "1D CNN":
-        z = (p - 0.007) / 0.0025
     else:
         z = (p - 0.30) / 0.10
     return float(1.0 / (1.0 + np.exp(-np.clip(z, -15.0, 15.0))))

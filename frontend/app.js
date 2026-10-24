@@ -676,13 +676,11 @@ function renderCharts(r) {
     });
 
     const MODEL_SHORT_NAMES = {
-        'XGBoost': 'XGB',
         'Random Forest': 'RF',
         'Tuned Random Forest': 'TRF',
+        'XGBoost': 'XGB',
         'Support Vector Machine': 'SVM',
-        'Logistic Regression': 'LR',
-        '1D CNN': 'CNN',
-        'CNN': 'CNN'
+        'Logistic Regression': 'LR'
     };
     const shortNames = modelNames.map(name => MODEL_SHORT_NAMES[name] || name);
 
@@ -749,7 +747,7 @@ function renderHistoryView() {
             <td><b>${item.source}</b></td>
             <td>${verdictText}</td>
             <td style="color:#6FA8DC; font-weight:600;">${confText}</td>
-            <td>${item.model || 'XGBoost'}</td>
+            <td>${item.model || 'Random Forest'}</td>
             <td class="muted">${item.timestamp}</td>
             <td><button class="btn btn-primary" style="min-height:2rem; padding:0 0.8rem; font-size:0.85rem;" onclick="openHistoryItem(${idx})">View</button></td>
         `;
